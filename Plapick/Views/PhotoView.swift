@@ -10,6 +10,13 @@ import UIKit
 
 class PhotoView: UIImageView {
     
+    // MARK: Properties
+    var isBackGround: Bool = true {
+        didSet {
+            if isBackGround { adjustColors() }
+        }
+    }
+    
     
     // MARK: Init
     init(photoUrl: String) {
@@ -20,10 +27,6 @@ class PhotoView: UIImageView {
         isUserInteractionEnabled = true
         
         load(urlString: photoUrl)
-        
-        translatesAutoresizingMaskIntoConstraints = false
-        
-        adjustColors()
     }
     
     required init?(coder: NSCoder) {
@@ -33,7 +36,7 @@ class PhotoView: UIImageView {
     
     // MARK: Functions
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        adjustColors()
+        if isBackGround { adjustColors() }
     }
     func adjustColors() {
         if self.traitCollection.userInterfaceStyle == .dark {

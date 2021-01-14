@@ -12,11 +12,17 @@ class MainTabBarController: UITabBarController {
     
     // MARK: Properties
     var app = App()
-    var homeViewController: UINavigationController?
-    var locationViewController: UINavigationController?
+    
+    var homeViewController: HomeViewController?
+    var locationViewController: LocationViewController?
     var postingViewController: PostingViewController?
-    var noticeViewController: UINavigationController?
-    var accountViewController: UINavigationController?
+    var noticeViewController: NoticeViewController?
+    var accountViewController: AccountViewController?
+    
+    var homeNavViewController: UINavigationController?
+    var locationNavViewController: UINavigationController?
+    var noticeNavViewController: UINavigationController?
+    var accountNavViewController: UINavigationController?
     
     
     // MARK: ViewDidLoad
@@ -25,28 +31,35 @@ class MainTabBarController: UITabBarController {
         
         view.backgroundColor = .systemBackground
         
-        homeViewController = UINavigationController(rootViewController: HomeViewController())
-        locationViewController = UINavigationController(rootViewController: LocationViewController())
+        homeViewController = HomeViewController()
+        locationViewController = LocationViewController()
         postingViewController = PostingViewController()
-        noticeViewController = UINavigationController(rootViewController: NoticeViewController())
-        accountViewController = UINavigationController(rootViewController: AccountViewController())
+        noticeViewController = NoticeViewController()
+        accountViewController = AccountViewController()
         
-        homeViewController?.tabBarItem.image = UIImage(systemName: "house")
-        locationViewController?.tabBarItem.image = UIImage(systemName: "location.north")
+        postingViewController?.delegate = self
+        postingViewController?.accountViewController = accountViewController
+        
+        homeNavViewController = UINavigationController(rootViewController: homeViewController!)
+        locationNavViewController = UINavigationController(rootViewController: locationViewController!)
+        noticeNavViewController = UINavigationController(rootViewController: noticeViewController!)
+        accountNavViewController = UINavigationController(rootViewController: accountViewController!)
+        
+        homeNavViewController?.tabBarItem.image = UIImage(systemName: "house")
+        locationNavViewController?.tabBarItem.image = UIImage(systemName: "location.north")
         postingViewController?.tabBarItem.image = UIImage(systemName: "plus.circle")
-        noticeViewController?.tabBarItem.image = UIImage(systemName: "bell")
-        accountViewController?.tabBarItem.image = UIImage(systemName: "person")
+        noticeNavViewController?.tabBarItem.image = UIImage(systemName: "bell")
+        accountNavViewController?.tabBarItem.image = UIImage(systemName: "person")
         
         setViewControllers([
-            homeViewController!,
-            locationViewController!,
+            homeNavViewController!,
+            locationNavViewController!,
             postingViewController!,
-            noticeViewController!,
-            accountViewController!
+            noticeNavViewController!,
+            accountNavViewController!
         ], animated: false)
         
         self.delegate = self
-        postingViewController?.delegate = self
         
         adjustColors()
     }
@@ -58,11 +71,10 @@ class MainTabBarController: UITabBarController {
     }
     func adjustColors() {
         // bottom tab bar 컬러 변경 inverted(반대 색상)
-        homeViewController?.tabBarItem.selectedImage = UIImage(systemName: "house.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
-        locationViewController?.tabBarItem.selectedImage = UIImage(systemName: "location.north.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
-//        postingViewController?.tabBarItem.selectedImage = UIImage(systemName: "plus.circle.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
-        noticeViewController?.tabBarItem.selectedImage = UIImage(systemName: "bell.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
-        accountViewController?.tabBarItem.selectedImage = UIImage(systemName: "person.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
+        homeNavViewController?.tabBarItem.selectedImage = UIImage(systemName: "house.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
+        locationNavViewController?.tabBarItem.selectedImage = UIImage(systemName: "location.north.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
+        noticeNavViewController?.tabBarItem.selectedImage = UIImage(systemName: "bell.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
+        accountNavViewController?.tabBarItem.selectedImage = UIImage(systemName: "person.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
 
         if self.traitCollection.userInterfaceStyle == .dark {
             // 다크모드
@@ -98,11 +110,12 @@ extension MainTabBarController: PostingViewControllerProtocol {
         self.postingViewController?.dismiss(animated: true, completion: {
             // 콜백을 받으면 다시 postingViewController 세팅해줌
             self.postingViewController = PostingViewController()
+            self.postingViewController?.delegate = self
+            self.postingViewController?.accountViewController = self.accountViewController
             self.postingViewController?.tabBarItem.image = UIImage(systemName: "plus.circle")
             self.viewControllers?.insert(self.postingViewController!, at: 2) // 원위치에 삽입
-            self.postingViewController?.delegate = self
             
-            self.adjustColors()
+//            self.adjustColors()
         })
     }
 }

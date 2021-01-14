@@ -97,4 +97,41 @@ extension UIViewController {
         self.view.window?.rootViewController = rootViewController
         view.window?.makeKeyAndVisible()
     }
+    
+    func hideKeyboardWhenTappedAround() {
+        // onClick 이벤트 추가하기
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        // 이거 해주면 버튼같은 component 눌러도 실행됨
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc func dismissKeyboard() {
+        // 키보드 숨기는거
+        view.endEditing(true)
+    }
+    
+    func requestErrorAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
+        alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.cancel))
+        self.present(alert, animated: true, completion: nil)
+    }
+}
+
+
+extension UILabel {
+    func setLineSpacing(lineSpacing: CGFloat = 0.0, lineHeightMultiple: CGFloat = 0.0) {
+        guard let labelText = self.text else { return }
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = lineSpacing
+        paragraphStyle.lineHeightMultiple = lineHeightMultiple
+        let attributedString:NSMutableAttributedString
+        if let labelattributedText = self.attributedText {
+            attributedString = NSMutableAttributedString(attributedString: labelattributedText)
+        } else {
+            attributedString = NSMutableAttributedString(string: labelText)
+        }
+        attributedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedString.length))
+        self.attributedText = attributedString
+    }
 }

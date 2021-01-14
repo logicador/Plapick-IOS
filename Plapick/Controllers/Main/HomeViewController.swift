@@ -83,7 +83,7 @@ class HomeViewController: UIViewController {
         recentPickTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         contentView.addSubview(recentPickContainerView)
-        recentPickContainerView.topAnchor.constraint(equalTo: recentPickTitleView.bottomAnchor, constant: 20).isActive = true
+        recentPickContainerView.topAnchor.constraint(equalTo: recentPickTitleView.bottomAnchor).isActive = true
         recentPickContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         recentPickContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         recentPickContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
@@ -190,12 +190,12 @@ class HomeViewController: UIViewController {
             photoGroupView.trailingAnchor.constraint(equalTo: self.recentPickContainerView.trailingAnchor).isActive = true
             
             if i == 0 {
-                photoGroupView.topAnchor.constraint(equalTo: self.recentPickContainerView.topAnchor).isActive = true
+                photoGroupView.topAnchor.constraint(equalTo: self.recentPickContainerView.topAnchor, constant: 1).isActive = true
             } else {
                 photoGroupView.topAnchor.constraint(equalTo: photoGroupViewList[i - 1].bottomAnchor, constant: 1).isActive = true
-                if i == photoGroupViewList.count - 1 {
-                    photoGroupView.bottomAnchor.constraint(equalTo: self.recentPickContainerView.bottomAnchor).isActive = true
-                }
+            }
+            if i == photoGroupViewList.count - 1 {
+                photoGroupView.bottomAnchor.constraint(equalTo: self.recentPickContainerView.bottomAnchor).isActive = true
             }
         }
     }
@@ -240,9 +240,9 @@ class HomeViewController: UIViewController {
                 placeLargeView.topAnchor.constraint(equalTo: self.hotPlaceContainerView.topAnchor).isActive = true
             } else {
                 placeLargeView.topAnchor.constraint(equalTo: placeLargeViewList[i - 1].bottomAnchor, constant: 20).isActive = true
-                if i == placeLargeViewList.count - 1 {
-                    placeLargeView.bottomAnchor.constraint(equalTo: self.hotPlaceContainerView.bottomAnchor).isActive = true
-                }
+            }
+            if i == placeLargeViewList.count - 1 {
+                placeLargeView.bottomAnchor.constraint(equalTo: self.hotPlaceContainerView.bottomAnchor).isActive = true
             }
         }
     }

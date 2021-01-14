@@ -16,6 +16,9 @@ struct User: Codable {
     var nickName: String
     var email: String
     var profileImageUrl: String
+    var likeCnt: Int
+    var followerCnt: Int
+    var followingCnt: Int
     var status: String
     var createdDate: String
     var updatedDate: String

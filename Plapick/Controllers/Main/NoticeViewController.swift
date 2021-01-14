@@ -18,5 +18,9 @@ class NoticeViewController: UIViewController {
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "알림"
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "설정", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "모두 삭제", style: UIBarButtonItem.Style.plain, target: self, action: nil)
     }
 }

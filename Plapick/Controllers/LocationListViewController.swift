@@ -201,9 +201,9 @@ class LocationListViewController: UIViewController {
                 parentLocationView.topAnchor.constraint(equalTo: parentContentView.topAnchor).isActive = true
             } else {
                 parentLocationView.topAnchor.constraint(equalTo: parentLocationViewList[i - 1].bottomAnchor).isActive = true
-                if i == parentLocationViewList.count - 1 {
-                    parentLocationView.bottomAnchor.constraint(equalTo: parentContentView.bottomAnchor).isActive = true
-                }
+            }
+            if i == parentLocationViewList.count - 1 {
+                parentLocationView.bottomAnchor.constraint(equalTo: parentContentView.bottomAnchor).isActive = true
             }
         }
         
@@ -238,9 +238,9 @@ class LocationListViewController: UIViewController {
                 childLocationView.topAnchor.constraint(equalTo: childContentView.topAnchor).isActive = true
             } else {
                 childLocationView.topAnchor.constraint(equalTo: childLocationViewList[i - 1].bottomAnchor).isActive = true
-                if i == childLocationViewList.count - 1 {
-                    childLocationView.bottomAnchor.constraint(equalTo: childContentView.bottomAnchor).isActive = true
-                }
+            }
+            if i == childLocationViewList.count - 1 {
+                childLocationView.bottomAnchor.constraint(equalTo: childContentView.bottomAnchor).isActive = true
             }
         }
     }

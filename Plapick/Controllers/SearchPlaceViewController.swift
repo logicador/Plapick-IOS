@@ -18,7 +18,7 @@ class SearchPlaceViewController: UIViewController {
     // MARK: Properties
     var app = App()
     var delegate: SearchPlaceViewControllerProtocol?
-    var searchPlacesRequest: SearchPlacesRequest?
+    var searchPlacesRequest = SearchPlacesRequest()
     var isSelectMode: Bool = false
     var searchPlaceViewList: [SearchPlaceView] = []
     var selectedSearchPlaceView: SearchPlaceView?
@@ -69,9 +69,6 @@ class SearchPlaceViewController: UIViewController {
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false // 스크롤 해도 검색창 안사라지게
         
-        searchPlacesRequest = SearchPlacesRequest(parentViewController: self)
-        searchPlacesRequest?.delegate = self
-        
         view.addSubview(indicatorView)
         indicatorView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         indicatorView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
@@ -99,11 +96,11 @@ class SearchPlaceViewController: UIViewController {
             return
         }
         
+        searchPlacesRequest.delegate = self
+        
         indicatorView.startAnimating()
         navigationItem.searchController?.searchBar.text = "가평"
-        searchPlacesRequest?.fetch(paramList: [
-            Param(key: "keyword", value: "가평")
-        ])
+        searchPlacesRequest.fetch(vc: self, keyword: "가평")
     }
     
     
@@ -143,38 +140,45 @@ class SearchPlaceViewController: UIViewController {
 
 // MARK: Extensions
 extension SearchPlaceViewController: SearchPlacesRequestProtocol {
-    func searchPlaces(placeList: [Place]) {
-        searchPlaceViewList.removeAll()
-        contentView.removeAllChildView()
-        
-        if placeList.count > 0 {
-            for (i, place) in placeList.enumerated() {
-                let searchPlaceView = SearchPlaceView(index: i, place: place)
-                searchPlaceView.delegate = self
-                searchPlaceViewList.append(searchPlaceView)
-            }
+    func response(placeList: [Place]?, status: String) {
+        indicatorView.stopAnimating()
             
-            for (i, searchPlaceView) in searchPlaceViewList.enumerated() {
-                contentView.addSubview(searchPlaceView)
-                
-                searchPlaceView.widthAnchor.constraint(equalTo: self.contentView.widthAnchor).isActive = true
-                searchPlaceView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
-                searchPlaceView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-                
-                if i == 0 {
-                    searchPlaceView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
-                } else {
-                    searchPlaceView.topAnchor.constraint(equalTo: searchPlaceViewList[i - 1].bottomAnchor, constant: 20).isActive = true
-                    if i == searchPlaceViewList.count - 1 {
-                        searchPlaceView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -20).isActive = true
+        if status == "OK" {
+            searchPlaceViewList.removeAll()
+            contentView.removeAllChildView()
+            
+            if let placeList = placeList {
+                if placeList.count > 0 {
+                    for (i, place) in placeList.enumerated() {
+                        let searchPlaceView = SearchPlaceView(index: i, place: place)
+                        searchPlaceView.delegate = self
+                        searchPlaceViewList.append(searchPlaceView)
                     }
+                    
+                    for (i, searchPlaceView) in searchPlaceViewList.enumerated() {
+                        contentView.addSubview(searchPlaceView)
+                        
+                        searchPlaceView.widthAnchor.constraint(equalTo: self.contentView.widthAnchor).isActive = true
+                        searchPlaceView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
+                        searchPlaceView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
+                        
+                        if i == 0 {
+                            searchPlaceView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
+                        } else {
+                            searchPlaceView.topAnchor.constraint(equalTo: searchPlaceViewList[i - 1].bottomAnchor, constant: 20).isActive = true
+                        }
+                        if i == searchPlaceViewList.count - 1 {
+                            searchPlaceView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -20).isActive = true
+                        }
+                    }
+                } else {
+                    setSpaceView()
                 }
             }
+            
         } else {
-            setSpaceView()
+            print(status)
         }
-        
-        indicatorView.stopAnimating()
     }
 }
 
@@ -230,9 +234,7 @@ extension SearchPlaceViewController: UISearchBarDelegate {
             }
             
             indicatorView.startAnimating()
-            searchPlacesRequest?.fetch(paramList: [
-                Param(key: "keyword", value: searchText)
-            ])
+            searchPlacesRequest.fetch(vc: self, keyword: keyword)
         }
     }
 }

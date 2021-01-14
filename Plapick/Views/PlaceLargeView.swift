@@ -136,12 +136,9 @@ class PlaceLargeView: UIView {
         bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
         for (i, pick) in hotPickList.enumerated() {
-            let iv = UIImageView()
-            iv.contentMode = .scaleAspectFill
-            iv.clipsToBounds = true
-            iv.load(urlString: pick.photoUrl)
-            scrollView.addSubview(iv)
-            iv.frame = CGRect(x: fullSize.width * CGFloat(i), y: 0, width: fullSize.width, height: fullSize.width * (2 / 3))
+            let pv = PhotoView(photoUrl: pick.photoUrl)
+            scrollView.addSubview(pv)
+            pv.frame = CGRect(x: fullSize.width * CGFloat(i), y: 0, width: fullSize.width, height: fullSize.width * (2 / 3))
         }
         
         self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(selfTapped)))

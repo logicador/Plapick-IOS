@@ -10,8 +10,12 @@ import Foundation
 
 struct Pick: Codable {
     var id: Int
+    var uId: Int = 0
+    var pId: Int = 0
+    var message: String = ""
     var photoUrl: String = ""
-    var text: String = ""
     var likeCnt: Int = 0
     var commentCnt: Int = 0
+    var createdDate: String = ""
+    var updatedDate: String = ""
 }

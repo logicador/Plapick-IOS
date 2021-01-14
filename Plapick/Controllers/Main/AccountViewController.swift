@@ -12,6 +12,8 @@ class AccountViewController: UIViewController {
     
     // MARK: Properties
     var app = App()
+    var postingViewController: PostingViewController?
+    var getUserPicksRequest = GetUserPicksRequest()
     
     
     // MARK: Views
@@ -83,12 +85,6 @@ class AccountViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    lazy var figureBottomLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
     
     // MARK: Like
     lazy var likeCntView: UIView = {
@@ -105,7 +101,6 @@ class AccountViewController: UIViewController {
     }()
     lazy var likeCntLabel: UILabel = {
         let label = UILabel()
-        label.text = "13"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -133,7 +128,6 @@ class AccountViewController: UIViewController {
     }()
     lazy var followingCntLabel: UILabel = {
         let label = UILabel()
-        label.text = "13"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -161,7 +155,6 @@ class AccountViewController: UIViewController {
     }()
     lazy var followerCntLabel: UILabel = {
         let label = UILabel()
-        label.text = "13"
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -199,6 +192,30 @@ class AccountViewController: UIViewController {
         return view
     }()
     
+    lazy var noPickView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    lazy var noPickLabel: UILabel = {
+        let label = UILabel()
+        label.text = "아직 게시된 픽이 없습니다\n새로운 픽을 추가해주세요"
+        label.textColor = .lightGray
+        label.setLineSpacing(lineSpacing: 10)
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    lazy var noPickBottomLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     
     // MARK: ViewDidLoad
     override func viewDidLoad() {
@@ -232,9 +249,8 @@ class AccountViewController: UIViewController {
         profileContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         
         profileContainerView.addSubview(profileWrapperView)
-        profileWrapperView.topAnchor.constraint(equalTo: profileContainerView.topAnchor, constant: 10).isActive = true
+        profileWrapperView.topAnchor.constraint(equalTo: profileContainerView.topAnchor, constant: 20).isActive = true
         profileWrapperView.centerXAnchor.constraint(equalTo: profileContainerView.centerXAnchor).isActive = true
-        profileWrapperView.bottomAnchor.constraint(equalTo: profileContainerView.bottomAnchor, constant: -10).isActive = true
         
         profileWrapperView.addSubview(profileImageView)
         profileImageView.topAnchor.constraint(equalTo: profileWrapperView.topAnchor).isActive = true
@@ -261,23 +277,18 @@ class AccountViewController: UIViewController {
         profileBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
         // MARK: Figure
-        contentView.addSubview(figureContainerView)
-        figureContainerView.topAnchor.constraint(equalTo: profileContainerView.bottomAnchor, constant: 40).isActive = true
-        figureContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        figureContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        figureContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        profileContainerView.addSubview(figureContainerView)
+        figureContainerView.topAnchor.constraint(equalTo: profileWrapperView.bottomAnchor, constant: 20).isActive = true
+        figureContainerView.leadingAnchor.constraint(equalTo: profileContainerView.leadingAnchor).isActive = true
+        figureContainerView.trailingAnchor.constraint(equalTo: profileContainerView.trailingAnchor).isActive = true
+        figureContainerView.widthAnchor.constraint(equalTo: profileContainerView.widthAnchor).isActive = true
+        figureContainerView.bottomAnchor.constraint(equalTo: profileContainerView.bottomAnchor).isActive = true
         
         contentView.addSubview(figureTopLineView)
         figureTopLineView.topAnchor.constraint(equalTo: figureContainerView.topAnchor).isActive = true
         figureTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         figureTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         figureTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
-        
-        contentView.addSubview(figureBottomLineView)
-        figureBottomLineView.bottomAnchor.constraint(equalTo: figureContainerView.bottomAnchor).isActive = true
-        figureBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        figureBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        figureBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
         // MARK: Like
         figureContainerView.addSubview(likeCntView)
@@ -349,13 +360,13 @@ class AccountViewController: UIViewController {
         followerCntTitleLabel.bottomAnchor.constraint(equalTo: followerCntWrapperView.bottomAnchor).isActive = true
         
         followerCntView.addSubview(followerLeftLineView)
-        followerLeftLineView.widthAnchor.constraint(equalToConstant: 1).isActive = true
+        followerLeftLineView.widthAnchor.constraint(equalToConstant: 0.4).isActive = true
         followerLeftLineView.leadingAnchor.constraint(equalTo: followerCntView.leadingAnchor).isActive = true
         followerLeftLineView.heightAnchor.constraint(equalTo: followerCntView.heightAnchor, constant: -40).isActive = true
         followerLeftLineView.centerYAnchor.constraint(equalTo: followerCntView.centerYAnchor).isActive = true
         
         followerCntView.addSubview(followerRightLineView)
-        followerRightLineView.widthAnchor.constraint(equalToConstant: 1).isActive = true
+        followerRightLineView.widthAnchor.constraint(equalToConstant: 0.4).isActive = true
         followerRightLineView.trailingAnchor.constraint(equalTo: followerCntView.trailingAnchor).isActive = true
         followerRightLineView.heightAnchor.constraint(equalTo: followerCntView.heightAnchor, constant: -40).isActive = true
         followerRightLineView.centerYAnchor.constraint(equalTo: followerCntView.centerYAnchor).isActive = true
@@ -368,7 +379,7 @@ class AccountViewController: UIViewController {
         myPickTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         
         contentView.addSubview(myPickContainerView)
-        myPickContainerView.topAnchor.constraint(equalTo: myPickTitleView.bottomAnchor, constant: 20).isActive = true
+        myPickContainerView.topAnchor.constraint(equalTo: myPickTitleView.bottomAnchor).isActive = true
         myPickContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         myPickContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         myPickContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
@@ -381,11 +392,10 @@ class AccountViewController: UIViewController {
             return
         }
         
-        let user = app.getUser()
         
-        profileImageView.load(urlString: user.profileImageUrl)
-        userNickNameLabel.text = user.nickName
+        getUserPicksRequest.delegate = self
         
+        getAccount()
         getMyPicks()
     }
     
@@ -401,13 +411,29 @@ class AccountViewController: UIViewController {
             profileImageView.backgroundColor = .systemBackground
             profileImageView.layer.borderColor = UIColor.systemBackground.cgColor
             figureContainerView.backgroundColor = .systemGray6
+            noPickView.backgroundColor = .systemGray6
         } else {
             view.backgroundColor = .tertiarySystemGroupedBackground
             profileContainerView.backgroundColor = .systemBackground
             profileImageView.backgroundColor = .tertiarySystemGroupedBackground
             profileImageView.layer.borderColor = UIColor.tertiarySystemGroupedBackground.cgColor
             figureContainerView.backgroundColor = .systemBackground
+            noPickView.backgroundColor = .systemBackground
         }
+    }
+    
+    func getAccount() {
+        let user = app.getUser()
+        
+        if user.profileImageUrl.isEmpty {
+            profileImageView.image = nil
+        } else {
+            profileImageView.load(urlString: ((user.profileImageUrl.contains(String(user.id))) ? (PLAPICK_URL + user.profileImageUrl) : user.profileImageUrl))
+        }
+        userNickNameLabel.text = user.nickName
+        likeCntLabel.text = String(user.likeCnt)
+        followingCntLabel.text = String(user.followingCnt)
+        followerCntLabel.text = String(user.followerCnt)
     }
     
     @objc func setting() {
@@ -417,6 +443,7 @@ class AccountViewController: UIViewController {
         }
         
         let settingViewController = SettingTableViewController()
+        settingViewController.accountViewController = self
         let navigationController = UINavigationController(rootViewController: settingViewController)
         navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)
@@ -435,31 +462,8 @@ class AccountViewController: UIViewController {
     }
     
     func getMyPicks() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
-            var pickList: [Pick] = []
-            
-            // 이 부분에서 최근 게시물들 15개 세팅
-            for i in 1...15 {
-                pickList.append(Pick(id: i, photoUrl: PLAPICK_URL + "/admin/img/ey.jpg"))
-            }
-            
-            var photoGroupViewList: [PhotoGroupView] = []
-            
-            var _pickList: [Pick] = []
-            for (i, pick) in pickList.enumerated() {
-                let index = i + 1
-                _pickList.append(pick)
-                
-                if index % 3 == 0 {
-                    let photoGroupView = PhotoGroupView(pickList: _pickList)
-                    photoGroupView.delegate = self
-                    photoGroupViewList.append(photoGroupView)
-                    _pickList = []
-                }
-            }
-            
-            self.setMyPickContainer(photoGroupViewList: photoGroupViewList)
-        }
+        self.myPickContainerView.removeAllChildView()
+        getUserPicksRequest.fetch(vc: self, uId: app.getUser().id)
     }
     
     func setMyPickContainer(photoGroupViewList: [PhotoGroupView]) {
@@ -471,12 +475,12 @@ class AccountViewController: UIViewController {
             photoGroupView.trailingAnchor.constraint(equalTo: self.myPickContainerView.trailingAnchor).isActive = true
             
             if i == 0 {
-                photoGroupView.topAnchor.constraint(equalTo: self.myPickContainerView.topAnchor).isActive = true
+                photoGroupView.topAnchor.constraint(equalTo: self.myPickContainerView.topAnchor, constant: 1).isActive = true
             } else {
                 photoGroupView.topAnchor.constraint(equalTo: photoGroupViewList[i - 1].bottomAnchor, constant: 1).isActive = true
-                if i == photoGroupViewList.count - 1 {
-                    photoGroupView.bottomAnchor.constraint(equalTo: self.myPickContainerView.bottomAnchor).isActive = true
-                }
+            }
+            if i == photoGroupViewList.count - 1 {
+                photoGroupView.bottomAnchor.constraint(equalTo: self.myPickContainerView.bottomAnchor).isActive = true
             }
         }
     }
@@ -486,7 +490,12 @@ class AccountViewController: UIViewController {
 // MARK: Extensions
 extension AccountViewController: TitleViewProtocol {
     func actionTapped(actionMode: String) {
-        print(actionMode)
+        postingViewController = PostingViewController()
+        postingViewController?.delegate = self
+        postingViewController?.accountViewController = self
+        let navigationController = UINavigationController(rootViewController: postingViewController!)
+        navigationController.modalPresentationStyle = .fullScreen
+        present(navigationController, animated: true)
     }
 }
 
@@ -494,5 +503,62 @@ extension AccountViewController: TitleViewProtocol {
 extension AccountViewController: PhotoGroupViewProtocol {
     func photoTapped(pick: Pick) {
         print(pick)
+    }
+}
+
+
+extension AccountViewController: PostingViewControllerProtocol {
+    func closeViewController() {
+        getMyPicks()
+        postingViewController?.dismiss(animated: true, completion: nil)
+    }
+}
+
+
+extension AccountViewController: GetUserPicksRequestProtocol {
+    func response(pickList: [Pick]?, status: String) {
+        if status == "OK" {
+            if let pickList = pickList {
+                if pickList.count == 0 {
+                    myPickContainerView.addSubview(noPickView)
+                    noPickView.topAnchor.constraint(equalTo: myPickContainerView.topAnchor).isActive = true
+                    noPickView.bottomAnchor.constraint(equalTo: myPickContainerView.bottomAnchor).isActive = true
+                    noPickView.leadingAnchor.constraint(equalTo: myPickContainerView.leadingAnchor).isActive = true
+                    noPickView.trailingAnchor.constraint(equalTo: myPickContainerView.trailingAnchor).isActive = true
+                    noPickView.widthAnchor.constraint(equalTo: myPickContainerView.widthAnchor).isActive = true
+                    
+                    noPickView.addSubview(noPickLabel)
+                    noPickLabel.topAnchor.constraint(equalTo: noPickView.topAnchor, constant: 40).isActive = true
+                    noPickLabel.bottomAnchor.constraint(equalTo: noPickView.bottomAnchor, constant: -40).isActive = true
+                    noPickLabel.centerXAnchor.constraint(equalTo: noPickView.centerXAnchor).isActive = true
+                    
+                    view.addSubview(noPickBottomLineView)
+                    noPickBottomLineView.bottomAnchor.constraint(equalTo: myPickContainerView.bottomAnchor).isActive = true
+                    noPickBottomLineView.leadingAnchor.constraint(equalTo: myPickContainerView.leadingAnchor).isActive = true
+                    noPickBottomLineView.trailingAnchor.constraint(equalTo: myPickContainerView.trailingAnchor).isActive = true
+                    noPickBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+                    return
+                }
+                
+                noPickBottomLineView.removeView()
+                noPickLabel.removeView()
+                noPickView.removeView()
+                
+                var photoGroupViewList: [PhotoGroupView] = []
+                var _pickList: [Pick] = []
+                for (i, pick) in pickList.enumerated() {
+                    let index = i + 1
+                    _pickList.append(pick)
+                    
+                    if index % 3 == 0 || index == pickList.count {
+                        let photoGroupView = PhotoGroupView(isBackGround: false, pickList: _pickList)
+                        photoGroupView.delegate = self
+                        photoGroupViewList.append(photoGroupView)
+                        _pickList = []
+                    }
+                }
+                self.setMyPickContainer(photoGroupViewList: photoGroupViewList)
+            }
+        }
     }
 }

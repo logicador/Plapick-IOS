@@ -16,12 +16,12 @@ class SettingTVCell: UITableViewCell {
             titleLabel.text = settingMenu?.title
             iconImageView.image = UIImage(systemName: settingMenu!.icon)
             
-            if settingMenu!.isHeader {
-                iconImageView.removeView()
-                titleLabel.removeView()
-            }
-            
-            adjustColors()
+//            if settingMenu!.isHeader {
+//                iconImageView.removeView()
+//                titleLabel.removeView()
+//            }
+//
+//            adjustColors()
         }
     }
     
@@ -48,14 +48,16 @@ class SettingTVCell: UITableViewCell {
         
         addSubview(iconImageView)
         iconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
-        iconImageView.widthAnchor.constraint(equalToConstant: 20).isActive = true
-        iconImageView.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        iconImageView.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        iconImageView.heightAnchor.constraint(equalToConstant: 25).isActive = true
         iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
         addSubview(titleLabel)
         titleLabel.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: 20).isActive = true
         titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
+        adjustColors()
     }
     
     required init?(coder: NSCoder) {
@@ -69,9 +71,11 @@ class SettingTVCell: UITableViewCell {
     }
     func adjustColors() {
         if self.traitCollection.userInterfaceStyle == .dark {
-            backgroundColor = settingMenu!.isHeader ? .systemBackground : .systemGray6
+//            backgroundColor = settingMenu!.isHeader ? .systemBackground : .systemGray6
+            backgroundColor = .systemGray6
         } else {
-            backgroundColor = settingMenu!.isHeader ? .tertiarySystemGroupedBackground : .systemBackground
+//            backgroundColor = settingMenu!.isHeader ? .tertiarySystemGroupedBackground : .systemBackground
+            backgroundColor = .systemBackground
         }
     }
 }

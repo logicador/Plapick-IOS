@@ -58,11 +58,14 @@ class App {
         let uNickName = userDefaults.string(forKey: "uNickName") ?? ""
         let uEmail = userDefaults.string(forKey: "uEmail") ?? ""
         let uProfileImageUrl = userDefaults.string(forKey: "uProfileImageUrl") ?? ""
+        let uLikeCnt = userDefaults.integer(forKey: "uLikeCnt")
+        let uFollowerCnt = userDefaults.integer(forKey: "uFollowerCnt")
+        let uFollowingCnt = userDefaults.integer(forKey: "uFollowingCnt")
         let uStatus = userDefaults.string(forKey: "uStatus") ?? ""
         let uCreatedDate = userDefaults.string(forKey: "uCreatedDate") ?? ""
         let uUpdatedDate = userDefaults.string(forKey: "uUpdatedDate") ?? ""
             
-        return User(id: uId, type: uType, socialId: uSocialId, name: uName, nickName: uNickName, email: uEmail, profileImageUrl: uProfileImageUrl, status: uStatus, createdDate: uCreatedDate, updatedDate: uUpdatedDate)
+        return User(id: uId, type: uType, socialId: uSocialId, name: uName, nickName: uNickName, email: uEmail, profileImageUrl: uProfileImageUrl, likeCnt: uLikeCnt, followerCnt: uFollowerCnt, followingCnt: uFollowingCnt, status: uStatus, createdDate: uCreatedDate, updatedDate: uUpdatedDate)
     }
     
     func login(user: User) {
@@ -74,6 +77,9 @@ class App {
         userDefaults.set(user.nickName, forKey: "uNickName")
         userDefaults.set(user.email, forKey: "uEmail")
         userDefaults.set(user.profileImageUrl, forKey: "uProfileImageUrl")
+        userDefaults.set(user.likeCnt, forKey: "uLikeCnt")
+        userDefaults.set(user.followerCnt, forKey: "uFollowerCnt")
+        userDefaults.set(user.followingCnt, forKey: "uFollowingCnt")
         userDefaults.set(user.status, forKey: "uStatus")
         userDefaults.set(user.createdDate, forKey: "uCreatedDate")
         userDefaults.set(user.updatedDate, forKey: "uUpdatedDate")
@@ -88,8 +94,19 @@ class App {
         userDefaults.removeObject(forKey: "uNickName")
         userDefaults.removeObject(forKey: "uEmail")
         userDefaults.removeObject(forKey: "uProfileImageUrl")
+        userDefaults.removeObject(forKey: "uLikeCnt")
+        userDefaults.removeObject(forKey: "uFollowerCnt")
+        userDefaults.removeObject(forKey: "uFollowingCnt")
         userDefaults.removeObject(forKey: "uStatus")
         userDefaults.removeObject(forKey: "uCreatedDate")
         userDefaults.removeObject(forKey: "uUpdatedDate")
+    }
+    
+    func setNickName(nickName: String) {
+        userDefaults.set(nickName, forKey: "uNickName")
+    }
+    
+    func setProfileImage(profileImageUrl: String) {
+        userDefaults.set(profileImageUrl, forKey: "uProfileImageUrl")
     }
 }

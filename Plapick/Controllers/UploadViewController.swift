@@ -19,11 +19,41 @@ class UploadViewController: UIViewController {
     // MARK: Properties
     var app = App()
     var delegate: UploadViewControllerProtocol?
-    var image: UIImage?
+    var uploadImage: UIImage?
     var place: Place?
+    var uploadImageRequest = UploadImageRequest()
+    var addPickrequest = AddPickRequest()
+    var accountViewController: AccountViewController?
     
     
     // MARK: Views
+    lazy var messageTitleView: TitleView = {
+        let tv = TitleView(titleText: "메세지 입력", actionText: nil, actionMode: nil)
+        return tv
+    }()
+    
+    lazy var messageView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    lazy var messageTextView: UITextView = {
+        let tv = UITextView()
+        tv.font = UIFont.systemFont(ofSize: 16)
+        tv.text = "이곳에 메세지를 입력합니다."
+        tv.textColor = .lightGray
+        tv.delegate = self
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        return tv
+    }()
+
+    lazy var messageBottomLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
     lazy var placeTitleView: TitleView = {
         let tv = TitleView(titleText: "선택한 플레이스", actionText: nil, actionMode: nil)
@@ -70,12 +100,6 @@ class UploadViewController: UIViewController {
         return view
     }()
     
-    lazy var placeTopLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
     lazy var placeBottomLineView: UIView = {
         let view = UIView()
         view.backgroundColor = .separator
@@ -83,12 +107,6 @@ class UploadViewController: UIViewController {
         return view
     }()
     
-    lazy var imageTopLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
     lazy var imageBottomLineView: UIView = {
         let view = UIView()
         view.backgroundColor = .separator
@@ -98,10 +116,10 @@ class UploadViewController: UIViewController {
     
     
     // MARK: Init
-    init(image: UIImage, place: Place) {
+    init(uploadImage: UIImage, place: Place) {
         super.init(nibName: nil, bundle: nil)
         
-        self.image = image
+        self.uploadImage = uploadImage
         self.place = place
     }
     
@@ -114,7 +132,6 @@ class UploadViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "픽 업로드"
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
@@ -122,9 +139,8 @@ class UploadViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: UIBarButtonItem.Style.plain, target: self, action: #selector(upload))
         
         placeSmallView = PlaceSmallView(place: self.place!)
-        imageView.image = self.image
+        imageView.image = self.uploadImage
         
-        // safeAreaLayoutGuide는 indicatorView가 들어가면서 필요해졌다.
         view.addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -140,14 +156,33 @@ class UploadViewController: UIViewController {
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
         
+        contentView.addSubview(messageTitleView)
+        messageTitleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 40).isActive = true
+        messageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        messageTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        messageTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        
+        contentView.addSubview(messageView)
+        messageView.topAnchor.constraint(equalTo: messageTitleView.bottomAnchor).isActive = true
+        messageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        messageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        messageView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        messageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        
+        messageView.addSubview(messageTextView)
+        messageTextView.topAnchor.constraint(equalTo: messageView.topAnchor).isActive = true
+        messageTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
+        messageTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
+        messageTextView.bottomAnchor.constraint(equalTo: messageView.bottomAnchor).isActive = true
+        
         contentView.addSubview(placeTitleView)
-        placeTitleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 40).isActive = true
+        placeTitleView.topAnchor.constraint(equalTo: messageView.bottomAnchor, constant: 40).isActive = true
         placeTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         placeTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         placeTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         
         contentView.addSubview(placeSmallView!)
-        placeSmallView?.topAnchor.constraint(equalTo: placeTitleView.bottomAnchor, constant: 20).isActive = true
+        placeSmallView?.topAnchor.constraint(equalTo: placeTitleView.bottomAnchor).isActive = true
         placeSmallView?.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         placeSmallView?.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         placeSmallView?.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
@@ -159,18 +194,18 @@ class UploadViewController: UIViewController {
         imageTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         
         contentView.addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: imageTitleView.bottomAnchor, constant: 20).isActive = true
+        imageView.topAnchor.constraint(equalTo: imageTitleView.bottomAnchor).isActive = true
         imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         imageView.heightAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
-        view.addSubview(placeTopLineView)
-        placeTopLineView.topAnchor.constraint(equalTo: placeSmallView!.topAnchor).isActive = true
-        placeTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        placeTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        placeTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        view.addSubview(messageBottomLineView)
+        messageBottomLineView.bottomAnchor.constraint(equalTo: messageTextView.bottomAnchor).isActive = true
+        messageBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        messageBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        messageBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
         view.addSubview(placeBottomLineView)
         placeBottomLineView.bottomAnchor.constraint(equalTo: placeSmallView!.bottomAnchor).isActive = true
@@ -178,17 +213,16 @@ class UploadViewController: UIViewController {
         placeBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         placeBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
-        view.addSubview(imageTopLineView)
-        imageTopLineView.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
-        imageTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        imageTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        imageTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
-        
         view.addSubview(imageBottomLineView)
         imageBottomLineView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
         imageBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         imageBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         imageBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        
+        self.hideKeyboardWhenTappedAround()
+        
+        uploadImageRequest.delegate = self
+        addPickrequest.delegate = self
         
         adjustColors()
         
@@ -207,9 +241,19 @@ class UploadViewController: UIViewController {
         if self.traitCollection.userInterfaceStyle == .dark {
             view.backgroundColor = .systemBackground
             imageView.backgroundColor = .systemGray6
+            messageView.backgroundColor = .systemGray6
+            messageTextView.backgroundColor = .systemGray6
+            if messageTextView.textColor != UIColor.lightGray {
+                messageTextView.textColor = .white
+            }
         } else {
             view.backgroundColor = .tertiarySystemGroupedBackground
             imageView.backgroundColor = .systemBackground
+            messageView.backgroundColor = .systemBackground
+            messageTextView.backgroundColor = .systemBackground
+            if messageTextView.textColor != UIColor.lightGray {
+                messageTextView.textColor = .black
+            }
         }
     }
     
@@ -223,9 +267,7 @@ class UploadViewController: UIViewController {
             return
         }
         
-        guard let image = self.image else { return }
-        guard let place = self.place else { return }
-//        let user = app.getUser()
+        guard let uploadImage = self.uploadImage else { return }
         
         view.addSubview(overlayView)
         overlayView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -240,51 +282,77 @@ class UploadViewController: UIViewController {
         indicatorView.centerYAnchor.constraint(equalTo: overlayView.centerYAnchor).isActive = true
         indicatorView.startAnimating()
         
-        let url = API_URL + "/posting"
-        let imageData = image.jpegData(compressionQuality: 1)
-        AF.upload(multipartFormData: { multipartFormData in
-            multipartFormData.append(Data(String(place.id).utf8), withName: "pId")
-            multipartFormData.append(Data(String(place.kId).utf8), withName: "pkId")
-            multipartFormData.append(Data(String(place.name).utf8), withName: "pName")
-            multipartFormData.append(Data(String(place.address).utf8), withName: "pAddress")
-            multipartFormData.append(Data(String(place.roadAddress).utf8), withName: "pRoadAddress")
-            multipartFormData.append(Data(String(place.categoryName).utf8), withName: "pCategoryName")
-            multipartFormData.append(Data(String(place.categoryGroupName).utf8), withName: "pCategoryGroupName")
-            multipartFormData.append(Data(String(place.categoryGroupCode).utf8), withName: "pCategoryGroupCode")
-            multipartFormData.append(Data(String(place.phone).utf8), withName: "pPhone")
-            multipartFormData.append(Data(String(place.lat).utf8), withName: "pLat")
-            multipartFormData.append(Data(String(place.lng).utf8), withName: "pLng")
-            multipartFormData.append(imageData!, withName: "image", fileName: "image.jpg", mimeType: "image/jpg")
-        }, to: url).responseJSON { response in
-            self.indicatorView.stopAnimating()
-            self.indicatorView.removeView()
-            self.overlayView.removeView()
-            
-            switch response.result {
-            case .success:
-                let dataDict: [String: Any] = try! JSONSerialization.jsonObject(with: response.data!, options: []) as! [String: Any]
-                let status = dataDict["status"] as! String
-                
-                if status != "OK" {
-                    DispatchQueue.main.async {
-                        let alert = UIAlertController(title: status, message: "에러가 발생했습니다.", preferredStyle: UIAlertController.Style.alert)
-                        alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.cancel))
-                        self.present(alert, animated: true)
-                    }
-                    return
-                }
-                
-                let alert = UIAlertController(title: "픽 업로드", message: "새로운 픽이 게시되었습니다.", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
-                    self.delegate?.closeViewController()
-                }))
-                self.present(alert, animated: true)
-                
-            case .failure:
-                let alert = UIAlertController(title: "픽 업로드", message: "업로드 중 에러가 발생했습니다.", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.cancel))
-                self.present(alert, animated: true)
+        uploadImageRequest.fetch(vc: self, imageData: uploadImage.jpegData(compressionQuality: 1)!)
+    }
+    
+    func hideIndicator() {
+        self.indicatorView.stopAnimating()
+        self.indicatorView.removeView()
+        self.overlayView.removeView()
+    }
+}
+
+
+// MARK: Extensions
+extension UploadViewController: UITextViewDelegate {
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.lightGray {
+            textView.text = nil
+            if self.traitCollection.userInterfaceStyle == .dark {
+                textView.textColor = .white
+            } else {
+                textView.textColor = .black
             }
+        }
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.isEmpty {
+            textView.text = "이곳에 메세지를 입력합니다."
+            textView.textColor = UIColor.lightGray
+        }
+    }
+}
+
+
+extension UploadViewController: UploadImageRequestProtocol {
+    func response(imageName: Int?, status: String) {
+        if status == "OK" {
+            if let piId = imageName {
+                guard let place = self.place else { return }
+                let message = messageTextView.textColor == UIColor.lightGray ? "" : messageTextView.text.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+                var paramList: [Param] = []
+                paramList.append(Param(key: "piId", value: String(piId)))
+                paramList.append(Param(key: "piMessage", value: message))
+                paramList.append(Param(key: "pkId", value: String(place.kId)))
+                paramList.append(Param(key: "pName", value: place.name))
+                paramList.append(Param(key: "pAddress", value: place.address))
+                paramList.append(Param(key: "pRoadAddress", value: place.roadAddress))
+                paramList.append(Param(key: "pCategoryName", value: place.categoryName))
+                paramList.append(Param(key: "pCategoryGroupName", value: place.categoryGroupName))
+                paramList.append(Param(key: "pCategoryGroupCode", value: place.categoryGroupCode))
+                paramList.append(Param(key: "pPhone", value: place.phone))
+                paramList.append(Param(key: "pLat", value: String(place.lat)))
+                paramList.append(Param(key: "pLng", value: String(place.lng)))
+                
+                addPickrequest.fetch(vc: self, paramList: paramList)
+            }
+        } else { hideIndicator() }
+    }
+}
+
+
+extension UploadViewController: AddPickRequestProtocol {
+    func response(status: String) {
+        hideIndicator()
+        
+        if status == "OK" {
+            self.accountViewController?.getMyPicks()
+            let alert = UIAlertController(title: "픽 업로드", message: "새로운 픽이 게시되었습니다.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
+                self.delegate?.closeViewController()
+            }))
+            present(alert, animated: true)
         }
     }
 }

@@ -12,7 +12,7 @@ class LaunchViewController: UIViewController {
     
     // MARK: Properties
     var app = App()
-    var loginRequest: LoginRequest?
+    var loginRequest = LoginRequest()
     
     
     // MARK: Views
@@ -62,13 +62,12 @@ class LaunchViewController: UIViewController {
         titleLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
         titleLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         
-        loginRequest = LoginRequest(parentViewController: self)
-        loginRequest?.delegate = self
-        
         if !app.isNetworkAvailable() {
             app.showNetworkAlert(parentViewController: self)
             return
         }
+        
+        loginRequest.delegate = self
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
             if self.app.isLogined() {
@@ -76,7 +75,8 @@ class LaunchViewController: UIViewController {
                 var paramList: [Param] = []
                 paramList.append(Param(key: "type", value: user.type))
                 paramList.append(Param(key: "socialId", value: user.socialId))
-                self.loginRequest?.fetch(paramList: paramList)
+                paramList.append(Param(key: "device", value: "IOS"))
+                self.loginRequest.fetch(vc: self, paramList: paramList)
             } else {
                 self.changeRootViewController(rootViewController: LoginViewController())
             }
@@ -88,7 +88,11 @@ class LaunchViewController: UIViewController {
 
 // MARK: Extensions
 extension LaunchViewController: LoginRequestProtocol {
-    func configureLogin(user: User) {
-        changeRootViewController(rootViewController: MainTabBarController())
+    func response(user: User?, status: String) {
+        if status == "OK" {
+            guard let user = user else { return }
+            app.login(user: user)
+            changeRootViewController(rootViewController: MainTabBarController())
+        }
     }
 }

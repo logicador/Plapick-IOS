@@ -22,6 +22,7 @@ class PostingViewController: UIViewController {
     var delegate: PostingViewControllerProtocol?
     let searchPlaceViewController: SearchPlaceViewController = SearchPlaceViewController()
     var uploadViewController: UploadViewController?
+    var accountViewController: AccountViewController?
     
     
     // MARK: Views
@@ -207,8 +208,9 @@ extension PostingViewController: UIImagePickerControllerDelegate, UINavigationCo
 
 extension PostingViewController: SearchPlaceViewControllerProtocol {
     func selectPlace(place: Place) {
-        uploadViewController = UploadViewController(image: imageView.image!, place: place)
+        uploadViewController = UploadViewController(uploadImage: imageView.image!, place: place)
         uploadViewController?.delegate = self
+        uploadViewController?.accountViewController = accountViewController
         let navigationController = UINavigationController(rootViewController: uploadViewController!)
         navigationController.modalPresentationStyle = .fullScreen
         searchPlaceViewController.present(navigationController, animated: true)

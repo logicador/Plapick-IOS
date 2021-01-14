@@ -15,7 +15,7 @@ class LoginViewController: UIViewController {
     
     // MARK: Properties
     var app = App()
-    var loginRequest: LoginRequest?
+    var loginRequest = LoginRequest()
     
     
     // MARK: Views
@@ -133,13 +133,12 @@ class LoginViewController: UIViewController {
         appleButton.trailingAnchor.constraint(equalTo: bottomContainerView.trailingAnchor, constant: -40).isActive = true
         appleButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        loginRequest = LoginRequest(parentViewController: self)
-        loginRequest?.delegate = self
-        
         if !app.isNetworkAvailable() {
             app.showNetworkAlert(parentViewController: self)
             return
         }
+        
+        loginRequest.delegate = self
     }
     
     
@@ -245,9 +244,10 @@ class LoginViewController: UIViewController {
         paramList.append(Param(key: "email", value: email))
         paramList.append(Param(key: "name", value: name))
         paramList.append(Param(key: "profileImage", value: profileImage))
+        paramList.append(Param(key: "device", value: "IOS"))
         
         showIndicator()
-        loginRequest?.fetch(paramList: paramList)
+        loginRequest.fetch(vc: self, paramList: paramList)
     }
 }
 
@@ -275,9 +275,10 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
             paramList.append(Param(key: "socialId", value: socialId))
             paramList.append(Param(key: "email", value: email ?? ""))
             paramList.append(Param(key: "name", value: name))
+            paramList.append(Param(key: "device", value: "IOS"))
             
             showIndicator()
-            loginRequest?.fetch(paramList: paramList)
+            loginRequest.fetch(vc: self, paramList: paramList)
             
         default:
             break
@@ -292,9 +293,13 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
 
 
 extension LoginViewController: LoginRequestProtocol {
-    func configureLogin(user: User) {
+    func response(user: User?, status: String) {
         hideIndicator()
-        app.login(user: user)
-        changeRootViewController(rootViewController: MainTabBarController())
+        
+        if status == "OK" {
+            guard let user = user else { return }
+            app.login(user: user)
+            changeRootViewController(rootViewController: MainTabBarController())
+        }
     }
 }

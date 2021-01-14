@@ -24,15 +24,46 @@ class PhotoGroupView: UIView {
     
     
     // MARK: Init
-    init(direction: String = "N", pickList: [Pick]) {
+    init(direction: String = "N", isBackGround: Bool = true, pickList: [Pick]) {
         super.init(frame: CGRect.zero)
         
         self.pickList = pickList
         
-        for pick in pickList {
-            let photoView = PhotoView(photoUrl: pick.photoUrl)
+        let photoView = PhotoView(photoUrl: pickList[0].photoUrl)
+        photoView.translatesAutoresizingMaskIntoConstraints = false
+        photoView.isBackGround = isBackGround
+        photoViewList.append(photoView)
+        if pickList.count > 1 {
+            let photoView = PhotoView(photoUrl: pickList[1].photoUrl)
+            photoView.translatesAutoresizingMaskIntoConstraints = false
+            photoView.isBackGround = isBackGround
+            photoViewList.append(photoView)
+        } else {
+            let photoView1 = PhotoView(photoUrl: "")
+            photoView1.translatesAutoresizingMaskIntoConstraints = false
+            photoView1.isBackGround = isBackGround
+            photoViewList.append(photoView1)
+            let photoView2 = PhotoView(photoUrl: "")
+            photoView2.translatesAutoresizingMaskIntoConstraints = false
+            photoView2.isBackGround = isBackGround
+            photoViewList.append(photoView2)
+        }
+        if pickList.count > 2 {
+            let photoView = PhotoView(photoUrl: pickList[2].photoUrl)
+            photoView.translatesAutoresizingMaskIntoConstraints = false
+            photoView.isBackGround = isBackGround
+            photoViewList.append(photoView)
+        } else {
+            let photoView = PhotoView(photoUrl: "")
+            photoView.translatesAutoresizingMaskIntoConstraints = false
+            photoView.isBackGround = isBackGround
             photoViewList.append(photoView)
         }
+        
+//        for pick in pickList {
+//            let photoView = PhotoView(photoUrl: pick.photoUrl)
+//            photoViewList.append(photoView)
+//        }
         
         for photoView in photoViewList {
             addSubview(photoView)
