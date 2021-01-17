@@ -47,7 +47,13 @@ class UploadViewController: UIViewController {
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
     }()
-
+    
+    lazy var messageTopLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     lazy var messageBottomLineView: UIView = {
         let view = UIView()
         view.backgroundColor = .separator
@@ -100,6 +106,12 @@ class UploadViewController: UIViewController {
         return view
     }()
     
+    lazy var placeTopLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     lazy var placeBottomLineView: UIView = {
         let view = UIView()
         view.backgroundColor = .separator
@@ -107,6 +119,12 @@ class UploadViewController: UIViewController {
         return view
     }()
     
+    lazy var imageTopLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     lazy var imageBottomLineView: UIView = {
         let view = UIView()
         view.backgroundColor = .separator
@@ -157,7 +175,7 @@ class UploadViewController: UIViewController {
         contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
         
         contentView.addSubview(messageTitleView)
-        messageTitleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 40).isActive = true
+        messageTitleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20).isActive = true
         messageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         messageTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         messageTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
@@ -176,7 +194,7 @@ class UploadViewController: UIViewController {
         messageTextView.bottomAnchor.constraint(equalTo: messageView.bottomAnchor).isActive = true
         
         contentView.addSubview(placeTitleView)
-        placeTitleView.topAnchor.constraint(equalTo: messageView.bottomAnchor, constant: 40).isActive = true
+        placeTitleView.topAnchor.constraint(equalTo: messageView.bottomAnchor, constant: 20).isActive = true
         placeTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         placeTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         placeTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
@@ -188,7 +206,7 @@ class UploadViewController: UIViewController {
         placeSmallView?.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         
         contentView.addSubview(imageTitleView)
-        imageTitleView.topAnchor.constraint(equalTo: placeSmallView!.bottomAnchor, constant: 40).isActive = true
+        imageTitleView.topAnchor.constraint(equalTo: placeSmallView!.bottomAnchor, constant: 20).isActive = true
         imageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         imageTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         imageTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
@@ -201,18 +219,33 @@ class UploadViewController: UIViewController {
         imageView.heightAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
+        view.addSubview(messageTopLineView)
+        messageTopLineView.topAnchor.constraint(equalTo: messageTextView.topAnchor).isActive = true
+        messageTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        messageTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        messageTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         view.addSubview(messageBottomLineView)
         messageBottomLineView.bottomAnchor.constraint(equalTo: messageTextView.bottomAnchor).isActive = true
         messageBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messageBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         messageBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
+        view.addSubview(placeTopLineView)
+        placeTopLineView.topAnchor.constraint(equalTo: placeSmallView!.topAnchor).isActive = true
+        placeTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        placeTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        placeTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         view.addSubview(placeBottomLineView)
         placeBottomLineView.bottomAnchor.constraint(equalTo: placeSmallView!.bottomAnchor).isActive = true
         placeBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         placeBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         placeBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
+        view.addSubview(imageTopLineView)
+        imageTopLineView.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
+        imageTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        imageTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        imageTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         view.addSubview(imageBottomLineView)
         imageBottomLineView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
         imageBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true

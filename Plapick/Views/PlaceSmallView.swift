@@ -46,7 +46,7 @@ class PlaceSmallView: UIView {
     lazy var pickCntImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(systemName: "camera")
-        iv.tintColor = .systemOrange
+        iv.tintColor = .mainColor
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv

@@ -16,6 +16,17 @@
 		5757008625A5DA6B006D5931 /* SearchPlaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5757008525A5DA6B006D5931 /* SearchPlaceView.swift */; };
 		5757008A25A5DCCF006D5931 /* Param.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5757008925A5DCCF006D5931 /* Param.swift */; };
 		5757008E25A5DE39006D5931 /* SearchPlacesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5757008D25A5DE39006D5931 /* SearchPlacesRequest.swift */; };
+		57755BB325B3F91400CF0849 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57755BB225B3F91400CF0849 /* UserNotifications.framework */; };
+		57755BB525B3F91D00CF0849 /* PushKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57755BB425B3F91D00CF0849 /* PushKit.framework */; };
+		57755BBA25B42B4400CF0849 /* SetPushNotificationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BB925B42B4400CF0849 /* SetPushNotificationRequest.swift */; };
+		57755BBD25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */; };
+		57755BC025B44D7700CF0849 /* PushNotificationSettingTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BBF25B44D7700CF0849 /* PushNotificationSettingTableViewController.swift */; };
+		57755BC925B452F400CF0849 /* SettingPushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BC825B452F400CF0849 /* SettingPushNotification.swift */; };
+		57755BCC25B4538900CF0849 /* SettingPushNotificationTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BCB25B4538900CF0849 /* SettingPushNotificationTVCell.swift */; };
+		57755BCF25B471CD00CF0849 /* GetPushNotificationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BCE25B471CD00CF0849 /* GetPushNotificationRequest.swift */; };
+		57755BD225B47A6200CF0849 /* PushNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BD125B47A6200CF0849 /* PushNotification.swift */; };
+		57755BD525B47F4B00CF0849 /* PickViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BD425B47F4B00CF0849 /* PickViewController.swift */; };
+		57755BD825B4893800CF0849 /* GetPlaceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BD725B4893800CF0849 /* GetPlaceRequest.swift */; };
 		5792854725AED1F10060F00C /* ProfileSettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5792854625AED1F10060F00C /* ProfileSettingViewController.swift */; };
 		5792854A25AF48A10060F00C /* UploadImageRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5792854925AF48A10060F00C /* UploadImageRequest.swift */; };
 		5792854D25AF4C750060F00C /* AddPickRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5792854C25AF4C750060F00C /* AddPickRequest.swift */; };
@@ -71,6 +82,17 @@
 		5757008525A5DA6B006D5931 /* SearchPlaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceView.swift; sourceTree = "<group>"; };
 		5757008925A5DCCF006D5931 /* Param.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Param.swift; sourceTree = "<group>"; };
 		5757008D25A5DE39006D5931 /* SearchPlacesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlacesRequest.swift; sourceTree = "<group>"; };
+		57755BB225B3F91400CF0849 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		57755BB425B3F91D00CF0849 /* PushKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PushKit.framework; path = System/Library/Frameworks/PushKit.framework; sourceTree = SDKROOT; };
+		57755BB925B42B4400CF0849 /* SetPushNotificationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetPushNotificationRequest.swift; sourceTree = "<group>"; };
+		57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPushNotificationDeviceRequest.swift; sourceTree = "<group>"; };
+		57755BBF25B44D7700CF0849 /* PushNotificationSettingTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotificationSettingTableViewController.swift; sourceTree = "<group>"; };
+		57755BC825B452F400CF0849 /* SettingPushNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingPushNotification.swift; sourceTree = "<group>"; };
+		57755BCB25B4538900CF0849 /* SettingPushNotificationTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingPushNotificationTVCell.swift; sourceTree = "<group>"; };
+		57755BCE25B471CD00CF0849 /* GetPushNotificationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPushNotificationRequest.swift; sourceTree = "<group>"; };
+		57755BD125B47A6200CF0849 /* PushNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotification.swift; sourceTree = "<group>"; };
+		57755BD425B47F4B00CF0849 /* PickViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickViewController.swift; sourceTree = "<group>"; };
+		57755BD725B4893800CF0849 /* GetPlaceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPlaceRequest.swift; sourceTree = "<group>"; };
 		5792854625AED1F10060F00C /* ProfileSettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingViewController.swift; sourceTree = "<group>"; };
 		5792854925AF48A10060F00C /* UploadImageRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadImageRequest.swift; sourceTree = "<group>"; };
 		5792854C25AF4C750060F00C /* AddPickRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPickRequest.swift; sourceTree = "<group>"; };
@@ -128,6 +150,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				57755BB525B3F91D00CF0849 /* PushKit.framework in Frameworks */,
+				57755BB325B3F91400CF0849 /* UserNotifications.framework in Frameworks */,
 				253117AEAEF1DA27906323F1 /* Pods_Plapick.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -148,6 +172,10 @@
 				57E56BF025B03267002C2059 /* VersionRequest.swift */,
 				57E56BF625B04830002C2059 /* Responses.swift */,
 				57E56BFF25B09CA4002C2059 /* CheckNickNameRequest.swift */,
+				57755BB925B42B4400CF0849 /* SetPushNotificationRequest.swift */,
+				57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */,
+				57755BCE25B471CD00CF0849 /* GetPushNotificationRequest.swift */,
+				57755BD725B4893800CF0849 /* GetPlaceRequest.swift */,
 			);
 			path = HttpConnections;
 			sourceTree = "<group>";
@@ -222,6 +250,8 @@
 				57A97D5125AD973A00E8F982 /* SettingTableViewController.swift */,
 				5792854625AED1F10060F00C /* ProfileSettingViewController.swift */,
 				57E56BFC25B09629002C2059 /* TermsViewController.swift */,
+				57755BBF25B44D7700CF0849 /* PushNotificationSettingTableViewController.swift */,
+				57755BD425B47F4B00CF0849 /* PickViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -264,6 +294,8 @@
 				5757008925A5DCCF006D5931 /* Param.swift */,
 				57EFB3CF25AC353B0001CF59 /* User.swift */,
 				57A97D5B25ADBCCC00E8F982 /* SettingMenu.swift */,
+				57755BC825B452F400CF0849 /* SettingPushNotification.swift */,
+				57755BD125B47A6200CF0849 /* PushNotification.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -274,6 +306,7 @@
 				57C0412C259A0B6F00856F61 /* TabBarCVCell.swift */,
 				57C04130259A12BA00856F61 /* LocationTabViewCVCell.swift */,
 				57A97D5825ADA80300E8F982 /* SettingTVCell.swift */,
+				57755BCB25B4538900CF0849 /* SettingPushNotificationTVCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -281,6 +314,8 @@
 		C2EB320CE637E17A414B8B3B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				57755BB425B3F91D00CF0849 /* PushKit.framework */,
+				57755BB225B3F91400CF0849 /* UserNotifications.framework */,
 				E39571607D70074FC00EBC1F /* Pods_Plapick.framework */,
 			);
 			name = Frameworks;
@@ -419,17 +454,22 @@
 				57C040FC259996AD00856F61 /* HomeViewController.swift in Sources */,
 				57C04129259A09EF00856F61 /* TabBarView.swift in Sources */,
 				57FB7F8125AC6681007BE142 /* App.swift in Sources */,
+				57755BD525B47F4B00CF0849 /* PickViewController.swift in Sources */,
+				57755BD825B4893800CF0849 /* GetPlaceRequest.swift in Sources */,
 				57C04138259A13F300856F61 /* LocationMapViewController.swift in Sources */,
 				57C04105259996DF00856F61 /* AccountViewController.swift in Sources */,
 				57C0413B259A249F00856F61 /* ParentLocation.swift in Sources */,
 				57C041172599CE1000856F61 /* PhotoView.swift in Sources */,
 				5757008A25A5DCCF006D5931 /* Param.swift in Sources */,
 				57E56BF125B03267002C2059 /* VersionRequest.swift in Sources */,
+				57755BCC25B4538900CF0849 /* SettingPushNotificationTVCell.swift in Sources */,
 				57C040D925998CCA00856F61 /* AppDelegate.swift in Sources */,
 				5792854D25AF4C750060F00C /* AddPickRequest.swift in Sources */,
 				5792F5C225AB494E00015FE9 /* LoginViewController.swift in Sources */,
+				57755BBD25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift in Sources */,
 				57E56C0025B09CA4002C2059 /* CheckNickNameRequest.swift in Sources */,
 				57C0411E2599E8A200856F61 /* Place.swift in Sources */,
+				57755BD225B47A6200CF0849 /* PushNotification.swift in Sources */,
 				57EFB3AD25AC01220001CF59 /* LoginRequest.swift in Sources */,
 				57E56BEA25B00DBD002C2059 /* SetMyProfileRequest.swift in Sources */,
 				57C040DB25998CCA00856F61 /* SceneDelegate.swift in Sources */,
@@ -442,10 +482,12 @@
 				57C040F325998DBE00856F61 /* MainTabBarController.swift in Sources */,
 				57A97D5C25ADBCCC00E8F982 /* SettingMenu.swift in Sources */,
 				57A97D5225AD973A00E8F982 /* SettingTableViewController.swift in Sources */,
+				57755BCF25B471CD00CF0849 /* GetPushNotificationRequest.swift in Sources */,
 				57A97D5925ADA80300E8F982 /* SettingTVCell.swift in Sources */,
 				572D31E725A5AAFF00A93FD9 /* ParentLocationView.swift in Sources */,
 				57A97D5525AD9A6E00E8F982 /* NoticeViewController.swift in Sources */,
 				57C041142599CD7600856F61 /* PhotoGroupView.swift in Sources */,
+				57755BC925B452F400CF0849 /* SettingPushNotification.swift in Sources */,
 				57E56BFD25B09629002C2059 /* TermsViewController.swift in Sources */,
 				57A97D4F25AD6A4300E8F982 /* LogoutRequest.swift in Sources */,
 				5757008E25A5DE39006D5931 /* SearchPlacesRequest.swift in Sources */,
@@ -453,10 +495,12 @@
 				57C041262599FA1C00856F61 /* PlaceLargeView.swift in Sources */,
 				5757008325A5CF77006D5931 /* SearchPlaceViewController.swift in Sources */,
 				57C040F92599963800856F61 /* Extensions.swift in Sources */,
+				57755BBA25B42B4400CF0849 /* SetPushNotificationRequest.swift in Sources */,
 				57C040FF259996B600856F61 /* PostingViewController.swift in Sources */,
 				5792854A25AF48A10060F00C /* UploadImageRequest.swift in Sources */,
 				57C041222599EFC300856F61 /* PlaceSmallView.swift in Sources */,
 				5792F5B625AB0A2100015FE9 /* Static.swift in Sources */,
+				57755BC025B44D7700CF0849 /* PushNotificationSettingTableViewController.swift in Sources */,
 				57EFB3D025AC353B0001CF59 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -587,7 +631,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Plapick/Plapick.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1000;
 				DEVELOPMENT_TEAM = 364WTC934M;
 				INFOPLIST_FILE = Plapick/Info.plist;
@@ -598,6 +643,7 @@
 				MARKETING_VERSION = 1.0.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.logicador.Plapick;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Plapick Profile";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -610,7 +656,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Plapick/Plapick.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1000;
 				DEVELOPMENT_TEAM = 364WTC934M;
 				INFOPLIST_FILE = Plapick/Info.plist;
@@ -621,6 +668,7 @@
 				MARKETING_VERSION = 1.0.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.logicador.Plapick;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "Plapick Profile";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

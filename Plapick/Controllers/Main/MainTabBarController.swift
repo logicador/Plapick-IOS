@@ -62,6 +62,13 @@ class MainTabBarController: UITabBarController {
         self.delegate = self
         
         adjustColors()
+        
+        // Navigation Back Button Global
+        UINavigationBar.appearance().backIndicatorImage = UIImage(systemName: "chevron.left")
+        UINavigationBar.appearance().backIndicatorTransitionMaskImage = UIImage(systemName: "chevron.left")
+        // Specific
+//        navigationController?.navigationBar.backIndicatorImage = UIImage(systemName: "chevron.left")
+//        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(systemName: "chevron.left")
     }
     
     

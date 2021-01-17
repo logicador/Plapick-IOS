@@ -10,9 +10,9 @@ import Foundation
 
 // MARK: PlaceList
 struct PlaceListResultResponse: Codable {
-    var result: [PlaceResponse]
+    var result: [KakaoPlaceResponse]
 }
-struct PlaceResponse: Codable {
+struct KakaoPlaceResponse: Codable {
     var address_name: String
     var category_group_code: String
     var category_group_name: String
@@ -29,6 +29,29 @@ struct PlaceResponse: Codable {
     var p_like_cnt: Int
     var p_pick_cnt: Int
 }
+
+// MARK: Place
+struct PlaceResultResponse: Codable {
+    var result: PlaceResponse
+}
+struct PlaceResponse: Codable {
+    var p_id: Int
+    var p_k_id: Int
+    var p_name: String
+    var p_category_name: String
+    var p_category_group_code: String
+    var p_category_group_name: String
+    var p_address: String
+    var p_road_address: String
+    var p_latitude: String
+    var p_longitude: String
+    var p_phone: String
+    var p_like_cnt: Int
+    var p_pick_cnt: Int
+    var p_ploc_code: String
+    var p_cloc_code: String
+}
+
 
 // MARK: UserProfile
 struct UserProfileResultResponse: Codable {
@@ -79,4 +102,16 @@ struct VersionResultResponse: Codable {
 struct VersionResponse: Codable {
     var version: String
     var build: Int
+}
+
+
+// MARK: PushNotification
+struct PushNotificationResultResponse: Codable {
+    var result: PushNotificationResponse
+}
+struct PushNotificationResponse: Codable {
+    var pnd_is_allowed_my_pick_comment: String
+    var pnd_is_allowed_recommended_place: String
+    var pnd_is_allowed_ad: String
+    var pnd_is_allowed_event_notice: String
 }

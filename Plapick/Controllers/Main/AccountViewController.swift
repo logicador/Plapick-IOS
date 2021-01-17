@@ -243,7 +243,7 @@ class AccountViewController: UIViewController {
         
         // MARK: Profile
         contentView.addSubview(profileContainerView)
-        profileContainerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 40).isActive = true
+        profileContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         profileContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         profileContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         profileContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
@@ -373,7 +373,7 @@ class AccountViewController: UIViewController {
         
         // MARK: MyPick
         contentView.addSubview(myPickTitleView)
-        myPickTitleView.topAnchor.constraint(equalTo: figureContainerView.bottomAnchor, constant: 40).isActive = true
+        myPickTitleView.topAnchor.constraint(equalTo: figureContainerView.bottomAnchor, constant: 20).isActive = true
         myPickTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         myPickTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         myPickTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
@@ -391,7 +391,6 @@ class AccountViewController: UIViewController {
             app.showNetworkAlert(parentViewController: self)
             return
         }
-        
         
         getUserPicksRequest.delegate = self
         
@@ -475,7 +474,7 @@ class AccountViewController: UIViewController {
             photoGroupView.trailingAnchor.constraint(equalTo: self.myPickContainerView.trailingAnchor).isActive = true
             
             if i == 0 {
-                photoGroupView.topAnchor.constraint(equalTo: self.myPickContainerView.topAnchor, constant: 1).isActive = true
+                photoGroupView.topAnchor.constraint(equalTo: self.myPickContainerView.topAnchor).isActive = true
             } else {
                 photoGroupView.topAnchor.constraint(equalTo: photoGroupViewList[i - 1].bottomAnchor, constant: 1).isActive = true
             }
@@ -502,14 +501,17 @@ extension AccountViewController: TitleViewProtocol {
 
 extension AccountViewController: PhotoGroupViewProtocol {
     func photoTapped(pick: Pick) {
-        print(pick)
+        let pickViewController = PickViewController()
+        pickViewController.pick = pick
+        let navigationController = UINavigationController(rootViewController: pickViewController)
+        present(navigationController, animated: true, completion: nil)
     }
 }
 
 
 extension AccountViewController: PostingViewControllerProtocol {
     func closeViewController() {
-        getMyPicks()
+//        getMyPicks()
         postingViewController?.dismiss(animated: true, completion: nil)
     }
 }

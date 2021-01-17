@@ -77,7 +77,7 @@ class HomeViewController: UIViewController {
         contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
         
         contentView.addSubview(recentPickTitleView)
-        recentPickTitleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 40).isActive = true
+        recentPickTitleView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20).isActive = true
         recentPickTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         recentPickTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         recentPickTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
@@ -89,13 +89,13 @@ class HomeViewController: UIViewController {
         recentPickContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         contentView.addSubview(hotPlaceTitleView)
-        hotPlaceTitleView.topAnchor.constraint(equalTo: recentPickContainerView.bottomAnchor, constant: 40).isActive = true
+        hotPlaceTitleView.topAnchor.constraint(equalTo: recentPickContainerView.bottomAnchor, constant: 20).isActive = true
         hotPlaceTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         hotPlaceTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         hotPlaceTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         contentView.addSubview(hotPlaceContainerView)
-        hotPlaceContainerView.topAnchor.constraint(equalTo: hotPlaceTitleView.bottomAnchor, constant: 20).isActive = true
+        hotPlaceContainerView.topAnchor.constraint(equalTo: hotPlaceTitleView.bottomAnchor).isActive = true
         hotPlaceContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         hotPlaceContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         hotPlaceContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
@@ -111,6 +111,9 @@ class HomeViewController: UIViewController {
         ])
         
         adjustColors()
+        
+        // 푸시 알림 허용 확인
+        app.checkPushNotificationAvailable(parentViewController: self)
         
         if !app.isNetworkAvailable() {
             app.showNetworkAlert(parentViewController: self)
@@ -190,7 +193,7 @@ class HomeViewController: UIViewController {
             photoGroupView.trailingAnchor.constraint(equalTo: self.recentPickContainerView.trailingAnchor).isActive = true
             
             if i == 0 {
-                photoGroupView.topAnchor.constraint(equalTo: self.recentPickContainerView.topAnchor, constant: 1).isActive = true
+                photoGroupView.topAnchor.constraint(equalTo: self.recentPickContainerView.topAnchor).isActive = true
             } else {
                 photoGroupView.topAnchor.constraint(equalTo: photoGroupViewList[i - 1].bottomAnchor, constant: 1).isActive = true
             }
@@ -206,14 +209,14 @@ class HomeViewController: UIViewController {
             
             var placeList: [Place] = []
             
-            // 이 부분에서 인기 플레이스들 3~5개 세팅
-            let randomCnt = Int.random(in: 3...5)
+            // 이 부분에서 인기 플레이스들 1~2개 세팅
+            let randomCnt = Int.random(in: 1...2)
             for i in 1...randomCnt {
                 var hotPickList: [Pick] = []
                 for i in 1...15 {
                     hotPickList.append(Pick(id: i, photoUrl: PLAPICK_URL + "/admin/img/ey.jpg"))
                 }
-                placeList.append(Place(id: i, kId: "25855305" + String(i), name: "아침고요수목원" + String(i), visibleAddress: "경기 가평군 상면 수목원로 432", address: "경기 가평군 상면 행현리 623-3", roadAddress: "경기 가평군 상면 수목원로 432", category: "수목원,식물원", categoryName: "여행 > 관광,명소 > 수목원,식물원", categoryGroupName: "관광명소", categoryGroupCode: "AT4", phone: "1544-6703", lat: 37.743004, lng: 127.351661, hotPickList: hotPickList, likeCnt: Int.random(in: 0...100), pickCnt: Int.random(in: 0...100)))
+                placeList.append(Place(id: i, kId: 25855305 + i, name: "아침고요수목원" + String(i), visibleAddress: "경기 가평군 상면 수목원로 432", address: "경기 가평군 상면 행현리 623-3", roadAddress: "경기 가평군 상면 수목원로 432", category: "수목원,식물원", categoryName: "여행 > 관광,명소 > 수목원,식물원", categoryGroupName: "관광명소", categoryGroupCode: "AT4", phone: "1544-6703", lat: 37.743004, lng: 127.351661, hotPickList: hotPickList, likeCnt: Int.random(in: 0...100), pickCnt: Int.random(in: 0...100)))
             }
             
             var placeLargeViewList: [PlaceLargeView] = []

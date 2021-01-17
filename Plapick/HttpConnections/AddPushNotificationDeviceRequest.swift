@@ -1,25 +1,24 @@
 //
-//  LogoutRequest.swift
+//  AddPushNotificationDeviceRequest.swift
 //  Plapick
 //
-//  Created by 서원영 on 2021/01/12.
+//  Created by 서원영 on 2021/01/17.
 //
 
 import Foundation
-import UIKit
 
 
 // MARK: Protocol
-protocol LogoutRequestProtocol {
+protocol AddPushNotificationDeviceRequestProtocol {
     func response(status: String)
 }
 
 
-class LogoutRequest {
+class AddPushNotificationDeviceRequest {
     
     // MARK: Properties
-    var delegate: LogoutRequestProtocol?
-    let apiUrl = API_URL + "/logout"
+    var delegate: AddPushNotificationDeviceRequestProtocol?
+    let apiUrl = API_URL + "/add/push/notification/device"
     
     
     // MARK: GetStatus
@@ -37,15 +36,20 @@ class LogoutRequest {
     
     
     // MARK: Fetch
-    func fetch(vc: UIViewController? = nil) {
+    func fetch(deviceToken: String) {
+        let paramString = "deviceId=" + deviceToken + "&device=IOS"
+        let paramData = paramString.data(using: String.Encoding.utf8)
+        
         let url = URL(string: apiUrl)
         var urlRequest = URLRequest(url: url!)
         urlRequest.httpMethod = "POST"
+        urlRequest.httpBody = paramData
+        urlRequest.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue(String(paramData!.count), forHTTPHeaderField: "Content-Length")
         
         let task = URLSession.shared.dataTask(with: urlRequest, completionHandler: { (data, resp, error) in
             DispatchQueue.main.async {
                 if let _ = error {
-                    if let vc = vc { vc.requestErrorAlert(title: "ERR_SERVER", message: "서버오류가 발생했습니다.") }
                     self.delegate?.response(status: "ERR_SERVER")
                     return
                 }
@@ -53,7 +57,6 @@ class LogoutRequest {
                 if let data = data {
                     let status = self.getStatus(data: data)
                     if status != "OK" {
-                        if let vc = vc { vc.requestErrorAlert(title: status, message: "응답오류가 발생했습니다.") }
                         self.delegate?.response(status: status)
                         return
                     }
@@ -61,7 +64,6 @@ class LogoutRequest {
                     self.delegate?.response(status: "OK")
                     
                 } else {
-                    if let vc = vc { vc.requestErrorAlert(title: "ERR_DATA", message: "데이터 응답 오류가 발생했습니다.") }
                     self.delegate?.response(status: "ERR_DATA")
                 }
             }

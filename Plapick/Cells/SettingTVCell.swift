@@ -71,10 +71,8 @@ class SettingTVCell: UITableViewCell {
     }
     func adjustColors() {
         if self.traitCollection.userInterfaceStyle == .dark {
-//            backgroundColor = settingMenu!.isHeader ? .systemBackground : .systemGray6
             backgroundColor = .systemGray6
         } else {
-//            backgroundColor = settingMenu!.isHeader ? .tertiarySystemGroupedBackground : .systemBackground
             backgroundColor = .systemBackground
         }
     }

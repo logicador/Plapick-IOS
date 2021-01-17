@@ -15,7 +15,7 @@ class SettingTableViewController: UITableViewController {
     var logoutRequest = LogoutRequest()
     let settingMenuList: [SettingMenu] = [
         SettingMenu(title: "프로필 설정", icon: "person.circle", action: "PROFILE"),
-        SettingMenu(title: "푸시 알림 설정", icon: "bell.circle", action: "PUSH"),
+        SettingMenu(title: "푸시 알림 설정", icon: "bell.circle", action: "PUSH_NOTIFICATION"),
         SettingMenu(title: "버전 정보", icon: "info.circle", action: "VERSION"),
         SettingMenu(title: "공지사항", icon: "mic.circle", action: "NOTICE"),
         SettingMenu(title: "고객센터", icon: "headphones.circle", action: "SERVICE")
@@ -44,6 +44,8 @@ class SettingTableViewController: UITableViewController {
         versionRequest.delegate = self
         
         adjustColors()
+        
+        app.delegate = self
         
         if !app.isNetworkAvailable() {
             app.showNetworkAlert(parentViewController: self)
@@ -110,9 +112,7 @@ class SettingTableViewController: UITableViewController {
         case "PROFILE":
             let profileSettingViewController = ProfileSettingViewController()
             profileSettingViewController.accountViewController = accountViewController
-            let navigationController = UINavigationController(rootViewController: profileSettingViewController)
-            navigationController.modalPresentationStyle = .fullScreen
-            present(navigationController, animated: true)
+            navigationController?.pushViewController(profileSettingViewController, animated: true)
         
         case "VERSION":
             if isVersionRequestTasking { return }
@@ -145,6 +145,9 @@ class SettingTableViewController: UITableViewController {
                 
             }))
             present(alert, animated: true)
+            
+        case "PUSH_NOTIFICATION":
+            app.checkPushNotificationAvailable(parentViewController: self)
             
         default:
             print("nothing to do")
@@ -190,6 +193,16 @@ extension SettingTableViewController: VersionRequestProtocol {
                     self.present(alert, animated: true)
                 }
             }
+        }
+    }
+}
+
+
+extension SettingTableViewController: AppProtocol {
+    func pushNotification(isAllowed: Bool) {
+        if isAllowed {
+            let pushNotificationSettingTableViewController = PushNotificationSettingTableViewController()
+            self.navigationController?.pushViewController(pushNotificationSettingTableViewController, animated: true)
         }
     }
 }

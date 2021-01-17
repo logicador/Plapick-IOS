@@ -68,7 +68,7 @@ class SearchPlacesRequest {
                         for resPlace in resPlaceList {
                             // id가 0이라면 등록되지 않은 place임
                             let id = resPlace.p_id
-                            let kId = resPlace.id
+                            let kId = Int(resPlace.id)
                             let name = resPlace.place_name
                             let address = resPlace.address_name
                             let roadAddress = resPlace.road_address_name
@@ -86,7 +86,7 @@ class SearchPlacesRequest {
                             let likeCnt = resPlace.p_like_cnt
                             let pickCnt = resPlace.p_pick_cnt
                             
-                            let place = Place(id: id, kId: kId, name: name, visibleAddress: visibleAddress, address: address, roadAddress: roadAddress, category: category, categoryName: categoryName, categoryGroupName: categoryGroupName, categoryGroupCode: categoryGroupCode, phone: phone, lat: lat, lng: lng, likeCnt: likeCnt, pickCnt: pickCnt)
+                            let place = Place(id: id, kId: kId!, name: name, visibleAddress: visibleAddress, address: address, roadAddress: roadAddress, category: category, categoryName: categoryName, categoryGroupName: categoryGroupName, categoryGroupCode: categoryGroupCode, phone: phone, lat: lat, lng: lng, likeCnt: likeCnt, pickCnt: pickCnt)
                             placeList?.append(place)
                         }
                         

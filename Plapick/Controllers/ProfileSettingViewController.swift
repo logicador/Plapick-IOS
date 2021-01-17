@@ -98,17 +98,15 @@ class ProfileSettingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
-        
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "프로필 설정"
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: UIBarButtonItem.Style.plain, target: self, action: #selector(editProfile))
         
         view.addSubview(containerView)
-        containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 40).isActive = true
+        containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
@@ -191,9 +189,9 @@ class ProfileSettingViewController: UIViewController {
         }
     }
     
-    @objc func backTapped() {
-        self.dismiss(animated: true, completion: nil)
-    }
+//    @objc func backTapped() {
+//        self.dismiss(animated: true, completion: nil)
+//    }
     
     @objc func profileImageViewTapped() {
         if !app.isNetworkAvailable() {
@@ -292,7 +290,8 @@ class ProfileSettingViewController: UIViewController {
         // 아무것도 변경된게 없을 때 (프로필 이미지도 업로드 안하고 삭제도 안하고 닉네임 변경도 안함)
         if !isRemoveProfileImage && newNickName == app.getUser().nickName {
             hideIndicator()
-            dismiss(animated: true, completion: nil)
+//            dismiss(animated: true, completion: nil)
+            navigationController?.popViewController(animated: true)
             
         } else {
             var paramList: [Param] = []
@@ -329,6 +328,7 @@ extension ProfileSettingViewController: UIImagePickerControllerDelegate, UINavig
         isUploadProfileImage = true
         isRemoveProfileImage = false
         
+        // imagePicker dismiss
         dismiss(animated: true, completion: nil)
     }
 }
@@ -355,7 +355,8 @@ extension ProfileSettingViewController: CheckNickNameRequestProtocol {
             // 아무것도 변경된게 없을 때 (프로필 이미지도 업로드 안하고 삭제도 안하고 닉네임 변경도 안함)
             if !isRemoveProfileImage && newNickName == app.getUser().nickName {
                 hideIndicator()
-                dismiss(animated: true, completion: nil)
+//                dismiss(animated: true, completion: nil)
+                navigationController?.popViewController(animated: true)
                 
             } else {
                 var paramList: [Param] = []
@@ -402,7 +403,8 @@ extension ProfileSettingViewController: SetMyProfileRequestProtocol {
                 app.setNickName(nickName: user.nickName)
                 app.setProfileImage(profileImageUrl: user.profileImageUrl)
                 accountViewController?.getAccount()
-                dismiss(animated: true, completion: nil)
+//                dismiss(animated: true, completion: nil)
+                navigationController?.popViewController(animated: true)
             }
         }
     }

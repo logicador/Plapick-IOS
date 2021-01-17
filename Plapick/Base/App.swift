@@ -10,8 +10,14 @@ import SystemConfiguration
 import UIKit
 
 
+protocol AppProtocol {
+    func pushNotification(isAllowed: Bool)
+}
+
+
 class App {
     
+    var delegate: AppProtocol?
     var userDefaults = UserDefaults.standard
     
     init() {
@@ -44,6 +50,27 @@ class App {
         let isReachable = flags.contains(.reachable)
         let needsConnection = flags.contains(.connectionRequired)
         return (isReachable && !needsConnection)
+    }
+    
+    func checkPushNotificationAvailable(parentViewController: UIViewController) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { (isAllowed, error) in
+            DispatchQueue.main.async {
+                if error != nil || !isAllowed {
+                    let alert = UIAlertController(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
+                    alert.addAction(UIAlertAction(title: "설정으로", style: UIAlertAction.Style.default, handler: { (_) in
+                        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                        }
+                    }))
+                    parentViewController.present(alert, animated: true)
+                    self.delegate?.pushNotification(isAllowed: false)
+                } else {
+                    UIApplication.shared.registerForRemoteNotifications()
+                    self.delegate?.pushNotification(isAllowed: true)
+                }
+            }
+        })
     }
     
     func isLogined() -> Bool {
@@ -108,5 +135,21 @@ class App {
     
     func setProfileImage(profileImageUrl: String) {
         userDefaults.set(profileImageUrl, forKey: "uProfileImageUrl")
+    }
+    
+//    func setIsAllowPushNotification(isAllowPushNotification: String) {
+//        userDefaults.set(isAllowPushNotification, forKey: "uIsAllowPushNotification")
+//    }
+//
+//    func getIsAllowPushNotification() -> String {
+//        return userDefaults.string(forKey: "uIsAllowPushNotification") ?? ""
+//    }
+    
+    func setPushNotificationDeviceToken(deviceToken: String) {
+        userDefaults.set(deviceToken, forKey: "uPushNotificationDeviceToken")
+    }
+
+    func getPushNotificationDeviceToken() -> String {
+        return userDefaults.string(forKey: "uPushNotificationDeviceToken") ?? ""
     }
 }

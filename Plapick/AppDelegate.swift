@@ -35,6 +35,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02x", $1)})
+        
+        let app = App()
+        app.setPushNotificationDeviceToken(deviceToken: deviceTokenString)
+        let addPushNotificationDeviceRequest = AddPushNotificationDeviceRequest()
+        addPushNotificationDeviceRequest.delegate = self
+        addPushNotificationDeviceRequest.fetch(deviceToken: deviceTokenString)
+    }
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print(error.localizedDescription)
+    }
 }
 
+
+extension AppDelegate: AddPushNotificationDeviceRequestProtocol {
+    func response(status: String) {
+        print("AddPushNotificationDeviceRequest", status)
+    }
+}

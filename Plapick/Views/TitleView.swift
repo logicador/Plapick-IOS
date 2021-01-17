@@ -24,7 +24,7 @@ class TitleView: UIView {
     // MARK: Views
     lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 32)
+        label.font = UIFont.systemFont(ofSize: 28) // same Large Title
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -48,18 +48,18 @@ class TitleView: UIView {
         return view
     }()
     
-    lazy var topLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    lazy var bottomLineView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .separator
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
+//    lazy var topLineView: UIView = {
+//        let view = UIView()
+//        view.backgroundColor = .separator
+//        view.translatesAutoresizingMaskIntoConstraints = false
+//        return view
+//    }()
+//    lazy var bottomLineView: UIView = {
+//        let view = UIView()
+//        view.backgroundColor = .separator
+//        view.translatesAutoresizingMaskIntoConstraints = false
+//        return view
+//    }()
     
     
     // MARK: Init
@@ -74,17 +74,17 @@ class TitleView: UIView {
         panel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
         panel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
         
-        addSubview(topLineView)
-        topLineView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        topLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        topLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        topLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
-        
-        addSubview(bottomLineView)
-        bottomLineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        bottomLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        bottomLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+//        addSubview(topLineView)
+//        topLineView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+//        topLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+//        topLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+//        topLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+//
+//        addSubview(bottomLineView)
+//        bottomLineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+//        bottomLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+//        bottomLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+//        bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
         if isAction {
             panel.addSubview(actionButton)
@@ -96,7 +96,7 @@ class TitleView: UIView {
         
         translatesAutoresizingMaskIntoConstraints = false
         
-        adjustColors()
+//        adjustColors()
     }
     
     required init?(coder: NSCoder) {
@@ -105,16 +105,16 @@ class TitleView: UIView {
     
     
     // MARK: Functions
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        adjustColors()
-    }
-    func adjustColors() {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            backgroundColor = .systemGray6
-        } else {
-            backgroundColor = .systemBackground
-        }
-    }
+//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+//        adjustColors()
+//    }
+//    func adjustColors() {
+//        if self.traitCollection.userInterfaceStyle == .dark {
+//            backgroundColor = .systemGray6
+//        } else {
+//            backgroundColor = .systemBackground
+//        }
+//    }
     
     @objc func actionButtonTapped() {
         guard let actionMode = self.actionMode else { return }

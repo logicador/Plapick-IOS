@@ -10,7 +10,7 @@ import Foundation
 
 struct Place: Codable {
     var id: Int
-    var kId: String
+    var kId: Int
     var name: String
     var visibleAddress: String
     var address: String
