@@ -66,6 +66,7 @@ class GetUserPicksRequest {
                         for resPick in resPickList {
                             let id = resPick.pi_id
                             let uId = resPick.pi_u_id
+                            let uNickName = resPick.u_nick_name
                             let pId = resPick.pi_p_id
                             let message = resPick.pi_message
                             let likeCnt = resPick.pi_like_cnt
@@ -74,7 +75,7 @@ class GetUserPicksRequest {
                             let updatedDate = resPick.pi_updated_date
                             let photoUrl = IMAGE_URL + "/users/" + String(uId) + "/" + String(id) + ".jpg"
                             
-                            let pick = Pick(id: id, uId: uId, pId: pId, message: message, photoUrl: photoUrl, likeCnt: likeCnt, commentCnt: commentCnt, createdDate: createdDate, updatedDate: updatedDate)
+                            let pick = Pick(id: id, uId: uId, uNickName: uNickName, pId: pId, message: message, photoUrl: photoUrl, likeCnt: likeCnt, commentCnt: commentCnt, createdDate: createdDate, updatedDate: updatedDate)
                             pickList?.append(pick)
                         }
                         self.delegate?.response(pickList: pickList, status: "OK")

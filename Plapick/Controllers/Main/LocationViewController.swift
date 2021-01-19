@@ -12,6 +12,7 @@ class LocationViewController: UIViewController {
     
     // MARK: Properties
     var app = App()
+    var mainTabBarController: MainTabBarController?
     var collectionView: UICollectionView?
     
     
@@ -23,13 +24,24 @@ class LocationViewController: UIViewController {
     }()
     
     
+    // MARK: Init
+    init(mainTabBarController: MainTabBarController) {
+        super.init(nibName: nil, bundle: nil)
+        self.mainTabBarController = mainTabBarController
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
     // MARK: viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .systemBackground
         
-        navigationItem.title = "지역에서 플레이스 찾기"
+//        navigationItem.title = "플레이스 찾기"
         
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -67,6 +79,13 @@ class LocationViewController: UIViewController {
         }
     }
     
+    
+    // MARK: ViewDidAppear
+    override func viewDidAppear(_ animated: Bool) {
+        mainTabBarController?.title = "플레이스 찾기"
+        if mainTabBarController?.navigationItem.leftBarButtonItem != nil { mainTabBarController?.navigationItem.leftBarButtonItem = nil }
+        if mainTabBarController?.navigationItem.rightBarButtonItem != nil { mainTabBarController?.navigationItem.rightBarButtonItem = nil }
+    }
 }
 
 

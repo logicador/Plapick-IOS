@@ -26,7 +26,7 @@ class PushNotificationSettingTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "푸시 알림 설정"
         
         tableView.register(SettingPushNotificationTVCell.self, forCellReuseIdentifier: "SettingPushNotificationTVCell")

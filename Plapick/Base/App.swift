@@ -8,10 +8,12 @@
 import Foundation
 import SystemConfiguration
 import UIKit
+import Photos
 
 
 protocol AppProtocol {
     func pushNotification(isAllowed: Bool)
+    func photoGallary(isAllowed: Bool)
 }
 
 
@@ -71,6 +73,40 @@ class App {
                 }
             }
         })
+    }
+    
+    func checkPhotoGallaryAvailable(parentViewController: UIViewController) {
+        let requiredAccessLevel: PHAccessLevel = .readWrite
+        PHPhotoLibrary.requestAuthorization(for: requiredAccessLevel) { authorizationStatus in
+            DispatchQueue.main.async {
+                if authorizationStatus == .limited || authorizationStatus == .authorized {
+                    self.delegate?.photoGallary(isAllowed: true)
+                } else {
+                    let alert = UIAlertController(title: "앨범 액세스 허용하기", message: "'플레픽'에서 앨범에 접근하고자 합니다.", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
+                    alert.addAction(UIAlertAction(title: "설정으로", style: UIAlertAction.Style.default, handler: { (_) in
+                        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                        }
+                    }))
+                    parentViewController.present(alert, animated: true)
+                    self.delegate?.photoGallary(isAllowed: false)
+                }
+            }
+        }
+    }
+    
+    func getUrlImage(urlString: String) -> UIImage {
+        let url = URL(string: urlString)
+        if let url = url {
+            do {
+                let data = try Data(contentsOf: url)
+                let image = UIImage(data: data)
+                if let image = image {
+                    return image
+                } else { return UIImage() }
+            } catch { return UIImage() }
+        } else { return UIImage() }
     }
     
     func isLogined() -> Bool {
@@ -137,19 +173,15 @@ class App {
         userDefaults.set(profileImageUrl, forKey: "uProfileImageUrl")
     }
     
-//    func setIsAllowPushNotification(isAllowPushNotification: String) {
-//        userDefaults.set(isAllowPushNotification, forKey: "uIsAllowPushNotification")
-//    }
-//
-//    func getIsAllowPushNotification() -> String {
-//        return userDefaults.string(forKey: "uIsAllowPushNotification") ?? ""
-//    }
-    
     func setPushNotificationDeviceToken(deviceToken: String) {
         userDefaults.set(deviceToken, forKey: "uPushNotificationDeviceToken")
     }
 
     func getPushNotificationDeviceToken() -> String {
         return userDefaults.string(forKey: "uPushNotificationDeviceToken") ?? ""
+    }
+    
+    func getUId() -> Int {
+        return userDefaults.integer(forKey: "uId")
     }
 }

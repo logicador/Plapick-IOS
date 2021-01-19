@@ -28,16 +28,12 @@ class ProfileSettingViewController: UIViewController {
         return view
     }()
     
-    lazy var profileImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFill
-        iv.clipsToBounds = true
-        iv.layer.cornerRadius = 60
-        iv.layer.borderWidth = 2
-        iv.isUserInteractionEnabled = true
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageViewTapped)))
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
+    lazy var profilePhotoView: PhotoView = {
+        let pv = PhotoView()
+        pv.layer.cornerRadius = 60
+        pv.layer.borderWidth = 2
+        pv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profilePhotoViewTapped)))
+        return pv
     }()
     
     lazy var cameraImageView: UIImageView = {
@@ -62,7 +58,7 @@ class ProfileSettingViewController: UIViewController {
     lazy var nickNameTextFieldView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 5
-        view.layer.borderWidth = 0.4
+        view.layer.borderWidth = LINE_VIEW_HEIGHT
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -98,7 +94,7 @@ class ProfileSettingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "프로필 설정"
         
 //        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
@@ -111,14 +107,14 @@ class ProfileSettingViewController: UIViewController {
         containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
-        containerView.addSubview(profileImageView)
-        profileImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 120).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 120).isActive = true
-        profileImageView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+        containerView.addSubview(profilePhotoView)
+        profilePhotoView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 20).isActive = true
+        profilePhotoView.widthAnchor.constraint(equalToConstant: 120).isActive = true
+        profilePhotoView.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        profilePhotoView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
         
         containerView.addSubview(nickNameTextFieldView)
-        nickNameTextFieldView.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 20).isActive = true
+        nickNameTextFieldView.topAnchor.constraint(equalTo: profilePhotoView.bottomAnchor, constant: 20).isActive = true
         nickNameTextFieldView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20).isActive = true
         nickNameTextFieldView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20).isActive = true
         nickNameTextFieldView.heightAnchor.constraint(equalToConstant: 50).isActive = true
@@ -131,8 +127,8 @@ class ProfileSettingViewController: UIViewController {
         nickNameTextField.bottomAnchor.constraint(equalTo: nickNameTextFieldView.bottomAnchor).isActive = true
         
         containerView.addSubview(cameraImageView)
-        cameraImageView.trailingAnchor.constraint(equalTo: profileImageView.trailingAnchor).isActive = true
-        cameraImageView.bottomAnchor.constraint(equalTo: profileImageView.bottomAnchor).isActive = true
+        cameraImageView.trailingAnchor.constraint(equalTo: profilePhotoView.trailingAnchor).isActive = true
+        cameraImageView.bottomAnchor.constraint(equalTo: profilePhotoView.bottomAnchor).isActive = true
         cameraImageView.widthAnchor.constraint(equalToConstant: 36).isActive = true
         cameraImageView.heightAnchor.constraint(equalToConstant: 36).isActive = true
         
@@ -140,31 +136,32 @@ class ProfileSettingViewController: UIViewController {
         topLineView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
         topLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         topLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        topLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        topLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         view.addSubview(bottomLineView)
         bottomLineView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         bottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         bottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
-        
-        self.hideKeyboardWhenTappedAround()
-        
-        let user = app.getUser()
-        
-        profileImageView.load(urlString: ((user.profileImageUrl.contains(String(user.id))) ? (PLAPICK_URL + user.profileImageUrl) : user.profileImageUrl))
-        nickNameTextField.text = user.nickName
+        bottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         checkNickNameRequest.delegate = self
         uploadImageRequest.delegate = self
         setMyProfileRequest.delegate = self
+        app.delegate = self
         
         adjustColors()
+        hideKeyboardWhenTappedAround()
         
         if !app.isNetworkAvailable() {
             app.showNetworkAlert(parentViewController: self)
             return
         }
+        
+        let user = app.getUser()
+        if !user.profileImageUrl.isEmpty {
+            profilePhotoView.image = app.getUrlImage(urlString: ((user.profileImageUrl.contains(String(user.id))) ? (PLAPICK_URL + user.profileImageUrl) : user.profileImageUrl))
+        }
+        nickNameTextField.text = user.nickName
     }
     
     
@@ -177,14 +174,12 @@ class ProfileSettingViewController: UIViewController {
         if self.traitCollection.userInterfaceStyle == .dark {
             view.backgroundColor = .systemBackground
             containerView.backgroundColor = .systemGray6
-            profileImageView.backgroundColor = .systemBackground
-            profileImageView.layer.borderColor = UIColor.systemBackground.cgColor
+            profilePhotoView.layer.borderColor = UIColor.systemBackground.cgColor
             nickNameTextFieldView.backgroundColor = .systemBackground
         } else {
             view.backgroundColor = .tertiarySystemGroupedBackground
             containerView.backgroundColor = .systemBackground
-            profileImageView.backgroundColor = .tertiarySystemGroupedBackground
-            profileImageView.layer.borderColor = UIColor.tertiarySystemGroupedBackground.cgColor
+            profilePhotoView.layer.borderColor = UIColor.tertiarySystemGroupedBackground.cgColor
             nickNameTextFieldView.backgroundColor = .tertiarySystemGroupedBackground
         }
     }
@@ -193,37 +188,13 @@ class ProfileSettingViewController: UIViewController {
 //        self.dismiss(animated: true, completion: nil)
 //    }
     
-    @objc func profileImageViewTapped() {
+    @objc func profilePhotoViewTapped() {
         if !app.isNetworkAvailable() {
             app.showNetworkAlert(parentViewController: self)
             return
         }
         
-        let alert = UIAlertController(title: "프로필 이미지 변경", message: nil, preferredStyle: UIAlertController.Style.actionSheet)
-        alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
-        alert.addAction(UIAlertAction(title: "앨범에서 선택", style: UIAlertAction.Style.default, handler: { (_) in
-            if !self.app.isNetworkAvailable() {
-                self.app.showNetworkAlert(parentViewController: self)
-                return
-            }
-            
-            let imagePickerController = UIImagePickerController()
-            imagePickerController.sourceType = .photoLibrary
-            imagePickerController.allowsEditing = true
-            imagePickerController.delegate = self
-            self.present(imagePickerController, animated: true, completion: nil)
-        }))
-        alert.addAction(UIAlertAction(title: "프로필 이미지 제거", style: UIAlertAction.Style.destructive, handler: { (_) in
-            if !self.app.isNetworkAvailable() {
-                self.app.showNetworkAlert(parentViewController: self)
-                return
-            }
-            
-            self.profileImageView.image = nil
-            self.isUploadProfileImage = false
-            self.isRemoveProfileImage = true
-        }))
-        present(alert, animated: true)
+        app.checkPhotoGallaryAvailable(parentViewController: self)
     }
     
     @objc func editProfile() {
@@ -276,14 +247,14 @@ class ProfileSettingViewController: UIViewController {
         
         // 프로필 이미지를 업로드했을 경우
         if isUploadProfileImage {
-            guard let image = profileImageView.image else {
+            guard let image = profilePhotoView.image else {
                 hideIndicator()
                 let alert = UIAlertController(title: "ERR_IMAGE", message: "이미지 데이터를 찾지 못했습니다.", preferredStyle: UIAlertController.Style.alert)
                 alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.cancel))
                 present(alert, animated: true)
                 return
             }
-            uploadImageRequest.fetch(imageData: image.jpegData(compressionQuality: 1)!)
+            uploadImageRequest.fetch(imageData: image.jpegData(compressionQuality: COMPRESS_IMAGE_QUALITY)!)
             return
         }
         
@@ -324,7 +295,7 @@ extension ProfileSettingViewController: UIImagePickerControllerDelegate, UINavig
         
         guard let _selectedImage = selectedImage else { return }
         
-        profileImageView.image = _selectedImage
+        profilePhotoView.image = _selectedImage
         isUploadProfileImage = true
         isRemoveProfileImage = false
         
@@ -341,14 +312,14 @@ extension ProfileSettingViewController: CheckNickNameRequestProtocol {
             
             // 프로필 이미지를 업로드했을 경우
             if isUploadProfileImage {
-                guard let image = profileImageView.image else {
+                guard let image = profilePhotoView.image else {
                     hideIndicator()
                     let alert = UIAlertController(title: "ERR_IMAGE", message: "이미지 데이터를 찾지 못했습니다.", preferredStyle: UIAlertController.Style.alert)
                     alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.cancel))
                     present(alert, animated: true)
                     return
                 }
-                uploadImageRequest.fetch(imageData: image.jpegData(compressionQuality: 1)!)
+                uploadImageRequest.fetch(imageData: image.jpegData(compressionQuality: COMPRESS_IMAGE_QUALITY)!)
                 return
             }
             
@@ -406,6 +377,40 @@ extension ProfileSettingViewController: SetMyProfileRequestProtocol {
 //                dismiss(animated: true, completion: nil)
                 navigationController?.popViewController(animated: true)
             }
+        }
+    }
+}
+
+
+extension ProfileSettingViewController: AppProtocol {
+    func pushNotification(isAllowed: Bool) { }
+    func photoGallary(isAllowed: Bool) {
+        if isAllowed {
+            let alert = UIAlertController(title: "프로필 이미지 변경", message: nil, preferredStyle: UIAlertController.Style.actionSheet)
+            alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
+            alert.addAction(UIAlertAction(title: "앨범에서 선택", style: UIAlertAction.Style.default, handler: { (_) in
+                if !self.app.isNetworkAvailable() {
+                    self.app.showNetworkAlert(parentViewController: self)
+                    return
+                }
+                
+                let imagePickerController = UIImagePickerController()
+                imagePickerController.sourceType = .photoLibrary
+                imagePickerController.allowsEditing = true
+                imagePickerController.delegate = self
+                self.present(imagePickerController, animated: true, completion: nil)
+            }))
+            alert.addAction(UIAlertAction(title: "프로필 이미지 제거", style: UIAlertAction.Style.destructive, handler: { (_) in
+                if !self.app.isNetworkAvailable() {
+                    self.app.showNetworkAlert(parentViewController: self)
+                    return
+                }
+                
+                self.profilePhotoView.image = nil
+                self.isUploadProfileImage = false
+                self.isRemoveProfileImage = true
+            }))
+            present(alert, animated: true)
         }
     }
 }

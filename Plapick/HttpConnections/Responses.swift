@@ -86,6 +86,7 @@ struct PickResponse: Codable {
     var pi_comment_cnt: Int
     var pi_created_date: String
     var pi_updated_date: String
+    var u_nick_name: String
 }
 
 

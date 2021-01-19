@@ -30,10 +30,10 @@ class SettingTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "설정"
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "로그아웃", style: UIBarButtonItem.Style.plain, target: self, action: #selector(logout))
         
@@ -66,9 +66,9 @@ class SettingTableViewController: UITableViewController {
         }
     }
     
-    @objc func backTapped() {
-        self.dismiss(animated: true, completion: nil)
-    }
+//    @objc func backTapped() {
+//        self.dismiss(animated: true, completion: nil)
+//    }
     
     @objc func logout() {
         if !app.isNetworkAvailable() {
@@ -78,7 +78,7 @@ class SettingTableViewController: UITableViewController {
         
         let alert = UIAlertController(title: "로그아웃", message: "정말 로그아웃 하시겠습니까?", preferredStyle: UIAlertController.Style.alert)
         alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
-        alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
+        alert.addAction(UIAlertAction(title: "로그아웃", style: UIAlertAction.Style.destructive, handler: { (_) in
             self.logoutRequest.fetch(vc: self)
         }))
         present(alert, animated: true)
@@ -199,6 +199,8 @@ extension SettingTableViewController: VersionRequestProtocol {
 
 
 extension SettingTableViewController: AppProtocol {
+    func photoGallary(isAllowed: Bool) { }
+    
     func pushNotification(isAllowed: Bool) {
         if isAllowed {
             let pushNotificationSettingTableViewController = PushNotificationSettingTableViewController()

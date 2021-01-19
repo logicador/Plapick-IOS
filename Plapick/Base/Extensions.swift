@@ -9,6 +9,7 @@ import UIKit
 import SystemConfiguration
 
 
+// MARK: UIColor
 extension UIColor {
     convenience init(hexString: String) {
         let hex = hexString.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -37,20 +38,20 @@ extension UIColor {
 }
 
 
-extension UIImageView {
-    func load(urlString: String) {
-        guard let url = URL(string: urlString) else { return }
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                if let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.image = image
-                    }
-                }
-            }
-        }
-    }
-}
+//extension UIImageView {
+//    func load(urlString: String) {
+//        guard let url = URL(string: urlString) else { return }
+//        DispatchQueue.global().async { [weak self] in
+//            if let data = try? Data(contentsOf: url) {
+//                if let image = UIImage(data: data) {
+//                    DispatchQueue.main.async {
+//                        self?.image = image
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 //extension UIViewController {
@@ -64,6 +65,7 @@ extension UIImageView {
 //}
 
 
+// MARK: UIScrollView
 extension UIScrollView {
     func resize() {
         var contentRect = CGRect.zero
@@ -75,6 +77,7 @@ extension UIScrollView {
 }
 
 
+// MARK: UIView
 extension UIView {
     func removeAllChildView() {
         for view in self.subviews {
@@ -90,6 +93,7 @@ extension UIView {
 }
 
 
+// MARK: UIViewController
 extension UIViewController {
     func changeRootViewController(rootViewController: UIViewController, duration: CFTimeInterval = 0.3) {
         let transition = CATransition()
@@ -121,6 +125,7 @@ extension UIViewController {
 }
 
 
+// MARK: UILabel
 extension UILabel {
     func setLineSpacing(lineSpacing: CGFloat = 0.0, lineHeightMultiple: CGFloat = 0.0) {
         guard let labelText = self.text else { return }
@@ -135,5 +140,17 @@ extension UILabel {
         }
         attributedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedString.length))
         self.attributedText = attributedString
+    }
+}
+
+
+// MARK: UIImage
+extension UIImage {
+    func resizeImage(size: CGSize) -> UIImage {
+        let originalSize = self.size
+        let ratio: CGFloat = {
+            return originalSize.width > originalSize.height ? 1 / (size.width / originalSize.width) : 1 / (size.height / originalSize.height)
+        }()
+        return UIImage(cgImage: self.cgImage!, scale: self.scale * ratio, orientation: self.imageOrientation)
     }
 }

@@ -17,6 +17,7 @@ protocol PhotoGroupViewProtocol {
 class PhotoGroupView: UIView {
     
     // MARK: Properties
+    var app = App()
     var delegate: PhotoGroupViewProtocol?
     var pickList: [Pick] = []
     let photoSize = (UIScreen.main.bounds.size.width / 3) - (2 / 3)
@@ -29,41 +30,27 @@ class PhotoGroupView: UIView {
         
         self.pickList = pickList
         
-        let photoView = PhotoView(photoUrl: pickList[0].photoUrl)
-        photoView.translatesAutoresizingMaskIntoConstraints = false
-        photoView.isBackGround = isBackGround
+        let photoView = PhotoView(isBackGround: isBackGround)
+        photoView.image = app.getUrlImage(urlString: pickList[0].photoUrl)
         photoViewList.append(photoView)
         if pickList.count > 1 {
-            let photoView = PhotoView(photoUrl: pickList[1].photoUrl)
-            photoView.translatesAutoresizingMaskIntoConstraints = false
-            photoView.isBackGround = isBackGround
+            let photoView = PhotoView(isBackGround: isBackGround)
+            photoView.image = app.getUrlImage(urlString: pickList[1].photoUrl)
             photoViewList.append(photoView)
         } else {
-            let photoView1 = PhotoView(photoUrl: "")
-            photoView1.translatesAutoresizingMaskIntoConstraints = false
-            photoView1.isBackGround = isBackGround
+            let photoView1 = PhotoView(isBackGround: isBackGround)
             photoViewList.append(photoView1)
-            let photoView2 = PhotoView(photoUrl: "")
-            photoView2.translatesAutoresizingMaskIntoConstraints = false
-            photoView2.isBackGround = isBackGround
+            let photoView2 = PhotoView(isBackGround: isBackGround)
             photoViewList.append(photoView2)
         }
         if pickList.count > 2 {
-            let photoView = PhotoView(photoUrl: pickList[2].photoUrl)
-            photoView.translatesAutoresizingMaskIntoConstraints = false
-            photoView.isBackGround = isBackGround
+            let photoView = PhotoView(isBackGround: isBackGround)
+            photoView.image = app.getUrlImage(urlString: pickList[2].photoUrl)
             photoViewList.append(photoView)
         } else {
-            let photoView = PhotoView(photoUrl: "")
-            photoView.translatesAutoresizingMaskIntoConstraints = false
-            photoView.isBackGround = isBackGround
+            let photoView = PhotoView(isBackGround: isBackGround)
             photoViewList.append(photoView)
         }
-        
-//        for pick in pickList {
-//            let photoView = PhotoView(photoUrl: pick.photoUrl)
-//            photoViewList.append(photoView)
-//        }
         
         for photoView in photoViewList {
             addSubview(photoView)

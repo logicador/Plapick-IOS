@@ -82,7 +82,7 @@ class GetPlaceRequest {
                         let likeCnt = resPlace.p_like_cnt
                         let pickCnt = resPlace.p_pick_cnt
                         
-                        let place = Place(id: id, kId: kId, name: name, visibleAddress: visibleAddress, address: address, roadAddress: roadAddress, category: category, categoryName: categoryName, categoryGroupName: categoryGroupName, categoryGroupCode: categoryGroupCode, phone: phone, lat: lat!, lng: lng!, likeCnt: likeCnt, pickCnt: pickCnt)
+                        place = Place(id: id, kId: kId, name: name, visibleAddress: visibleAddress, address: address, roadAddress: roadAddress, category: category, categoryName: categoryName, categoryGroupName: categoryGroupName, categoryGroupCode: categoryGroupCode, phone: phone, lat: lat!, lng: lng!, likeCnt: likeCnt, pickCnt: pickCnt)
                         self.delegate?.response(place: place, status: "OK")
                         
                     } catch {

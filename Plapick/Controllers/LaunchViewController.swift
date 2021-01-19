@@ -92,7 +92,8 @@ extension LaunchViewController: LoginRequestProtocol {
         if status == "OK" {
             guard let user = user else { return }
             app.login(user: user)
-            changeRootViewController(rootViewController: MainTabBarController())
+            let navigationController = UINavigationController(rootViewController: MainTabBarController())
+            changeRootViewController(rootViewController: navigationController)
         }
     }
 }

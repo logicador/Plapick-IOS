@@ -107,13 +107,13 @@ class SearchPlaceView: UIView {
         topLineView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         topLineView.leadingAnchor.constraint(equalTo:leadingAnchor).isActive = true
         topLineView.trailingAnchor.constraint(equalTo:trailingAnchor).isActive = true
-        topLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        topLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         addSubview(bottomLineView)
         bottomLineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         bottomLineView.leadingAnchor.constraint(equalTo:leadingAnchor).isActive = true
         bottomLineView.trailingAnchor.constraint(equalTo:trailingAnchor).isActive = true
-        bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        bottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         placeSmallView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(placeTapped)))
         

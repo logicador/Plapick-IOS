@@ -35,7 +35,7 @@ class TermsViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(closeTapped))
         
         view.addSubview(webView)
         webView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -48,7 +48,7 @@ class TermsViewController: UIViewController {
     
     
     // MARK: Functions
-    @objc func backTapped() {
+    @objc func closeTapped() {
         self.dismiss(animated: true, completion: nil)
     }
 }

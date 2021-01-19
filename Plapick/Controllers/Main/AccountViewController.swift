@@ -12,6 +12,7 @@ class AccountViewController: UIViewController {
     
     // MARK: Properties
     var app = App()
+    var mainTabBarController: MainTabBarController?
     var postingViewController: PostingViewController?
     var getUserPicksRequest = GetUserPicksRequest()
     
@@ -42,14 +43,11 @@ class AccountViewController: UIViewController {
         return view
     }()
     
-    lazy var profileImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFill
-        iv.clipsToBounds = true
-        iv.layer.cornerRadius = 50
-        iv.layer.borderWidth = 2
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
+    lazy var profilePhotoView: PhotoView = {
+        let pv = PhotoView()
+        pv.layer.cornerRadius = 50
+        pv.layer.borderWidth = 2
+        return pv
     }()
     
     lazy var userNickNameLabel: UILabel = {
@@ -217,14 +215,25 @@ class AccountViewController: UIViewController {
     }()
     
     
+    // MARK: Init
+    init(mainTabBarController: MainTabBarController) {
+        super.init(nibName: nil, bundle: nil)
+        self.mainTabBarController = mainTabBarController
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
     // MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "내 정보"
+//        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationItem.title = "계정"
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(setting))
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(setting))
         
         view.addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -252,29 +261,29 @@ class AccountViewController: UIViewController {
         profileWrapperView.topAnchor.constraint(equalTo: profileContainerView.topAnchor, constant: 20).isActive = true
         profileWrapperView.centerXAnchor.constraint(equalTo: profileContainerView.centerXAnchor).isActive = true
         
-        profileWrapperView.addSubview(profileImageView)
-        profileImageView.topAnchor.constraint(equalTo: profileWrapperView.topAnchor).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        profileImageView.leadingAnchor.constraint(equalTo: profileWrapperView.leadingAnchor).isActive = true
-        profileImageView.bottomAnchor.constraint(equalTo: profileWrapperView.bottomAnchor).isActive = true
+        profileWrapperView.addSubview(profilePhotoView)
+        profilePhotoView.topAnchor.constraint(equalTo: profileWrapperView.topAnchor).isActive = true
+        profilePhotoView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        profilePhotoView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        profilePhotoView.leadingAnchor.constraint(equalTo: profileWrapperView.leadingAnchor).isActive = true
+        profilePhotoView.bottomAnchor.constraint(equalTo: profileWrapperView.bottomAnchor).isActive = true
         
         profileWrapperView.addSubview(userNickNameLabel)
         userNickNameLabel.centerYAnchor.constraint(equalTo: profileWrapperView.centerYAnchor).isActive = true
-        userNickNameLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: 20).isActive = true
+        userNickNameLabel.leadingAnchor.constraint(equalTo: profilePhotoView.trailingAnchor, constant: 20).isActive = true
         userNickNameLabel.trailingAnchor.constraint(equalTo: profileWrapperView.trailingAnchor).isActive = true
         
         contentView.addSubview(profileTopLineView)
         profileTopLineView.topAnchor.constraint(equalTo: profileContainerView.topAnchor).isActive = true
         profileTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         profileTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        profileTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        profileTopLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         contentView.addSubview(profileBottomLineView)
         profileBottomLineView.bottomAnchor.constraint(equalTo: profileContainerView.bottomAnchor).isActive = true
         profileBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         profileBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        profileBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        profileBottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         // MARK: Figure
         profileContainerView.addSubview(figureContainerView)
@@ -288,7 +297,7 @@ class AccountViewController: UIViewController {
         figureTopLineView.topAnchor.constraint(equalTo: figureContainerView.topAnchor).isActive = true
         figureTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         figureTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        figureTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        figureTopLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         // MARK: Like
         figureContainerView.addSubview(likeCntView)
@@ -360,13 +369,13 @@ class AccountViewController: UIViewController {
         followerCntTitleLabel.bottomAnchor.constraint(equalTo: followerCntWrapperView.bottomAnchor).isActive = true
         
         followerCntView.addSubview(followerLeftLineView)
-        followerLeftLineView.widthAnchor.constraint(equalToConstant: 0.4).isActive = true
+        followerLeftLineView.widthAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         followerLeftLineView.leadingAnchor.constraint(equalTo: followerCntView.leadingAnchor).isActive = true
         followerLeftLineView.heightAnchor.constraint(equalTo: followerCntView.heightAnchor, constant: -40).isActive = true
         followerLeftLineView.centerYAnchor.constraint(equalTo: followerCntView.centerYAnchor).isActive = true
         
         followerCntView.addSubview(followerRightLineView)
-        followerRightLineView.widthAnchor.constraint(equalToConstant: 0.4).isActive = true
+        followerRightLineView.widthAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         followerRightLineView.trailingAnchor.constraint(equalTo: followerCntView.trailingAnchor).isActive = true
         followerRightLineView.heightAnchor.constraint(equalTo: followerCntView.heightAnchor, constant: -40).isActive = true
         followerRightLineView.centerYAnchor.constraint(equalTo: followerCntView.centerYAnchor).isActive = true
@@ -385,6 +394,15 @@ class AccountViewController: UIViewController {
         myPickContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         myPickContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
+        // 초기 세팅 빈 pick으로
+        setMyPickContainer(photoGroupViewList: [
+            PhotoGroupView(direction: "N", pickList: [Pick(id: 0), Pick(id: 0), Pick(id: 0)]),
+            PhotoGroupView(direction: "N", pickList: [Pick(id: 0), Pick(id: 0), Pick(id: 0)]),
+            PhotoGroupView(direction: "N", pickList: [Pick(id: 0), Pick(id: 0), Pick(id: 0)])
+        ])
+        
+        getUserPicksRequest.delegate = self
+        
         adjustColors()
         
         if !app.isNetworkAvailable() {
@@ -392,10 +410,16 @@ class AccountViewController: UIViewController {
             return
         }
         
-        getUserPicksRequest.delegate = self
-        
         getAccount()
         getMyPicks()
+    }
+    
+    
+    // MARK: ViewDidAppear
+    override func viewDidAppear(_ animated: Bool) {
+        mainTabBarController?.title = "계정"
+        mainTabBarController?.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(setting))
+        if mainTabBarController?.navigationItem.leftBarButtonItem != nil { mainTabBarController?.navigationItem.leftBarButtonItem = nil }
     }
     
     
@@ -407,15 +431,13 @@ class AccountViewController: UIViewController {
         if self.traitCollection.userInterfaceStyle == .dark {
             view.backgroundColor = .systemBackground
             profileContainerView.backgroundColor = .systemGray6
-            profileImageView.backgroundColor = .systemBackground
-            profileImageView.layer.borderColor = UIColor.systemBackground.cgColor
+            profilePhotoView.layer.borderColor = UIColor.systemBackground.cgColor
             figureContainerView.backgroundColor = .systemGray6
             noPickView.backgroundColor = .systemGray6
         } else {
             view.backgroundColor = .tertiarySystemGroupedBackground
             profileContainerView.backgroundColor = .systemBackground
-            profileImageView.backgroundColor = .tertiarySystemGroupedBackground
-            profileImageView.layer.borderColor = UIColor.tertiarySystemGroupedBackground.cgColor
+            profilePhotoView.layer.borderColor = UIColor.tertiarySystemGroupedBackground.cgColor
             figureContainerView.backgroundColor = .systemBackground
             noPickView.backgroundColor = .systemBackground
         }
@@ -424,11 +446,10 @@ class AccountViewController: UIViewController {
     func getAccount() {
         let user = app.getUser()
         
-        if user.profileImageUrl.isEmpty {
-            profileImageView.image = nil
-        } else {
-            profileImageView.load(urlString: ((user.profileImageUrl.contains(String(user.id))) ? (PLAPICK_URL + user.profileImageUrl) : user.profileImageUrl))
+        if !user.profileImageUrl.isEmpty {
+            profilePhotoView.image = app.getUrlImage(urlString: ((user.profileImageUrl.contains(String(user.id))) ? (PLAPICK_URL + user.profileImageUrl) : user.profileImageUrl))
         }
+        
         userNickNameLabel.text = user.nickName
         likeCntLabel.text = String(user.likeCnt)
         followingCntLabel.text = String(user.followingCnt)
@@ -443,9 +464,11 @@ class AccountViewController: UIViewController {
         
         let settingViewController = SettingTableViewController()
         settingViewController.accountViewController = self
-        let navigationController = UINavigationController(rootViewController: settingViewController)
-        navigationController.modalPresentationStyle = .fullScreen
-        present(navigationController, animated: true)
+//        let navigationController = UINavigationController(rootViewController: settingViewController)
+//        navigationController.modalPresentationStyle = .fullScreen
+//        present(navigationController, animated: true)
+        
+        self.navigationController?.pushViewController(settingViewController, animated: true)
     }
     
     @objc func likeCntTapped() {
@@ -461,7 +484,7 @@ class AccountViewController: UIViewController {
     }
     
     func getMyPicks() {
-        self.myPickContainerView.removeAllChildView()
+//        self.myPickContainerView.removeAllChildView()
         getUserPicksRequest.fetch(vc: self, uId: app.getUser().id)
     }
     
@@ -490,11 +513,13 @@ class AccountViewController: UIViewController {
 extension AccountViewController: TitleViewProtocol {
     func actionTapped(actionMode: String) {
         postingViewController = PostingViewController()
-        postingViewController?.delegate = self
+//        postingViewController?.delegate = self
         postingViewController?.accountViewController = self
-        let navigationController = UINavigationController(rootViewController: postingViewController!)
-        navigationController.modalPresentationStyle = .fullScreen
-        present(navigationController, animated: true)
+        self.navigationController?.pushViewController(postingViewController!, animated: true)
+//        mainTabBarController?.tabBarController?.selectedIndex = 2
+//        let navigationController = UINavigationController(rootViewController: postingViewController!)
+//        navigationController.modalPresentationStyle = .fullScreen
+//        present(navigationController, animated: true)
     }
 }
 
@@ -503,22 +528,33 @@ extension AccountViewController: PhotoGroupViewProtocol {
     func photoTapped(pick: Pick) {
         let pickViewController = PickViewController()
         pickViewController.pick = pick
-        let navigationController = UINavigationController(rootViewController: pickViewController)
-        present(navigationController, animated: true, completion: nil)
+        pickViewController.accountViewController = self
+        navigationController?.pushViewController(pickViewController, animated: true)
+//        pickViewController.modalPresentationStyle = .fullScreen
+//        pickViewController.isModalInPresentation = true
+//        let navigationController = UINavigationController(rootViewController: pickViewController)
+//        navigationController.modalPresentationStyle = .fullScreen
+//
+////        self.navigationController?.pushViewController(pickViewController, animated: true)
+//
+////        delegate?.openPick(navigationController: pickViewController)
+//        navigationController.isModalInPresentation = true
+//        present(navigationController, animated: true, completion: nil)
     }
 }
 
 
-extension AccountViewController: PostingViewControllerProtocol {
-    func closeViewController() {
-//        getMyPicks()
-        postingViewController?.dismiss(animated: true, completion: nil)
-    }
-}
+//extension AccountViewController: PostingViewControllerProtocol {
+//    func closeViewController() {
+//        postingViewController?.dismiss(animated: true, completion: nil)
+//    }
+//}
 
 
 extension AccountViewController: GetUserPicksRequestProtocol {
     func response(pickList: [Pick]?, status: String) {
+        myPickContainerView.removeAllChildView()
+        
         if status == "OK" {
             if let pickList = pickList {
                 if pickList.count == 0 {
@@ -538,7 +574,7 @@ extension AccountViewController: GetUserPicksRequestProtocol {
                     noPickBottomLineView.bottomAnchor.constraint(equalTo: myPickContainerView.bottomAnchor).isActive = true
                     noPickBottomLineView.leadingAnchor.constraint(equalTo: myPickContainerView.leadingAnchor).isActive = true
                     noPickBottomLineView.trailingAnchor.constraint(equalTo: myPickContainerView.trailingAnchor).isActive = true
-                    noPickBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+                    noPickBottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
                     return
                 }
                 
@@ -553,7 +589,7 @@ extension AccountViewController: GetUserPicksRequestProtocol {
                     _pickList.append(pick)
                     
                     if index % 3 == 0 || index == pickList.count {
-                        let photoGroupView = PhotoGroupView(isBackGround: false, pickList: _pickList)
+                        let photoGroupView = PhotoGroupView(pickList: _pickList)
                         photoGroupView.delegate = self
                         photoGroupViewList.append(photoGroupView)
                         _pickList = []

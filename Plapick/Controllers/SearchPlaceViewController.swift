@@ -55,9 +55,9 @@ class SearchPlaceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.title = "플레이스 찾기"
+        self.title = "플레이스 검색"
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
         
         let searchController = UISearchController(searchResultsController: nil)
         searchController.automaticallyShowsCancelButton = false  // 취소버튼 안보이게
@@ -116,9 +116,9 @@ class SearchPlaceViewController: UIViewController {
         }
     }
     
-    @objc func backTapped() {
-        self.dismiss(animated: true, completion: nil)
-    }
+//    @objc func backTapped() {
+//        self.dismiss(animated: true, completion: nil)
+//    }
     
     @objc func nextTapped() {
         guard let selectedSearchPlaceView = self.selectedSearchPlaceView else { return }

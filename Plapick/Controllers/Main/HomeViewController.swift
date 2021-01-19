@@ -12,6 +12,7 @@ class HomeViewController: UIViewController {
     
     // MARK: Properties
     var app = App()
+    var mainTabBarController: MainTabBarController?
     
     
     // MARK: Views
@@ -52,14 +53,33 @@ class HomeViewController: UIViewController {
     }()
     
     
+    // MARK: Init
+    init(mainTabBarController: MainTabBarController) {
+        super.init(nibName: nil, bundle: nil)
+        self.mainTabBarController = mainTabBarController
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
     // MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "플레픽"
+//        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationItem.title = "플레픽"
+        
+//        let image = UIImage(named: "logo.png")
+//        let scaledImage = image?.resizeImage(size: CGSize(width: 24, height: 24))
+//        let imageView = UIImageView(image: scaledImage)
+//        imageView.frame = CGRect(origin: .zero, size: scaledImage!.size)
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: imageView)
+        
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(image: image?.withRenderingMode(UIImage.RenderingMode.alwaysOriginal), style: UIBarButtonItem.Style.plain, target: self, action: nil)
  
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(openSearchViewController))
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(openSearchViewController))
         
         view.addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -125,6 +145,14 @@ class HomeViewController: UIViewController {
     }
     
     
+    // MARK: ViewDidAppear
+    override func viewDidAppear(_ animated: Bool) {
+        mainTabBarController?.title = "플레픽"
+        if mainTabBarController?.navigationItem.leftBarButtonItem != nil { mainTabBarController?.navigationItem.leftBarButtonItem = nil }
+        mainTabBarController?.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(openSearchViewController))
+    }
+    
+    
     // MARK: Functions
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         adjustColors()
@@ -145,9 +173,10 @@ class HomeViewController: UIViewController {
         
         let searchPlaceViewController = SearchPlaceViewController()
 //        searchPlaceViewController.isSelectMode = true
-        let navigationController = UINavigationController(rootViewController: searchPlaceViewController)
-        navigationController.modalPresentationStyle = .fullScreen
-        present(navigationController, animated: true)
+//        let navigationController = UINavigationController(rootViewController: searchPlaceViewController)
+//        navigationController.modalPresentationStyle = .fullScreen
+//        present(navigationController, animated: true)
+        self.navigationController?.pushViewController(searchPlaceViewController, animated: true)
     }
     
     func getRecentPicks() {

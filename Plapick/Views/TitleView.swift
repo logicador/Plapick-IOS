@@ -48,19 +48,6 @@ class TitleView: UIView {
         return view
     }()
     
-//    lazy var topLineView: UIView = {
-//        let view = UIView()
-//        view.backgroundColor = .separator
-//        view.translatesAutoresizingMaskIntoConstraints = false
-//        return view
-//    }()
-//    lazy var bottomLineView: UIView = {
-//        let view = UIView()
-//        view.backgroundColor = .separator
-//        view.translatesAutoresizingMaskIntoConstraints = false
-//        return view
-//    }()
-    
     
     // MARK: Init
     init(titleText: String, isAction: Bool = false, actionText: String?, actionMode: String?) {
@@ -73,18 +60,6 @@ class TitleView: UIView {
         panel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -20).isActive = true
         panel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20).isActive = true
         panel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20).isActive = true
-        
-//        addSubview(topLineView)
-//        topLineView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-//        topLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-//        topLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-//        topLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
-//
-//        addSubview(bottomLineView)
-//        bottomLineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-//        bottomLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-//        bottomLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-//        bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
         
         if isAction {
             panel.addSubview(actionButton)

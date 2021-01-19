@@ -11,22 +11,21 @@ import UIKit
 class PhotoView: UIImageView {
     
     // MARK: Properties
-    var isBackGround: Bool = true {
-        didSet {
-            if isBackGround { adjustColors() }
-        }
-    }
+    var isBackGround: Bool = true // for traitCollectionDidChange
     
     
     // MARK: Init
-    init(photoUrl: String) {
+    init(isBackGround: Bool = true, isConstraints: Bool = true) {
         super.init(frame: CGRect.zero)
+        
+        self.isBackGround = isBackGround
         
         contentMode = .scaleAspectFill
         clipsToBounds = true
         isUserInteractionEnabled = true
         
-        load(urlString: photoUrl)
+        if isConstraints { translatesAutoresizingMaskIntoConstraints = false }
+        if isBackGround { adjustColors() }
     }
     
     required init?(coder: NSCoder) {

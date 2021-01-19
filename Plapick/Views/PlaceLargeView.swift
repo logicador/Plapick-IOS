@@ -17,6 +17,7 @@ protocol PlaceLargeViewProtocol {
 class PlaceLargeView: UIView {
     
     // MARK: Properties
+    var app = App()
     var delegate: PlaceLargeViewProtocol?
     var fullSize = UIScreen.main.bounds.size
     var place: Place?
@@ -104,14 +105,14 @@ class PlaceLargeView: UIView {
         scrollTopLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         scrollTopLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         scrollTopLineView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        scrollTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        scrollTopLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
 
         addSubview(scrollBottomLineView)
         scrollBottomLineView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         scrollBottomLineView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         scrollBottomLineView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         scrollBottomLineView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        scrollBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        scrollBottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         addSubview(pageControl)
         if #available(iOS 14.0, *) {
@@ -127,16 +128,17 @@ class PlaceLargeView: UIView {
         topLineView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         topLineView.leadingAnchor.constraint(equalTo:leadingAnchor).isActive = true
         topLineView.trailingAnchor.constraint(equalTo:trailingAnchor).isActive = true
-        topLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        topLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         addSubview(bottomLineView)
         bottomLineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         bottomLineView.leadingAnchor.constraint(equalTo:leadingAnchor).isActive = true
         bottomLineView.trailingAnchor.constraint(equalTo:trailingAnchor).isActive = true
-        bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        bottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         for (i, pick) in hotPickList.enumerated() {
-            let pv = PhotoView(photoUrl: pick.photoUrl)
+            let pv = PhotoView(isConstraints: false)
+            pv.image = app.getUrlImage(urlString: pick.photoUrl)
             scrollView.addSubview(pv)
             pv.frame = CGRect(x: fullSize.width * CGFloat(i), y: 0, width: fullSize.width, height: fullSize.width * (2 / 3))
         }

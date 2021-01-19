@@ -73,12 +73,10 @@ class UploadViewController: UIViewController {
         return tv
     }()
     
-    lazy var imageView: UIImageView = {
-        let iv = UIImageView()
-        iv.backgroundColor = .tertiarySystemGroupedBackground
-        iv.contentMode = .scaleAspectFit
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
+    lazy var photoView: PhotoView = {
+        let pv = PhotoView()
+        pv.contentMode = .scaleAspectFit
+        return pv
     }()
     
     lazy var contentView: UIView = {
@@ -152,12 +150,12 @@ class UploadViewController: UIViewController {
         
         navigationItem.title = "픽 업로드"
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "완료", style: UIBarButtonItem.Style.plain, target: self, action: #selector(upload))
         
         placeSmallView = PlaceSmallView(place: self.place!)
-        imageView.image = self.uploadImage
+        photoView.image = self.uploadImage
         
         view.addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -211,46 +209,46 @@ class UploadViewController: UIViewController {
         imageTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         imageTitleView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         
-        contentView.addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: imageTitleView.bottomAnchor).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        imageView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
-        imageView.heightAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        contentView.addSubview(photoView)
+        photoView.topAnchor.constraint(equalTo: imageTitleView.bottomAnchor).isActive = true
+        photoView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        photoView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        photoView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        photoView.heightAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        photoView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
         view.addSubview(messageTopLineView)
         messageTopLineView.topAnchor.constraint(equalTo: messageTextView.topAnchor).isActive = true
         messageTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messageTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        messageTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        messageTopLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         view.addSubview(messageBottomLineView)
         messageBottomLineView.bottomAnchor.constraint(equalTo: messageTextView.bottomAnchor).isActive = true
         messageBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         messageBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        messageBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        messageBottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         view.addSubview(placeTopLineView)
         placeTopLineView.topAnchor.constraint(equalTo: placeSmallView!.topAnchor).isActive = true
         placeTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         placeTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        placeTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        placeTopLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         view.addSubview(placeBottomLineView)
         placeBottomLineView.bottomAnchor.constraint(equalTo: placeSmallView!.bottomAnchor).isActive = true
         placeBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         placeBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        placeBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        placeBottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         view.addSubview(imageTopLineView)
-        imageTopLineView.topAnchor.constraint(equalTo: imageView.topAnchor).isActive = true
+        imageTopLineView.topAnchor.constraint(equalTo: photoView.topAnchor).isActive = true
         imageTopLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         imageTopLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        imageTopLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        imageTopLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         view.addSubview(imageBottomLineView)
-        imageBottomLineView.bottomAnchor.constraint(equalTo: imageView.bottomAnchor).isActive = true
+        imageBottomLineView.bottomAnchor.constraint(equalTo: photoView.bottomAnchor).isActive = true
         imageBottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         imageBottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        imageBottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
+        imageBottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
         
         self.hideKeyboardWhenTappedAround()
         
@@ -273,7 +271,6 @@ class UploadViewController: UIViewController {
     func adjustColors() {
         if self.traitCollection.userInterfaceStyle == .dark {
             view.backgroundColor = .systemBackground
-            imageView.backgroundColor = .systemGray6
             messageView.backgroundColor = .systemGray6
             messageTextView.backgroundColor = .systemGray6
             if messageTextView.textColor != UIColor.lightGray {
@@ -281,7 +278,6 @@ class UploadViewController: UIViewController {
             }
         } else {
             view.backgroundColor = .tertiarySystemGroupedBackground
-            imageView.backgroundColor = .systemBackground
             messageView.backgroundColor = .systemBackground
             messageTextView.backgroundColor = .systemBackground
             if messageTextView.textColor != UIColor.lightGray {
@@ -290,9 +286,9 @@ class UploadViewController: UIViewController {
         }
     }
     
-    @objc func backTapped() {
-        self.dismiss(animated: true, completion: nil)
-    }
+//    @objc func backTapped() {
+//        self.dismiss(animated: true, completion: nil)
+//    }
     
     @objc func upload() {
         if !app.isNetworkAvailable() {
@@ -315,7 +311,7 @@ class UploadViewController: UIViewController {
         indicatorView.centerYAnchor.constraint(equalTo: overlayView.centerYAnchor).isActive = true
         indicatorView.startAnimating()
         
-        uploadImageRequest.fetch(vc: self, imageData: uploadImage.jpegData(compressionQuality: 1)!)
+        uploadImageRequest.fetch(vc: self, imageData: uploadImage.jpegData(compressionQuality: COMPRESS_IMAGE_QUALITY)!)
     }
     
     func hideIndicator() {

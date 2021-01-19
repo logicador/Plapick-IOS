@@ -20,7 +20,7 @@ class PostingViewController: UIViewController {
     // MARK: Properties
     var app = App()
     var delegate: PostingViewControllerProtocol?
-    let searchPlaceViewController: SearchPlaceViewController = SearchPlaceViewController()
+    let searchPlaceViewController = SearchPlaceViewController()
     var uploadViewController: UploadViewController?
     var accountViewController: AccountViewController?
     
@@ -34,20 +34,19 @@ class PostingViewController: UIViewController {
         return button
     }()
     
-    lazy var imageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFit
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
+    lazy var photoView: PhotoView = {
+        let pv = PhotoView()
+        pv.contentMode = .scaleAspectFit
+        return pv
     }()
     
-    lazy var photoAuthButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("앨범 액세스 허용하기", for: UIControl.State.normal)
-        button.addTarget(self, action: #selector(requestAuth), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+//    lazy var photoAuthButton: UIButton = {
+//        let button = UIButton(type: UIButton.ButtonType.system)
+//        button.setTitle("앨범 액세스 허용하기", for: UIControl.State.normal)
+//        button.addTarget(self, action: #selector(requestAuth), for: UIControl.Event.touchUpInside)
+//        button.translatesAutoresizingMaskIntoConstraints = false
+//        return button
+//    }()
     
     lazy var topLineView: UIView = {
         let view = UIView()
@@ -70,31 +69,47 @@ class PostingViewController: UIViewController {
 //        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.title = "새로운 픽"
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
         
-        let requiredAccessLevel: PHAccessLevel = .readWrite
-        PHPhotoLibrary.requestAuthorization(for: requiredAccessLevel) { authorizationStatus in
-            switch authorizationStatus {
-            case .limited:
-                self.configureImageView()
-            case .authorized:
-                self.configureImageView()
-            case .denied:
-                self.configurePhotoAuthView()
-            default:
-                self.configurePhotoAuthView()
-            }
-        }
+        view.addSubview(pickButton)
+        pickButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
+        pickButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        
+        view.addSubview(photoView)
+        photoView.topAnchor.constraint(equalTo: pickButton.bottomAnchor, constant: 20).isActive = true
+        photoView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        photoView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        photoView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        photoView.heightAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        
+        view.addSubview(topLineView)
+        topLineView.topAnchor.constraint(equalTo: photoView.topAnchor).isActive = true
+        topLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        topLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        topLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
+        
+        view.addSubview(bottomLineView)
+        bottomLineView.bottomAnchor.constraint(equalTo: photoView.bottomAnchor).isActive = true
+        bottomLineView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        bottomLineView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        bottomLineView.heightAnchor.constraint(equalToConstant: LINE_VIEW_HEIGHT).isActive = true
+        
+        adjustColors()
         
         searchPlaceViewController.delegate = self
         searchPlaceViewController.isSelectMode = true
-        
-        adjustColors()
+        app.delegate = self
         
         if !app.isNetworkAvailable() {
             app.showNetworkAlert(parentViewController: self)
             return
         }
+    }
+    
+    
+    // MARK:
+    override func viewDidDisappear(_ animated: Bool) {
+        delegate?.closeViewController()
     }
     
     
@@ -105,16 +120,16 @@ class PostingViewController: UIViewController {
     func adjustColors() {
         if self.traitCollection.userInterfaceStyle == .dark {
             view.backgroundColor = .systemBackground
-            imageView.backgroundColor = .systemGray6
+//            imageView.backgroundColor = .systemGray6
         } else {
             view.backgroundColor = .tertiarySystemGroupedBackground
-            imageView.backgroundColor = .systemBackground
+//            imageView.backgroundColor = .systemBackground
         }
     }
     
-    @objc func backTapped() {
-        delegate?.closeViewController() // 부모인 MainTabBarController에게 자신이 종료됨을 알려주어야 함
-    }
+//    @objc func backTapped() {
+//        delegate?.closeViewController() // 부모인 MainTabBarController에게 자신이 종료됨을 알려주어야 함
+//    }
     
     @objc func openImagePickerController() {
         if !app.isNetworkAvailable() {
@@ -122,11 +137,7 @@ class PostingViewController: UIViewController {
             return
         }
         
-        let imagePickerController = UIImagePickerController()
-        imagePickerController.sourceType = .photoLibrary
-        imagePickerController.allowsEditing = false
-        imagePickerController.delegate = self
-        present(imagePickerController, animated: true, completion: nil)
+        app.checkPhotoGallaryAvailable(parentViewController: self)
     }
     
     @objc func openSearchViewController() {
@@ -135,51 +146,32 @@ class PostingViewController: UIViewController {
             return
         }
         
-        let navigationController = UINavigationController(rootViewController: searchPlaceViewController)
-        navigationController.modalPresentationStyle = .fullScreen
-        present(navigationController, animated: true)
+        self.navigationController?.pushViewController(searchPlaceViewController, animated: true)
+        
+//        let navigationController = UINavigationController(rootViewController: searchPlaceViewController)
+//        navigationController.modalPresentationStyle = .fullScreen
+//        present(navigationController, animated: true)
     }
     
-    @objc func requestAuth() {
-        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
-        }
-    }
+//    @objc func requestAuth() {
+//        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+//            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+//        }
+//    }
     
-    func configurePhotoAuthView() {
-        DispatchQueue.main.async {
-            self.view.addSubview(self.photoAuthButton)
-            self.photoAuthButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-            self.photoAuthButton.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-        }
-    }
-    
-    func configureImageView() {
-        DispatchQueue.main.async {
-            self.view.addSubview(self.pickButton)
-            self.pickButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 20).isActive = true
-            self.pickButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -20).isActive = true
-            
-            self.view.addSubview(self.imageView)
-            self.imageView.topAnchor.constraint(equalTo: self.pickButton.bottomAnchor, constant: 20).isActive = true
-            self.imageView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-            self.imageView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-            self.imageView.widthAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
-            self.imageView.heightAnchor.constraint(equalTo: self.view.widthAnchor).isActive = true
-            
-            self.view.addSubview(self.topLineView)
-            self.topLineView.topAnchor.constraint(equalTo: self.imageView.topAnchor).isActive = true
-            self.topLineView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-            self.topLineView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-            self.topLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
-            
-            self.view.addSubview(self.bottomLineView)
-            self.bottomLineView.bottomAnchor.constraint(equalTo: self.imageView.bottomAnchor).isActive = true
-            self.bottomLineView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-            self.bottomLineView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-            self.bottomLineView.heightAnchor.constraint(equalToConstant: 0.4).isActive = true
-        }
-    }
+//    func configurePhotoAuthView() {
+//        DispatchQueue.main.async {
+//            self.view.addSubview(self.photoAuthButton)
+//            self.photoAuthButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+//            self.photoAuthButton.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+//        }
+//    }
+//
+//    func configureImageView() {
+//        DispatchQueue.main.async {
+//
+//        }
+//    }
 }
 
 
@@ -197,7 +189,7 @@ extension PostingViewController: UIImagePickerControllerDelegate, UINavigationCo
         
         guard let _selectedImage = selectedImage else { return }
         
-        imageView.image = _selectedImage
+        photoView.image = _selectedImage
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "다음", style: UIBarButtonItem.Style.plain, target: self, action: #selector(openSearchViewController))
         
@@ -208,22 +200,38 @@ extension PostingViewController: UIImagePickerControllerDelegate, UINavigationCo
 
 extension PostingViewController: SearchPlaceViewControllerProtocol {
     func selectPlace(place: Place) {
-        uploadViewController = UploadViewController(uploadImage: imageView.image!, place: place)
+        uploadViewController = UploadViewController(uploadImage: photoView.image!, place: place)
         uploadViewController?.delegate = self
         uploadViewController?.accountViewController = accountViewController
-        let navigationController = UINavigationController(rootViewController: uploadViewController!)
-        navigationController.modalPresentationStyle = .fullScreen
-        searchPlaceViewController.present(navigationController, animated: true)
+        self.navigationController?.pushViewController(uploadViewController!, animated: true)
+//        let navigationController = UINavigationController(rootViewController: uploadViewController!)
+//        navigationController.modalPresentationStyle = .fullScreen
+//        searchPlaceViewController.present(navigationController, animated: true)
     }
 }
 
 
 extension PostingViewController: UploadViewControllerProtocol {
     func closeViewController() {
-        self.uploadViewController?.dismiss(animated: false) {
-            self.searchPlaceViewController.dismiss(animated: false) {
-                self.delegate?.closeViewController()
-            }
+        self.navigationController?.popToRootViewController(animated: true)
+//        self.uploadViewController?.dismiss(animated: false) {
+//            self.searchPlaceViewController.dismiss(animated: false) {
+//                self.delegate?.closeViewController()
+//            }
+//        }
+    }
+}
+
+
+extension PostingViewController: AppProtocol {
+    func pushNotification(isAllowed: Bool) { }
+    func photoGallary(isAllowed: Bool) {
+        if isAllowed {
+            let imagePickerController = UIImagePickerController()
+            imagePickerController.sourceType = .photoLibrary
+            imagePickerController.allowsEditing = false
+            imagePickerController.delegate = self
+            present(imagePickerController, animated: true, completion: nil)
         }
     }
 }
