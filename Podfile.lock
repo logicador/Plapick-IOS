@@ -31,11 +31,15 @@ PODS:
     - KakaoSDKAuth (= 2.0.4)
     - KakaoSDKCommon (= 2.0.4)
   - NMapsMap (3.10.2)
+  - SDWebImage (5.9.2):
+    - SDWebImage/Core (= 5.9.2)
+  - SDWebImage/Core (5.9.2)
 
 DEPENDENCIES:
   - Alamofire (~> 5.2)
   - KakaoSDK
   - NMapsMap
+  - SDWebImage (~> 5.0)
 
 SPEC REPOS:
   trunk:
@@ -50,6 +54,7 @@ SPEC REPOS:
     - KakaoSDKTemplate
     - KakaoSDKUser
     - NMapsMap
+    - SDWebImage
 
 SPEC CHECKSUMS:
   Alamofire: 814429acc853c6c54ff123fc3d2ef66803823ce0
@@ -63,7 +68,8 @@ SPEC CHECKSUMS:
   KakaoSDKTemplate: 330007aea0b46de1ed93e4cbddc7b4c3b59bdc25
   KakaoSDKUser: 7951e09f9e6de3908ae2d7f8486290c8607c217a
   NMapsMap: 2c092c6408c738774edea41e00f0fd1bad9e0ca9
+  SDWebImage: 0b42b8719ab0c5257177d5894306e8a336b21cbb
 
-PODFILE CHECKSUM: 0d57382eb880c6dd2cb6db9bb1a44500d46de5cb
+PODFILE CHECKSUM: c93efd1532ea2200a90e440ad138fa29599d1342
 
 COCOAPODS: 1.9.3

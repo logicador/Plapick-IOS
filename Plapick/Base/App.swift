@@ -25,14 +25,14 @@ class App {
     init() {
     }
     
-    func showNetworkAlert(parentViewController: UIViewController) {
+    func showNetworkAlert(vc: UIViewController) {
         DispatchQueue.main.async {
             let alert = UIAlertController(title: "네트워크 오류", message: "네트워크가 연결중인지 확인해주세요.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.cancel))
             alert.addAction(UIAlertAction(title: "다시시도", style: UIAlertAction.Style.default, handler: { (_) in
-                parentViewController.changeRootViewController(rootViewController: LaunchViewController())
+                vc.changeRootViewController(rootViewController: LaunchViewController())
             }))
-            parentViewController.present(alert, animated: true)
+            vc.present(alert, animated: true)
         }
     }
     
@@ -54,59 +54,75 @@ class App {
         return (isReachable && !needsConnection)
     }
     
-    func checkPushNotificationAvailable(parentViewController: UIViewController) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { (isAllowed, error) in
-            DispatchQueue.main.async {
-                if error != nil || !isAllowed {
-                    let alert = UIAlertController(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.", preferredStyle: UIAlertController.Style.alert)
-                    alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
-                    alert.addAction(UIAlertAction(title: "설정으로", style: UIAlertAction.Style.default, handler: { (_) in
-                        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
-                            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
-                        }
-                    }))
-                    parentViewController.present(alert, animated: true)
-                    self.delegate?.pushNotification(isAllowed: false)
-                } else {
-                    UIApplication.shared.registerForRemoteNotifications()
-                    self.delegate?.pushNotification(isAllowed: true)
-                }
+    func checkPushNotificationAvailable(vc: UIViewController) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { (isAllowed, error) in DispatchQueue.main.async {
+            if let _ = error {
+                vc.requestSettingAlert(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.")
+                self.delegate?.pushNotification(isAllowed: false)
+                return
             }
-        })
+            
+            if isAllowed {
+                UIApplication.shared.registerForRemoteNotifications()
+            } else {
+                vc.requestSettingAlert(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.")
+            }
+            
+            self.delegate?.pushNotification(isAllowed: isAllowed)
+        }})
     }
     
-    func checkPhotoGallaryAvailable(parentViewController: UIViewController) {
-        let requiredAccessLevel: PHAccessLevel = .readWrite
-        PHPhotoLibrary.requestAuthorization(for: requiredAccessLevel) { authorizationStatus in
-            DispatchQueue.main.async {
-                if authorizationStatus == .limited || authorizationStatus == .authorized {
-                    self.delegate?.photoGallary(isAllowed: true)
-                } else {
-                    let alert = UIAlertController(title: "앨범 액세스 허용하기", message: "'플레픽'에서 앨범에 접근하고자 합니다.", preferredStyle: UIAlertController.Style.alert)
-                    alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
-                    alert.addAction(UIAlertAction(title: "설정으로", style: UIAlertAction.Style.default, handler: { (_) in
-                        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
-                            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
-                        }
-                    }))
-                    parentViewController.present(alert, animated: true)
-                    self.delegate?.photoGallary(isAllowed: false)
+    func checkPhotoGallaryAvailable(vc: UIViewController) {
+        let status = PHPhotoLibrary.authorizationStatus()
+        if status == .notDetermined || status == .denied {
+            PHPhotoLibrary.requestAuthorization({ (status) in DispatchQueue.main.async {
+                if status == .notDetermined || status == .denied {
+                    vc.requestSettingAlert(title: "앨범 액세스 허용하기", message: "'플레픽'에서 앨범에 접근하고자 합니다.")
+                    return
                 }
+                self.delegate?.photoGallary(isAllowed: true)
+            }})
+            return
+        }
+        delegate?.photoGallary(isAllowed: true)
+    }
+    
+//    func getUrlImage(urlString: String) -> UIImage {
+//        let url = URL(string: urlString)
+//        if let url = url {
+//            do {
+//                let data = try Data(contentsOf: url)
+//                let image = UIImage(data: data)
+//                if let image = image {
+//                    return image
+//                } else { return UIImage() }
+//            } catch { return UIImage() }
+//        } else { return UIImage() }
+//    }
+//    
+//    func getPickImage(uId: Int, piId: Int) -> UIImage {
+//        return getUrlImage(urlString: "\(IMAGE_URL)/users/\(uId)/\(piId).jpg")
+//    }
+    
+    func getCategoryString(categoryName: String, replaceStr: String = "-") -> String {
+        if categoryName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return replaceStr
+        }
+        
+        if let splittedCategoryName = categoryName.split(separator: ">").last {
+            let str = String(splittedCategoryName).trimmingCharacters(in: .whitespacesAndNewlines)
+            if str.isEmpty {
+                return replaceStr
+            } else {
+                return str
             }
         }
+        
+        return replaceStr
     }
     
-    func getUrlImage(urlString: String) -> UIImage {
-        let url = URL(string: urlString)
-        if let url = url {
-            do {
-                let data = try Data(contentsOf: url)
-                let image = UIImage(data: data)
-                if let image = image {
-                    return image
-                } else { return UIImage() }
-            } catch { return UIImage() }
-        } else { return UIImage() }
+    func getPickUrl(id: Int, uId: Int) -> String {
+        return "\(IMAGE_URL)/users/\(uId)/\(id).jpg"
     }
     
     func isLogined() -> Bool {
@@ -114,21 +130,25 @@ class App {
     }
     
     func getUser() -> User {
-        let uId = userDefaults.integer(forKey: "uId")
-        let uType = userDefaults.string(forKey: "uType") ?? ""
-        let uSocialId = userDefaults.string(forKey: "uSocialId") ?? ""
-        let uName = userDefaults.string(forKey: "uName") ?? ""
-        let uNickName = userDefaults.string(forKey: "uNickName") ?? ""
-        let uEmail = userDefaults.string(forKey: "uEmail") ?? ""
-        let uProfileImageUrl = userDefaults.string(forKey: "uProfileImageUrl") ?? ""
-        let uLikeCnt = userDefaults.integer(forKey: "uLikeCnt")
-        let uFollowerCnt = userDefaults.integer(forKey: "uFollowerCnt")
-        let uFollowingCnt = userDefaults.integer(forKey: "uFollowingCnt")
-        let uStatus = userDefaults.string(forKey: "uStatus") ?? ""
-        let uCreatedDate = userDefaults.string(forKey: "uCreatedDate") ?? ""
-        let uUpdatedDate = userDefaults.string(forKey: "uUpdatedDate") ?? ""
-            
-        return User(id: uId, type: uType, socialId: uSocialId, name: uName, nickName: uNickName, email: uEmail, profileImageUrl: uProfileImageUrl, likeCnt: uLikeCnt, followerCnt: uFollowerCnt, followingCnt: uFollowingCnt, status: uStatus, createdDate: uCreatedDate, updatedDate: uUpdatedDate)
+        let id = userDefaults.integer(forKey: "uId")
+        let type = userDefaults.string(forKey: "uType") ?? ""
+        let socialId = userDefaults.string(forKey: "uSocialId") ?? ""
+        let name = userDefaults.string(forKey: "uName") ?? ""
+        let nickName = userDefaults.string(forKey: "uNickName") ?? ""
+        let email = userDefaults.string(forKey: "uEmail") ?? ""
+        let password = userDefaults.string(forKey: "uPassword") ?? ""
+        let profileImage = userDefaults.string(forKey: "uProfileImage") ?? ""
+        let likeCnt = userDefaults.integer(forKey: "uLikeCnt")
+        let followerCnt = userDefaults.integer(forKey: "uFollowerCnt")
+        let followingCnt = userDefaults.integer(forKey: "uFollowingCnt")
+        let status = userDefaults.string(forKey: "uStatus") ?? ""
+        let lastLoginPlatform = userDefaults.string(forKey: "uLastLoginPlatform") ?? ""
+        let isLogined = userDefaults.string(forKey: "uIsLogined") ?? ""
+        let createdDate = userDefaults.string(forKey: "uCreatedDate") ?? ""
+        let updatedDate = userDefaults.string(forKey: "uUpdatedDate") ?? ""
+        let connectedDate = userDefaults.string(forKey: "uConnectedDate") ?? ""
+        
+        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, likeCnt: likeCnt, followerCnt: followerCnt, followingCnt: followingCnt, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate)
     }
     
     func login(user: User) {
@@ -139,13 +159,17 @@ class App {
         userDefaults.set(user.name, forKey: "uName")
         userDefaults.set(user.nickName, forKey: "uNickName")
         userDefaults.set(user.email, forKey: "uEmail")
-        userDefaults.set(user.profileImageUrl, forKey: "uProfileImageUrl")
+        userDefaults.set(user.password, forKey: "uPassword")
+        userDefaults.set(user.profileImage, forKey: "uProfileImage")
         userDefaults.set(user.likeCnt, forKey: "uLikeCnt")
         userDefaults.set(user.followerCnt, forKey: "uFollowerCnt")
         userDefaults.set(user.followingCnt, forKey: "uFollowingCnt")
         userDefaults.set(user.status, forKey: "uStatus")
+        userDefaults.set(user.lastLoginPlatform, forKey: "uLastLoginPlatform")
+        userDefaults.set(user.isLogined, forKey: "uIsLogined")
         userDefaults.set(user.createdDate, forKey: "uCreatedDate")
         userDefaults.set(user.updatedDate, forKey: "uUpdatedDate")
+        userDefaults.set(user.connectedDate, forKey: "uConnectedDate")
     }
     
     func logout() {
@@ -156,13 +180,17 @@ class App {
         userDefaults.removeObject(forKey: "uName")
         userDefaults.removeObject(forKey: "uNickName")
         userDefaults.removeObject(forKey: "uEmail")
+        userDefaults.removeObject(forKey: "uPassword")
         userDefaults.removeObject(forKey: "uProfileImageUrl")
         userDefaults.removeObject(forKey: "uLikeCnt")
         userDefaults.removeObject(forKey: "uFollowerCnt")
         userDefaults.removeObject(forKey: "uFollowingCnt")
         userDefaults.removeObject(forKey: "uStatus")
+        userDefaults.removeObject(forKey: "uLastLoginPlatform")
+        userDefaults.removeObject(forKey: "uIsLogined")
         userDefaults.removeObject(forKey: "uCreatedDate")
         userDefaults.removeObject(forKey: "uUpdatedDate")
+        userDefaults.removeObject(forKey: "uConnectedDate")
     }
     
     func setNickName(nickName: String) {
@@ -173,13 +201,21 @@ class App {
         userDefaults.set(profileImageUrl, forKey: "uProfileImageUrl")
     }
     
-    func setPushNotificationDeviceToken(deviceToken: String) {
-        userDefaults.set(deviceToken, forKey: "uPushNotificationDeviceToken")
+    func setPndId(pndId: String) {
+        userDefaults.set(pndId, forKey: "pndId")
     }
+    
+    func getPndId() -> String {
+        return userDefaults.string(forKey: "pndId") ?? ""
+    }
+    
+//    func setPushNotificationDeviceToken(deviceToken: String) {
+//        userDefaults.set(deviceToken, forKey: "uPushNotificationDeviceToken")
+//    }
 
-    func getPushNotificationDeviceToken() -> String {
-        return userDefaults.string(forKey: "uPushNotificationDeviceToken") ?? ""
-    }
+//    func getPushNotificationDeviceToken() -> String {
+//        return userDefaults.string(forKey: "uPushNotificationDeviceToken") ?? ""
+//    }
     
     func getUId() -> Int {
         return userDefaults.integer(forKey: "uId")

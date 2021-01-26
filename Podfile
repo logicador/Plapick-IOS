@@ -9,4 +9,5 @@ target 'Plapick' do
   pod 'NMapsMap'
   pod 'Alamofire', '~> 5.2'
   pod 'KakaoSDK'
+  pod 'SDWebImage', '~> 5.0'
 end

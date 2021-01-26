@@ -39,10 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02x", $1)})
         
         let app = App()
-        app.setPushNotificationDeviceToken(deviceToken: deviceTokenString)
+        app.setPndId(pndId: deviceTokenString)
         let addPushNotificationDeviceRequest = AddPushNotificationDeviceRequest()
-        addPushNotificationDeviceRequest.delegate = self
-        addPushNotificationDeviceRequest.fetch(deviceToken: deviceTokenString)
+//        addPushNotificationDeviceRequest.delegate = self
+        addPushNotificationDeviceRequest.fetch(isShowAlert: false, paramDict: ["pndId" : deviceTokenString])
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -51,8 +51,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 
-extension AppDelegate: AddPushNotificationDeviceRequestProtocol {
-    func response(status: String) {
-        print("AddPushNotificationDeviceRequest", status)
-    }
-}
+//extension AppDelegate: AddPushNotificationDeviceRequestProtocol {
+//    func response(status: String) {
+//        // nothing to do
+//    }
+//}
