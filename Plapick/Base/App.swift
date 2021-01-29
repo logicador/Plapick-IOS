@@ -9,6 +9,7 @@ import Foundation
 import SystemConfiguration
 import UIKit
 import Photos
+import CoreLocation
 
 
 protocol AppProtocol {
@@ -19,9 +20,12 @@ protocol AppProtocol {
 
 class App {
     
+    // MARK: Property
     var delegate: AppProtocol?
     var userDefaults = UserDefaults.standard
     
+    
+    // MARK: Init
     init() {
     }
     
@@ -138,9 +142,11 @@ class App {
         let email = userDefaults.string(forKey: "uEmail") ?? ""
         let password = userDefaults.string(forKey: "uPassword") ?? ""
         let profileImage = userDefaults.string(forKey: "uProfileImage") ?? ""
-        let likeCnt = userDefaults.integer(forKey: "uLikeCnt")
-        let followerCnt = userDefaults.integer(forKey: "uFollowerCnt")
-        let followingCnt = userDefaults.integer(forKey: "uFollowingCnt")
+//        let likeCnt = userDefaults.integer(forKey: "uLikeCnt")
+//        let followerCnt = userDefaults.integer(forKey: "uFollowerCnt")
+//        let followingCnt = userDefaults.integer(forKey: "uFollowingCnt")
+//        let newsCnt = userDefaults.integer(forKey: "uNewsCnt")
+//        let myNewsCnt = userDefaults.integer(forKey: "uMyNewsCnt")
         let status = userDefaults.string(forKey: "uStatus") ?? ""
         let lastLoginPlatform = userDefaults.string(forKey: "uLastLoginPlatform") ?? ""
         let isLogined = userDefaults.string(forKey: "uIsLogined") ?? ""
@@ -148,7 +154,7 @@ class App {
         let updatedDate = userDefaults.string(forKey: "uUpdatedDate") ?? ""
         let connectedDate = userDefaults.string(forKey: "uConnectedDate") ?? ""
         
-        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, likeCnt: likeCnt, followerCnt: followerCnt, followingCnt: followingCnt, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate)
+        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate)
     }
     
     func login(user: User) {
@@ -161,9 +167,11 @@ class App {
         userDefaults.set(user.email, forKey: "uEmail")
         userDefaults.set(user.password, forKey: "uPassword")
         userDefaults.set(user.profileImage, forKey: "uProfileImage")
-        userDefaults.set(user.likeCnt, forKey: "uLikeCnt")
-        userDefaults.set(user.followerCnt, forKey: "uFollowerCnt")
-        userDefaults.set(user.followingCnt, forKey: "uFollowingCnt")
+//        userDefaults.set(user.likeCnt, forKey: "uLikeCnt")
+//        userDefaults.set(user.followerCnt, forKey: "uFollowerCnt")
+//        userDefaults.set(user.followingCnt, forKey: "uFollowingCnt")
+//        userDefaults.set(user.newsCnt, forKey: "uNewsCnt")
+//        userDefaults.set(user.myNewsCnt, forKey: "uMyNewsCnt")
         userDefaults.set(user.status, forKey: "uStatus")
         userDefaults.set(user.lastLoginPlatform, forKey: "uLastLoginPlatform")
         userDefaults.set(user.isLogined, forKey: "uIsLogined")
@@ -181,10 +189,12 @@ class App {
         userDefaults.removeObject(forKey: "uNickName")
         userDefaults.removeObject(forKey: "uEmail")
         userDefaults.removeObject(forKey: "uPassword")
-        userDefaults.removeObject(forKey: "uProfileImageUrl")
-        userDefaults.removeObject(forKey: "uLikeCnt")
-        userDefaults.removeObject(forKey: "uFollowerCnt")
-        userDefaults.removeObject(forKey: "uFollowingCnt")
+        userDefaults.removeObject(forKey: "uProfileImage")
+//        userDefaults.removeObject(forKey: "uLikeCnt")
+//        userDefaults.removeObject(forKey: "uFollowerCnt")
+//        userDefaults.removeObject(forKey: "uFollowingCnt")
+//        userDefaults.removeObject(forKey: "uNewsCnt")
+//        userDefaults.removeObject(forKey: "uMyNewsCnt")
         userDefaults.removeObject(forKey: "uStatus")
         userDefaults.removeObject(forKey: "uLastLoginPlatform")
         userDefaults.removeObject(forKey: "uIsLogined")
@@ -193,29 +203,26 @@ class App {
         userDefaults.removeObject(forKey: "uConnectedDate")
     }
     
+    func getNickName() -> String {
+        return userDefaults.string(forKey: "uNickName") ?? ""
+    }
     func setNickName(nickName: String) {
         userDefaults.set(nickName, forKey: "uNickName")
     }
     
-    func setProfileImage(profileImageUrl: String) {
-        userDefaults.set(profileImageUrl, forKey: "uProfileImageUrl")
+    func getProfileImage() -> String {
+        return userDefaults.string(forKey: "uProfileImage") ?? ""
     }
-    
-    func setPndId(pndId: String) {
-        userDefaults.set(pndId, forKey: "pndId")
+    func setProfileImage(profileImage: String) {
+        userDefaults.set(profileImage, forKey: "uProfileImage")
     }
     
     func getPndId() -> String {
         return userDefaults.string(forKey: "pndId") ?? ""
     }
-    
-//    func setPushNotificationDeviceToken(deviceToken: String) {
-//        userDefaults.set(deviceToken, forKey: "uPushNotificationDeviceToken")
-//    }
-
-//    func getPushNotificationDeviceToken() -> String {
-//        return userDefaults.string(forKey: "uPushNotificationDeviceToken") ?? ""
-//    }
+    func setPndId(pndId: String) {
+        userDefaults.set(pndId, forKey: "pndId")
+    }
     
     func getUId() -> Int {
         return userDefaults.integer(forKey: "uId")

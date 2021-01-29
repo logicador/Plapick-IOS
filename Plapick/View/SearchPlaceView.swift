@@ -27,9 +27,9 @@ class SearchPlaceView: UIView {
             NSLayoutConstraint.deactivate(animConsList)
             
             if isSelected {
-                let placeSmallViewTrailingCons = placeSmallView?.trailingAnchor.constraint(equalTo: detailButton.leadingAnchor)
-                placeSmallViewTrailingCons?.isActive = true
-                animConsList.append(placeSmallViewTrailingCons!)
+////                let placeSmallViewTrailingCons = placeSmallView?.trailingAnchor.constraint(equalTo: detailButton.leadingAnchor)
+//                placeSmallViewTrailingCons?.isActive = true
+//                animConsList.append(placeSmallViewTrailingCons!)
                 
                 let detailButtonTrailingCons = detailButton.trailingAnchor.constraint(equalTo: trailingAnchor)
                 detailButtonTrailingCons.isActive = true
@@ -40,9 +40,9 @@ class SearchPlaceView: UIView {
                 detailButtonLeadingCons.isActive = true
                 animConsList.append(detailButtonLeadingCons)
                 
-                let placeSmallViewTrailingCons = placeSmallView?.trailingAnchor.constraint(equalTo: trailingAnchor)
-                placeSmallViewTrailingCons?.isActive = true
-                animConsList.append(placeSmallViewTrailingCons!)
+//                let placeSmallViewTrailingCons = placeSmallView?.trailingAnchor.constraint(equalTo: trailingAnchor)
+//                placeSmallViewTrailingCons?.isActive = true
+//                animConsList.append(placeSmallViewTrailingCons!)
             }
             
             UIView.animate(withDuration: 0.2) {
@@ -54,7 +54,7 @@ class SearchPlaceView: UIView {
     
     
     // MARK: Views
-    var placeSmallView: PlaceSmallView?
+//    var placeSmallView: PlaceSmallView?
     
     lazy var topLineView: UIView = {
         let view = UIView()
@@ -86,7 +86,7 @@ class SearchPlaceView: UIView {
         self.index = index
         self.place = place
 //        placeSmallView = PlaceSmallView(place: place)
-        placeSmallView = PlaceSmallView()
+//        placeSmallView = PlaceSmallView()
         
         addSubview(detailButton)
         detailButton.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -96,13 +96,13 @@ class SearchPlaceView: UIView {
         detailButtonLeadingCons.isActive = true
         animConsList.append(detailButtonLeadingCons)
         
-        addSubview(placeSmallView!)
-        placeSmallView?.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        placeSmallView?.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        placeSmallView?.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        let placeSmallViewTrailingCons = placeSmallView?.trailingAnchor.constraint(equalTo: trailingAnchor)
-        placeSmallViewTrailingCons?.isActive = true
-        animConsList.append(placeSmallViewTrailingCons!)
+//        addSubview(placeSmallView!)
+//        placeSmallView?.topAnchor.constraint(equalTo: topAnchor).isActive = true
+//        placeSmallView?.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+//        placeSmallView?.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+//        let placeSmallViewTrailingCons = placeSmallView?.trailingAnchor.constraint(equalTo: trailingAnchor)
+//        placeSmallViewTrailingCons?.isActive = true
+//        animConsList.append(placeSmallViewTrailingCons!)
         
         addSubview(topLineView)
         topLineView.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -116,7 +116,7 @@ class SearchPlaceView: UIView {
         bottomLineView.trailingAnchor.constraint(equalTo:trailingAnchor).isActive = true
         bottomLineView.heightAnchor.constraint(equalToConstant: LINE_WIDTH).isActive = true
         
-        placeSmallView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(placeTapped)))
+//        placeSmallView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(placeTapped)))
         
         translatesAutoresizingMaskIntoConstraints = false
         

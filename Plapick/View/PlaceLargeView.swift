@@ -22,6 +22,7 @@ protocol PlaceLargeViewProtocol {
 class PlaceLargeView: UIView {
     
     // MARK: Property
+    let slideWidth = SCREEN_WIDTH
     let slideHeight = SCREEN_WIDTH
     var app = App()
     var delegate: PlaceLargeViewProtocol?
@@ -44,13 +45,13 @@ class PlaceLargeView: UIView {
             
             guard let mostPickList = place.mostPickList else { return }
             
-            scrollView.contentSize = CGSize(width: SCREEN_WIDTH * CGFloat(mostPickList.count), height: slideHeight)
+            scrollView.contentSize = CGSize(width: slideWidth * CGFloat(mostPickList.count), height: slideHeight)
             pageControl.numberOfPages = mostPickList.count
             
             for (i, mostPick) in mostPickList.enumerated() {
                 let mpsv = MostPickSlideView()
                 mpsv.mostPick = mostPick
-                mpsv.frame = CGRect(x: SCREEN_WIDTH * CGFloat(i), y: 0, width: SCREEN_WIDTH, height: slideHeight)
+                mpsv.frame = CGRect(x: ((slideWidth - 1) * CGFloat(i)) + (1 * CGFloat(i)), y: 0, width: (slideWidth - 1), height: slideHeight)
                 mpsv.delegate = self
                 scrollView.addSubview(mpsv)
             }
@@ -61,6 +62,7 @@ class PlaceLargeView: UIView {
     // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
+        sv.bounces = false
         sv.showsHorizontalScrollIndicator = false
         sv.isPagingEnabled = true
         sv.delegate = self
@@ -115,7 +117,7 @@ class PlaceLargeView: UIView {
         button.backgroundColor = .tertiarySystemGroupedBackground
         button.setTitle("자세히", for: UIControl.State.normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.cornerRadius = 15
+        button.layer.cornerRadius = SPACE_S
         button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XXS, left: SPACE_S, bottom: SPACE_XXS, right: SPACE_S)
         button.addTarget(self, action: #selector(detailTapped), for: UIControl.Event.touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -185,8 +187,8 @@ class PlaceLargeView: UIView {
     
     
     // MARK: Init
-    init() {
-        super.init(frame: CGRect.zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         configureView()
         

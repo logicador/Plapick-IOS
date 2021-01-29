@@ -13,13 +13,8 @@ class HomeViewController: UIViewController {
     // MARK: Property
     var app = App()
     var mainVC: MainViewController?
-    
-    // MARK: Property - Request
     var getRecentPicksRequest = GetRecentPicksRequest()
     var getHotPlacesRequest = GetHotPlacesRequest()
-//    let likePlaceRequest = LikePlaceRequest()
-    
-    // MARK: Property - View
     var photoGroupViewList: [PhotoGroupView] = []
     var placeLargeViewList: [PlaceLargeView] = []
     
@@ -81,14 +76,26 @@ class HomeViewController: UIViewController {
         configureView()
         
         // 초기세팅 빈 Pick으로 (UI 흔들림 방지)
-        for i in 1...5 {
+        for i in 0...4 {
             var pgv = PhotoGroupView()
-            if i == 2 { pgv = PhotoGroupView(direction: "L") }
-            else if i == 4 { pgv = PhotoGroupView(direction: "R") }
+            if i == 1 { pgv = PhotoGroupView(direction: "L") }
+            else if i == 3 { pgv = PhotoGroupView(direction: "R") }
             pgv.delegate = self
+            
+            recentPickContainerView.addSubview(pgv)
+            pgv.leadingAnchor.constraint(equalTo: recentPickContainerView.leadingAnchor).isActive = true
+            pgv.trailingAnchor.constraint(equalTo: recentPickContainerView.trailingAnchor).isActive = true
+            if i == 0 {
+                pgv.topAnchor.constraint(equalTo: recentPickContainerView.topAnchor).isActive = true
+            } else {
+                pgv.topAnchor.constraint(equalTo: recentPickContainerView.subviews[recentPickContainerView.subviews.count - 2].bottomAnchor, constant: 1).isActive = true
+            }
+            if i == 4 {
+                pgv.bottomAnchor.constraint(equalTo: recentPickContainerView.bottomAnchor).isActive = true
+            }
+            
             photoGroupViewList.append(pgv)
         }
-        configurePhotoGroupView()
         
         // 푸시 알림 허용 확인
         app.checkPushNotificationAvailable(vc: self)
@@ -102,12 +109,13 @@ class HomeViewController: UIViewController {
     }
     
     
-    // MARK: ViewDidAppear
-    override func viewDidAppear(_ animated: Bool) {
+    // MARK: ViewWillAppear
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         mainVC?.title = "플레픽"
         if mainVC?.navigationItem.leftBarButtonItem != nil { mainVC?.navigationItem.leftBarButtonItem = nil }
         if mainVC?.navigationItem.rightBarButtonItem != nil { mainVC?.navigationItem.rightBarButtonItem = nil }
-//        mainVC?.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(openSearchViewController))
     }
     
     
@@ -147,59 +155,30 @@ class HomeViewController: UIViewController {
         hotPlaceContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         hotPlaceContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
     }
-    
-    func configurePhotoGroupView() {
-        for (i, pgv) in photoGroupViewList.enumerated() {
-            recentPickContainerView.addSubview(pgv)
-            pgv.leadingAnchor.constraint(equalTo: recentPickContainerView.leadingAnchor).isActive = true
-            pgv.trailingAnchor.constraint(equalTo: recentPickContainerView.trailingAnchor).isActive = true
-            if i == 0 {
-                pgv.topAnchor.constraint(equalTo: recentPickContainerView.topAnchor).isActive = true
-            } else {
-                pgv.topAnchor.constraint(equalTo: photoGroupViewList[i - 1].bottomAnchor, constant: 1).isActive = true
-            }
-            if i == photoGroupViewList.count - 1 {
-                pgv.bottomAnchor.constraint(equalTo: recentPickContainerView.bottomAnchor).isActive = true
-            }
-        }
-    }
-    
-//    // MARK: Function - @OBJC
-//    @objc func openSearchViewController() {
-//
-////        let searchPlaceViewController = SearchPlaceViewController()
-//////        searchPlaceViewController.isSelectMode = true
-//////        let navigationController = UINavigationController(rootViewController: searchPlaceViewController)
-//////        navigationController.modalPresentationStyle = .fullScreen
-//////        present(navigationController, animated: true)
-////        self.navigationController?.pushViewController(searchPlaceViewController, animated: true)
-//    }
 }
 
 
-// MARK: Extension
+// MARK: Extension - TitleView
 extension HomeViewController: TitleViewProtocol {
     func action(actionMode: String) {
         print(actionMode)
     }
 }
 
-
+// MARK: Extension - PhotoGroupView
 extension HomeViewController: PhotoGroupViewProtocol {
     func pickTapped(pick: Pick) {
-        print("pickTapped", pick)
+        print("pickTapped", pick.id)
     }
 }
 
-
+// MARK: Extension - PlaceLargeView
 extension HomeViewController: PlaceLargeViewProtocol {
     func openPlace(place: Place) {
-        print("openPlace", place.id)
+        let placeVC = PlaceViewController()
+        placeVC.place = place
+        navigationController?.pushViewController(placeVC, animated: true)
     }
-    
-//    func likePlace(place: Place) {
-//        likePlaceRequest.fetch(paramDict: ["pId": String(place.id)])
-//    }
     
     func openPlaceAllComments(place: Place) {
         print("openAllComments", place.id)
@@ -214,7 +193,7 @@ extension HomeViewController: PlaceLargeViewProtocol {
     }
     
     func openPickUser(uId: Int) {
-        print("openPickUser", uId)
+        present(UINavigationController(rootViewController: AccountViewController(uId: uId)), animated: true, completion: nil)
     }
     
     func openPickCnt(piId: Int) {
@@ -222,7 +201,7 @@ extension HomeViewController: PlaceLargeViewProtocol {
     }
 }
 
-
+// MARK: Extension - GetRecentPicks
 extension HomeViewController: GetRecentPicksRequestProtocol {
     func response(pickList: [Pick]?, getRecentPicks status: String) {
         if status == "OK" {
@@ -240,7 +219,7 @@ extension HomeViewController: GetRecentPicksRequestProtocol {
     }
 }
 
-
+// MARK: Extension - GetHotPlaces
 extension HomeViewController: GetHotPlacesRequestProtocol {
     func response(placeList: [Place]?, getHotPlaces status: String) {
         if status == "OK" {
@@ -275,10 +254,3 @@ extension HomeViewController: GetHotPlacesRequestProtocol {
         }
     }
 }
-
-
-//extension HomeViewController: LikePlaceRequestProtocol {
-//    func response(likePlace status: String) {
-//        // nothing to do
-//    }
-//}

@@ -39,8 +39,10 @@ class NoticeViewController: UIViewController {
     }
     
     
-    // MARK: ViewDidAppear
-    override func viewDidAppear(_ animated: Bool) {
+    // MARK: ViewWillAppear
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         mainVC?.title = "알림"
         mainVC?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "설정", style: UIBarButtonItem.Style.plain, target: self, action: nil)
         mainVC?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "모두 삭제", style: UIBarButtonItem.Style.plain, target: self, action: nil)

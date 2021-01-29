@@ -15,7 +15,7 @@ class LoginViewController: UIViewController {
     
     // MARK: Property
     var app = App()
-    var loginRequest = LoginRequest()
+    let loginRequest = LoginRequest()
     
     
     // MARK: View

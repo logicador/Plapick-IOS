@@ -180,6 +180,16 @@ extension UIViewController {
         idv.removeView()
         bov.removeView()
     }
+    
+    func isValidStrLength(max: Int, kMin: Int, kMax: Int, value: String) -> Bool {
+        let cnt = value.count
+        let utf8Cnt = value.utf8.count
+        if utf8Cnt >= (kMin * 3) && utf8Cnt <= (kMax * 3) {
+            if cnt <= max {
+                return true
+            } else { return false }
+        } else { return false }
+    }
 }
 
 

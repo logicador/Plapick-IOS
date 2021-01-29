@@ -11,7 +11,7 @@ import Photos
 
 // MARK: Protocol
 protocol PostingViewControllerProtocol {
-    func closeVC()
+    func closePostingVC(isUploaded: Bool)
 }
 
 
@@ -20,11 +20,14 @@ class PostingViewController: UIViewController {
     // MARK: Property
     var app = App()
     var delegate: PostingViewControllerProtocol?
-    var accountVC: AccountViewController?
-    var searchKakaoPlaceVC: SearchKakaoPlaceViewController?
+//    var searchKakaoPlaceVC = SearchKakaoPlaceViewController()
+    var isOpenedChildVC: Bool = false
     var selectedImage: UIImage?
     var selectedPlace: Place?
     let addPlaceRequest = AddPlaceRequest()
+    let uploadImageRequest = UploadImageRequest()
+    let addPickRequest = AddPickRequest()
+    var isUploaded: Bool = false
     
     
     // MARK: View
@@ -58,7 +61,6 @@ class PostingViewController: UIViewController {
         let tv = UITextView()
         tv.font = UIFont.systemFont(ofSize: 16)
         tv.text = "이곳에 메시지를 입력합니다."
-//        tv.textColor = .lightGray
         tv.textColor = .lightGray
         tv.delegate = self
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -126,17 +128,6 @@ class PostingViewController: UIViewController {
     }()
     
     
-    // MARK: Init
-    init(accountVC: AccountViewController) {
-        super.init(nibName: nil, bundle: nil)
-        self.accountVC = accountVC
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    
     // MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,21 +136,31 @@ class PostingViewController: UIViewController {
         
         navigationItem.title = "새로운 픽"
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        
+        isModalInPresentation = true
+        
         configureView()
         
         setThemeColor()
         
+//        searchKakaoPlaceVC.delegate = self
+        
         app.delegate = self
         addPlaceRequest.delegate = self
+        uploadImageRequest.delegate = self
+        addPickRequest.delegate = self
     }
     
     
     // MARK: ViewDidDisappear
     override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
         // searchKakaoPlaceVC가 열리면서 viewDidDisappear가 호출되기때문에 Main에 closeVC를 주게됨
         // 그걸 막기 위해 searchKakaoPlaceVC가 nil인지 확인 후 종료 시그널
-        if searchKakaoPlaceVC == nil {
-            delegate?.closeVC()
+        if !isOpenedChildVC {
+            delegate?.closePostingVC(isUploaded: isUploaded)
         }
     }
     
@@ -172,6 +173,14 @@ class PostingViewController: UIViewController {
         messageTextFieldView.layer.borderColor = UIColor.separator.cgColor
         if messageTextView.textColor != UIColor.lightGray {
             messageTextView.textColor = UIColor.systemBackground.inverted
+        }
+        
+        if self.traitCollection.userInterfaceStyle == .dark {
+            view.backgroundColor = .black
+            messageTextView.backgroundColor = .black
+        } else {
+            view.backgroundColor = .white
+            messageTextView.backgroundColor = .white
         }
     }
     
@@ -189,7 +198,7 @@ class PostingViewController: UIViewController {
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
         
-        // MARK: View - Message
+        // MARK: ConfigureView - Message
         contentView.addSubview(messageTitleView)
         messageTitleView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         messageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
@@ -207,7 +216,7 @@ class PostingViewController: UIViewController {
         messageTextView.trailingAnchor.constraint(equalTo: messageTextFieldView.trailingAnchor, constant: -SPACE_XS).isActive = true
         messageTextView.bottomAnchor.constraint(equalTo: messageTextFieldView.bottomAnchor, constant: -SPACE_XS).isActive = true
         
-        // MARK: View - Image
+        // MARK: ConfigureView - Image
         contentView.addSubview(imageTitleView)
         imageTitleView.topAnchor.constraint(equalTo: messageTextView.bottomAnchor).isActive = true
         imageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
@@ -223,7 +232,7 @@ class PostingViewController: UIViewController {
         noPhotoLabel.centerXAnchor.constraint(equalTo: photoView.centerXAnchor).isActive = true
         noPhotoLabel.centerYAnchor.constraint(equalTo: photoView.centerYAnchor).isActive = true
         
-        // MARK: View - Place
+        // MARK: ConfigureView - Place
         contentView.addSubview(placeTitleView)
         placeTitleView.topAnchor.constraint(equalTo: photoView.bottomAnchor).isActive = true
         placeTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
@@ -241,29 +250,20 @@ class PostingViewController: UIViewController {
         noPlaceLabel.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor, constant: -SPACE_XXXXL).isActive = true
     }
     
-    func posting() {
-        guard let place = self.selectedPlace else { return }
-        guard let image = self.selectedImage else { return }
-        
-        var message = ""
-        if messageTextView.textColor != UIColor.lightGray {
-            message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        }
-        
-        // addpick
-    }
-    
     // MARK: Function - @OBJC
     @objc func postingTapped() {
-        guard let place = self.selectedPlace else { return }
+        guard let place = selectedPlace else { return }
         showIndicator(idv: indicatorView, bov: blurOverlayView)
         
         if place.id == 0 {
-            showIndicator(idv: indicatorView, bov: blurOverlayView)
             addPlaceRequest.fetch(vc: self, paramDict: ["kId": String(place.kId), "name": place.name ?? "", "categoryName": place.categoryName ?? "", "categoryGroupCode": place.categoryGroupCode ?? "", "categoryGroupName": place.categoryGroupName ?? "", "address": place.address ?? "", "roadAddress": place.roadAddress ?? "", "latitude": place.latitude ?? "", "longitude": place.longitude ?? "", "phone": place.phone ?? ""])
             
         } else {
-            posting()
+            guard let image = selectedImage else {
+                hideIndicator(idv: indicatorView, bov: blurOverlayView)
+                return
+            }
+            uploadImageRequest.fetch(vc: self, image: image)
         }
     }
 }
@@ -280,9 +280,11 @@ extension PostingViewController: TitleViewProtocol {
             app.checkPhotoGallaryAvailable(vc: self)
             
         } else if actionMode == "SEARCH_PLACE" {
-            searchKakaoPlaceVC = SearchKakaoPlaceViewController()
-            searchKakaoPlaceVC?.delegate = self
-            navigationController?.pushViewController(searchKakaoPlaceVC!, animated: true)
+            isOpenedChildVC = true
+            let searchPlaceVC = SearchPlaceViewController()
+            searchPlaceVC.mode = "KEYWORD"
+            searchPlaceVC.delegate = self
+            navigationController?.pushViewController(searchPlaceVC, animated: true)
         }
     }
 }
@@ -320,12 +322,13 @@ extension PostingViewController: AppProtocol {
     }
 }
 
-// MARK: Extension - SearchKakaoPlaceView
-extension PostingViewController: SearchKakaoPlaceViewControllerProtocol {
-    func selectPlace(place: Place?) {
+// MARK: Extension - SearchPlace
+extension PostingViewController: SearchPlaceViewControllerProtocol {
+    func closeSearchPlaceVC(place: Place?) {
         // searchKakaoPlaceVC가 종료되면 nil로 초기화 필수
         // viewDidDisappear과 관련있음
-        searchKakaoPlaceVC = nil
+//        searchKakaoPlaceVC = nil
+        isOpenedChildVC = false
         
         if let place = place {
             
@@ -337,15 +340,15 @@ extension PostingViewController: SearchKakaoPlaceViewControllerProtocol {
             selectedPlace = place
             placeContainerView.removeAllChildView()
             
-            let psv = PlaceSmallView()
-            psv.place = place
-            psv.delegate = self
+            let pmv = PlaceMediumView()
+            pmv.place = place
+            pmv.delegate = self
             
-            placeContainerView.addSubview(psv)
-            psv.topAnchor.constraint(equalTo: placeContainerView.topAnchor).isActive = true
-            psv.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
-            psv.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
-            psv.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor).isActive = true
+            placeContainerView.addSubview(pmv)
+            pmv.topAnchor.constraint(equalTo: placeContainerView.topAnchor).isActive = true
+            pmv.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
+            pmv.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
+            pmv.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor).isActive = true
             
             if selectedImage != nil {
                 navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시하기", style: UIBarButtonItem.Style.plain, target: self, action: #selector(postingTapped))
@@ -354,8 +357,8 @@ extension PostingViewController: SearchKakaoPlaceViewControllerProtocol {
     }
 }
 
-// MARK: Extension - PlaceSmallView
-extension PostingViewController: PlaceSmallViewProtocol {
+// MARK: Extension - PlaceMediumView
+extension PostingViewController: PlaceMediumViewProtocol {
     func openPlace(place: Place) {
         if messageTextView.isFirstResponder {
             messageTextView.resignFirstResponder()
@@ -386,20 +389,61 @@ extension PostingViewController: UITextViewDelegate {
     // 입력이 끝났을때 (커서가 내려갔을때)
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            textView.text = "이곳에 메세지를 입력합니다."
+            textView.text = "이곳에 메시지를 입력합니다."
             textView.textColor = UIColor.lightGray
         }
     }
 }
 
-// MARK: Extension - AddPlaceRequest
+// MARK: Extension - AddPlace
 extension PostingViewController: AddPlaceRequestProtocol {
     func response(place: Place?, addPlace status: String) {
         if status == "OK" {
+            guard let image = selectedImage else {
+                hideIndicator(idv: indicatorView, bov: blurOverlayView)
+                return
+            }
             selectedPlace = place
-            posting()
+            uploadImageRequest.fetch(vc: self, image: image)
+            
         } else {
             hideIndicator(idv: indicatorView, bov: blurOverlayView)
+        }
+    }
+}
+
+// MARK: Extension - UploadImage
+extension PostingViewController: UploadImageRequestProtocol {
+    func response(imageName: Int?, uploadImage status: String) {
+        if status == "OK" {
+            if let piId = imageName {
+                guard let place = selectedPlace else { return }
+                
+                var message = ""
+                if messageTextView.textColor != UIColor.lightGray {
+                    message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                
+                addPickRequest.fetch(vc: self, paramDict: ["message": message, "piId": String(piId), "pId": String(place.id)])
+            }
+            
+        } else {
+            hideIndicator(idv: indicatorView, bov: blurOverlayView)
+        }
+    }
+}
+
+// MARK: Extension - AddPick
+extension PostingViewController: AddPickRequestProtocol {
+    func response(addPick status: String) {
+        hideIndicator(idv: indicatorView, bov: blurOverlayView)
+        if status == "OK" {
+            isUploaded = true
+            let alert = UIAlertController(title: "픽 게시하기", message: "새로운 픽이 게시되었습니다.", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
+                self.navigationController?.popViewController(animated: true)
+            }))
+            present(alert, animated: true)
         }
     }
 }

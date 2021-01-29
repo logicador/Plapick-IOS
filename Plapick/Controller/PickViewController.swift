@@ -22,8 +22,8 @@ class PickViewController: UIViewController {
 //            }
         }
     }
-    var getPlaceRequest = GetPlaceRequest()
-    let removePickRequest = RemovePickRequest()
+//    var getPlaceRequest = GetPlaceRequest()
+//    let removePickRequest = RemovePickRequest()
     var accountViewController: AccountViewController?
     
     var isZooming: Bool = false
@@ -49,7 +49,7 @@ class PickViewController: UIViewController {
         return view
     }()
     
-    var placeSmallView: PlaceSmallView?
+//    var placeSmallView: PlaceSmallView?
     lazy var placeTopLineView: UIView = {
         let view = UIView()
         view.backgroundColor = .separator
@@ -164,8 +164,8 @@ class PickViewController: UIViewController {
         spaceView.widthAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         spaceView.heightAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
         
-        getPlaceRequest.delegate = self
-        removePickRequest.delegate = self
+//        getPlaceRequest.delegate = self
+//        removePickRequest.delegate = self
         
         adjustColors()
         
@@ -202,7 +202,7 @@ class PickViewController: UIViewController {
             removeAlert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
             removeAlert.addAction(UIAlertAction(title: "삭제", style: UIAlertAction.Style.destructive, handler: { (_) in
                 let piId = self.pick?.id
-                self.removePickRequest.fetch(vc: self, piId: piId!)
+//                self.removePickRequest.fetch(vc: self, piId: piId!)
             }))
             self.present(removeAlert, animated: true, completion: nil)
         }))
@@ -291,8 +291,8 @@ class PickViewController: UIViewController {
         spaceView.removeView()
         
 //        placeSmallView = PlaceSmallView(place: place)
-        placeSmallView = PlaceSmallView()
-        placeSmallView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(placeTapped)))
+//        placeSmallView = PlaceSmallView()
+//        placeSmallView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(placeTapped)))
         
 //        photoView.image = app.getUrlImage(urlString: pick.photoUrl)
         
@@ -309,25 +309,25 @@ class PickViewController: UIViewController {
         photoView.addGestureRecognizer(panGesture)
         photoView.addGestureRecognizer(pinchGesture)
         
-        contentView.addSubview(placeSmallView!)
-        placeSmallView?.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        placeSmallView?.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        placeSmallView?.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+//        contentView.addSubview(placeSmallView!)
+//        placeSmallView?.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+//        placeSmallView?.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+//        placeSmallView?.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         contentView.addSubview(placeTopLineView)
-        placeTopLineView.topAnchor.constraint(equalTo: placeSmallView!.topAnchor).isActive = true
+//        placeTopLineView.topAnchor.constraint(equalTo: placeSmallView!.topAnchor).isActive = true
         placeTopLineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         placeTopLineView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         placeTopLineView.heightAnchor.constraint(equalToConstant: LINE_WIDTH).isActive = true
         
         contentView.addSubview(placeBottomLineView)
-        placeBottomLineView.bottomAnchor.constraint(equalTo: placeSmallView!.bottomAnchor).isActive = true
+//        placeBottomLineView.bottomAnchor.constraint(equalTo: placeSmallView!.bottomAnchor).isActive = true
         placeBottomLineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         placeBottomLineView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         placeBottomLineView.heightAnchor.constraint(equalToConstant: LINE_WIDTH).isActive = true
         
         contentView.addSubview(photoTopLineView)
-        photoTopLineView.topAnchor.constraint(equalTo: placeSmallView!.bottomAnchor, constant: 20).isActive = true
+//        photoTopLineView.topAnchor.constraint(equalTo: placeSmallView!.bottomAnchor, constant: 20).isActive = true
         photoTopLineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         photoTopLineView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         photoTopLineView.heightAnchor.constraint(equalToConstant: LINE_WIDTH).isActive = true
@@ -393,29 +393,29 @@ class PickViewController: UIViewController {
 
 
 // MARK: Extensions
-extension PickViewController: GetPlaceRequestProtocol {
-    func response(place: Place?, status: String) {
-        if status == "OK" {
-            if let place = place {
-                configureView(place: place)
-            }
-        }
-    }
-}
+//extension PickViewController: GetPlaceRequestProtocol {
+//    func response(place: Place?, status: String) {
+//        if status == "OK" {
+//            if let place = place {
+//                configureView(place: place)
+//            }
+//        }
+//    }
+//}
 
 
-extension PickViewController: RemovePickRequestProtocol {
-    func response(status: String) {
-        if status == "OK" {
-            self.accountViewController?.getMyPicks()
-            let alert = UIAlertController(title: "픽 삭제", message: "픽이 삭제되었습니다.", preferredStyle: UIAlertController.Style.alert)
-            alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
-                self.navigationController?.popViewController(animated: true)
-            }))
-            present(alert, animated: true)
-        }
-    }
-}
+//extension PickViewController: RemovePickRequestProtocol {
+//    func response(status: String) {
+//        if status == "OK" {
+////            self.accountViewController?.getMyPicks()
+//            let alert = UIAlertController(title: "픽 삭제", message: "픽이 삭제되었습니다.", preferredStyle: UIAlertController.Style.alert)
+//            alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
+//                self.navigationController?.popViewController(animated: true)
+//            }))
+//            present(alert, animated: true)
+//        }
+//    }
+//}
 
 
 extension PickViewController: UIGestureRecognizerDelegate {

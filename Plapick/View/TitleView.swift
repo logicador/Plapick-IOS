@@ -19,6 +19,12 @@ class TitleView: UIView {
     // MARK: Proprety
     var delegate: TitleViewProtocol?
     var actionMode: String?
+    public enum Style : Int {
+        case ultraSmall = 0
+        case small = 1
+        case medium = 2
+        case large = 3
+    }
     
     
     // MARK: View
@@ -30,7 +36,6 @@ class TitleView: UIView {
     
     lazy var label: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 32) // same Large Title
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -38,17 +43,42 @@ class TitleView: UIView {
     lazy var button: UIButton = {
         let button = UIButton(type: UIButton.ButtonType.system)
         button.addTarget(self, action: #selector(actionTapped), for: UIControl.Event.touchUpInside)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     
     // MARK: Init
-    init(text: String, isAction: Bool = false, actionText: String? = nil, actionMode: String? = nil) {
+    init(text: String, style: Style = .large, isAction: Bool = false, actionText: String? = nil, actionMode: String? = nil) {
         super.init(frame: CGRect.zero)
         
         label.text = text
+        
+        var topConstant = SPACE_XXXL
+        var bottomConstant = -SPACE_XXL
+        
+        if style == .ultraSmall {
+            label.font = UIFont.boldSystemFont(ofSize: 20)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+            topConstant = SPACE_L
+            bottomConstant = -SPACE
+            
+        } else if style == .small {
+            label.font = UIFont.boldSystemFont(ofSize: 24)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+            topConstant = SPACE_XL
+            bottomConstant = -SPACE_L
+            
+        } else if style == .medium {
+            label.font = UIFont.boldSystemFont(ofSize: 28)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+            topConstant = SPACE_XXL
+            bottomConstant = -SPACE_XL
+            
+        } else {
+            label.font = UIFont.boldSystemFont(ofSize: 32)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+        }
         
         addSubview(containerView)
         containerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -57,9 +87,9 @@ class TitleView: UIView {
         containerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
         containerView.addSubview(label)
-        label.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_XXXL).isActive = true
+        label.topAnchor.constraint(equalTo: containerView.topAnchor, constant: topConstant).isActive = true
         label.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
-        label.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -SPACE_XXL).isActive = true
+        label.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: bottomConstant).isActive = true
         
         if isAction {
             self.actionMode = actionMode

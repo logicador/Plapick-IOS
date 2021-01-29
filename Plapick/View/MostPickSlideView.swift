@@ -82,6 +82,10 @@ class MostPickSlideView: UIView {
         return pv
     }()
     
+    lazy var PhotoViewLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
     lazy var line: LineView = {
         let lv = LineView(orientation: .vertical)
         return lv
@@ -89,8 +93,8 @@ class MostPickSlideView: UIView {
     
     
     // MARK: Init
-    init() {
-        super.init(frame: CGRect.zero)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         configureView()
     }
@@ -105,7 +109,7 @@ class MostPickSlideView: UIView {
         addSubview(headerView)
         headerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         headerView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        headerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
+        headerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
         headerView.addSubview(profileImageView)
         profileImageView.topAnchor.constraint(equalTo: headerView.topAnchor, constant: SPACE_XS).isActive = true
@@ -117,25 +121,28 @@ class MostPickSlideView: UIView {
         headerView.addSubview(nickNameLabel)
         nickNameLabel.topAnchor.constraint(equalTo: headerView.topAnchor).isActive = true
         nickNameLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
-//        nickNameLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
         nickNameLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
         
         headerView.addSubview(cntLabel)
         cntLabel.topAnchor.constraint(equalTo: headerView.topAnchor).isActive = true
         cntLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
-//        cntLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
         cntLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor).isActive = true
-        
-        addSubview(line)
-        line.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        line.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        line.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
         addSubview(photoView)
         photoView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
         photoView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         photoView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         photoView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        
+        addSubview(PhotoViewLine)
+        PhotoViewLine.topAnchor.constraint(equalTo: photoView.topAnchor).isActive = true
+        PhotoViewLine.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        PhotoViewLine.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
+        addSubview(line)
+        line.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        line.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        line.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
     
     

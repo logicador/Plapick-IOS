@@ -22,7 +22,7 @@ class PhotoGroupView: UIView {
     var delegate: PhotoGroupViewProtocol?
     let photoSize = (UIScreen.main.bounds.size.width / 3) - (2 / 3)
     var photoViewList: [PhotoView] = [PhotoView(), PhotoView(), PhotoView()]
-    var pickList: [Pick] = [] { // 무조건 3개가 들어온다고 가정한다.
+    var pickList: [Pick] = [] {
         didSet {
             for (i, pick) in self.pickList.enumerated() {
                 if let url = URL(string: app.getPickUrl(id: pick.id, uId: pick.uId)) {
@@ -127,12 +127,15 @@ class PhotoGroupView: UIView {
     
     // MARK: Function - @OBJC
     @objc func photoView1Tapped() {
+        if pickList.count < 1 { return }
         delegate?.pickTapped(pick: pickList[0])
     }
     @objc func photoView2Tapped() {
+        if pickList.count < 2 { return }
         delegate?.pickTapped(pick: pickList[1])
     }
     @objc func photoView3Tapped() {
+        if pickList.count < 3 { return }
         delegate?.pickTapped(pick: pickList[2])
     }
 }

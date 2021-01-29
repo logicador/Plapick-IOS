@@ -27,6 +27,6 @@ struct Place: Codable {
     var clocCode: String? = ""
     var mostPickList: [MostPick]? = []
     
-    var isLike: String = "N"
-    var isComment: String = "N"
+    var isLike: String? = "N"
+    var isComment: String? = "N"
 }
