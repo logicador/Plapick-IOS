@@ -102,7 +102,6 @@ class HomeViewController: UIViewController {
         
         getRecentPicksRequest.delegate = self
         getHotPlacesRequest.delegate = self
-//        likePlaceRequest.delegate = self
         
         getRecentPicksRequest.fetch(vc: self, paramDict: [:])
         getHotPlacesRequest.fetch(vc: self, paramDict: [:])
@@ -167,8 +166,8 @@ extension HomeViewController: TitleViewProtocol {
 
 // MARK: Extension - PhotoGroupView
 extension HomeViewController: PhotoGroupViewProtocol {
-    func pickTapped(pick: Pick) {
-        print("pickTapped", pick.id)
+    func openPick(pick: Pick) {
+        print("openPick", pick.id)
     }
 }
 
@@ -192,18 +191,22 @@ extension HomeViewController: PlaceLargeViewProtocol {
         print("openPick", piId)
     }
     
-    func openPickUser(uId: Int) {
-        present(UINavigationController(rootViewController: AccountViewController(uId: uId)), animated: true, completion: nil)
-    }
-    
-    func openPickCnt(piId: Int) {
-        print("openPickStatistics", piId)
+    func openUser(uId: Int) {
+        let authUId = app.getUId()
+        
+        if authUId == uId {
+            let accountVC = mainVC?.accountVC
+            mainVC?.present(UINavigationController(rootViewController: accountVC!), animated: true, completion: nil)
+        } else {
+            present(UINavigationController(rootViewController: AccountViewController(uId: uId)), animated: true, completion: nil)
+        }
     }
 }
 
 // MARK: Extension - GetRecentPicks
 extension HomeViewController: GetRecentPicksRequestProtocol {
     func response(pickList: [Pick]?, getRecentPicks status: String) {
+        print("[HTTP RES]", getRecentPicksRequest.apiUrl, status)
         if status == "OK" {
             if let pickList = pickList {
                 var _pickList: [Pick] = []
@@ -222,6 +225,7 @@ extension HomeViewController: GetRecentPicksRequestProtocol {
 // MARK: Extension - GetHotPlaces
 extension HomeViewController: GetHotPlacesRequestProtocol {
     func response(placeList: [Place]?, getHotPlaces status: String) {
+        print("[HTTP RES]", getHotPlacesRequest.apiUrl, status)
         if status == "OK" {
             if let placeList = placeList {
                 hotPlaceContainerView.removeAllChildView()

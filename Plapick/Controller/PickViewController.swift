@@ -297,8 +297,8 @@ class PickViewController: UIViewController {
 //        photoView.image = app.getUrlImage(urlString: pick.photoUrl)
         
         messageLabel.text = pick.message
-        figureLikeCntLabel.text = "좋아요 \(String(pick.likeCnt))개"
-        figureCommentCntLabel.text = "댓글 \(String(pick.commentCnt))개"
+//        figureLikeCntLabel.text = "좋아요 \(String(pick.likeCnt))개"
+//        figureCommentCntLabel.text = "댓글 \(String(pick.commentCnt))개"
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(photoViewTapped))
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(photoViewPanned(sender:)))

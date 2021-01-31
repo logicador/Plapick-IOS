@@ -274,7 +274,7 @@ extension SearchPlaceViewController: PlaceMediumViewProtocol {
 
 // MARK: Extension - PlaceVC
 extension SearchPlaceViewController: PlaceViewControllerProtocol {
-    func closeVC() {
+    func closePlaceVC() {
         isOpenedChildVC = false
     }
 }

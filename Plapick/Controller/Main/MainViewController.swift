@@ -19,8 +19,6 @@ class MainViewController: UITabBarController {
     var accountVC: AccountViewController?
     var postingVC: PostingViewController?
     
-//    var accountNavVC: UINavigationController?
-    
     
     // MARK: ViewDidLoad
     override func viewDidLoad() {
@@ -62,6 +60,8 @@ class MainViewController: UITabBarController {
                 accountVC!
             ], animated: false)
         
+        postingVC?.authAccountVC = accountVC
+        
         self.delegate = self
         postingVC?.delegate = self
         accountVC?.delegate = self
@@ -76,7 +76,6 @@ class MainViewController: UITabBarController {
         homeVC?.tabBarItem.selectedImage = UIImage(systemName: "house.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
         searchVC?.tabBarItem.selectedImage = UIImage(systemName: "magnifyingglass")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
         noticeVC?.tabBarItem.selectedImage = UIImage(systemName: "bell.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
-//        accountVC?.tabBarItem.selectedImage = UIImage(systemName: "person.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
     }
 }
 
@@ -99,18 +98,10 @@ extension MainViewController: UITabBarControllerDelegate {
 // MARK: Extension - Posting
 extension MainViewController: PostingViewControllerProtocol {
     func closePostingVC(isUploaded: Bool) {
-//        if isUploaded {
-            postingVC = PostingViewController() // 새로운 VC로
-            postingVC?.delegate = self
-            postingVC?.tabBarItem.image = UIImage(systemName: "plus.circle")
-            
-            // 픽 갱신
-//            if let accountVC = self.accountVC {
-//                if accountVC.isViewLoaded {
-//                    self.accountVC?.getPicks()
-//                }
-//            }
-//        }
+        postingVC = PostingViewController()
+        postingVC?.authAccountVC = accountVC
+        postingVC?.delegate = self
+        postingVC?.tabBarItem.image = UIImage(systemName: "plus.circle")
         
         viewControllers?.insert(postingVC!, at: 2) // 원위치에 삽입
     }
@@ -119,11 +110,10 @@ extension MainViewController: PostingViewControllerProtocol {
 // MARK: Extension - Account
 extension MainViewController: AccountViewControllerProtocol {
     func closeAccountVC() {
-//        accountVC = AccountViewController(uId: uId)
         accountVC?.delegate = self
         accountVC?.tabBarItem.image = UIImage(systemName: "person")
         viewControllers?.insert(accountVC!, at: 4) // 원위치에 삽입
     }
     
-    func changeNewsUser() { }
+    func follow() { }
 }

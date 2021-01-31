@@ -9,7 +9,7 @@ import UIKit
 
 
 protocol PlaceViewControllerProtocol {
-    func closeVC()
+    func closePlaceVC()
 }
 
 
@@ -30,8 +30,6 @@ class PlaceViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
-        
         isModalInPresentation = true
         
         configureView()
@@ -44,7 +42,7 @@ class PlaceViewController: UIViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if !isOpenedChildVC {
-            delegate?.closeVC()
+            delegate?.closePlaceVC()
         }
     }
     

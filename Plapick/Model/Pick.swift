@@ -11,12 +11,14 @@ import Foundation
 struct Pick: Codable {
     var user: User? = nil
     var place: Place? = nil
+    
     var id: Int
-    var pId: Int
     var uId: Int
-    var message: String? = ""
-    var likeCnt: Int
-    var commentCnt: Int
+    var pId: Int
+    var message: String
     var createdDate: String
     var updatedDate: String
+    
+    var likeCnt: Int? = 0
+    var commentCnt: Int? = 0
 }

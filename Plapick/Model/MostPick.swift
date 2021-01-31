@@ -10,8 +10,8 @@ import Foundation
 
 struct MostPick: Codable {
     var id: Int
-    var likeCnt: Int
-    var commentCnt: Int
+//    var likeCnt: Int
+//    var commentCnt: Int
     
     var uId: Int
     var uNickName: String

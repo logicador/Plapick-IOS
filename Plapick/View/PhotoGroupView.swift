@@ -11,7 +11,7 @@ import SDWebImage
 
 // MARK: Protocol
 protocol PhotoGroupViewProtocol {
-    func pickTapped(pick: Pick)
+    func openPick(pick: Pick)
 }
 
 
@@ -37,7 +37,7 @@ class PhotoGroupView: UIView {
     init(direction: String = "N") {
         super.init(frame: CGRect.zero)
         
-        let emptyPick = Pick(id: 0, pId: 0, uId: 0, likeCnt: 0, commentCnt: 0, createdDate: "", updatedDate: "")
+        let emptyPick = Pick(id: 0, uId: 0, pId: 0, message: "", createdDate: "", updatedDate: "")
         self.pickList = [emptyPick, emptyPick, emptyPick]
         
         configureView(direction: direction)
@@ -128,14 +128,14 @@ class PhotoGroupView: UIView {
     // MARK: Function - @OBJC
     @objc func photoView1Tapped() {
         if pickList.count < 1 { return }
-        delegate?.pickTapped(pick: pickList[0])
+        delegate?.openPick(pick: pickList[0])
     }
     @objc func photoView2Tapped() {
         if pickList.count < 2 { return }
-        delegate?.pickTapped(pick: pickList[1])
+        delegate?.openPick(pick: pickList[1])
     }
     @objc func photoView3Tapped() {
         if pickList.count < 3 { return }
-        delegate?.pickTapped(pick: pickList[2])
+        delegate?.openPick(pick: pickList[2])
     }
 }

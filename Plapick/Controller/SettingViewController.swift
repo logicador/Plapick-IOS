@@ -18,12 +18,11 @@ class SettingViewController: UIViewController {
     // MARK: Property
     var delegate: SettingViewControllerProtocol?
     let app = App()
-    let getPushNotificationDeviceRequest = GetPushNotificationDeviceRequest()
+//    let getPushNotificationDeviceRequest = GetPushNotificationDeviceRequest()
     let editPushNotificationDeviceRequest = EditPushNotificationDeviceRequest()
-    let getVersionRequest = GetVersionRequest()
+//    let getVersionRequest = GetVersionRequest()
     let logoutRequest = LogoutRequest()
-    let getPersonalRequest = GetPersonalRequest()
-//    var authAccountVC: AccountViewController?
+    var authAccountVC: AccountViewController?
     var isOpenedChildVC: Bool = false
     
     
@@ -51,10 +50,10 @@ class SettingViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    lazy var newsPushView: PushView = {
+    lazy var followPushView: PushView = {
         let pv = PushView()
-        pv.actionMode = "NEWS"
-        pv.label.text = "나를 소식듣기에 추가"
+        pv.actionMode = "FOLLOW"
+        pv.label.text = "다른 사람이 나를 팔로우"
         pv.delegate = self
         return pv
     }()
@@ -266,26 +265,68 @@ class SettingViewController: UIViewController {
         
 //        editUserVC.delegate = self
         
-        getPushNotificationDeviceRequest.delegate = self
+//        getPushNotificationDeviceRequest.delegate = self
         editPushNotificationDeviceRequest.delegate = self
-        getVersionRequest.delegate = self
+//        getVersionRequest.delegate = self
         logoutRequest.delegate = self
-        getPersonalRequest.delegate = self
         
 //        editUserVC.accountVC = accountVC
         
-        getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": app.getPndId()])
-        getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
-        getPersonalRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
+//        getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": app.getPndId()])
+//        getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
+        
+        let user = app.getUser()
+        if let type = user.type {
+            if type == "KAKAO" {
+                typeLabel.text = "카카오 로그인"
+            } else if type == "APPLE" {
+                typeLabel.text = "애플 로그인"
+            } else if type == "NAVER" {
+                typeLabel.text = "네이버 로그인"
+            } else {
+                typeLabel.text = "이메일 로그인"
+            }
+        }
+        if let email = user.email {
+            emailLabel.text = email
+        }
+        if let name = user.name {
+            nameLabel.text = name
+        }
+        
+        let curVersionCode = app.getCurVersionCode()
+        let curVersionName = app.getCurVersionName()
+        let newVersionCode = app.getNewVersionCode()
+        
+        versionLabel.text = "IOS App ver. \(curVersionName)"
+        
+        if newVersionCode == curVersionCode {
+            versionButton.setTitle("최신버전", for: UIControl.State.normal)
+            versionButton.isEnabled = false
+        } else {
+            versionButton.setTitle("업데이트", for: UIControl.State.normal)
+            versionButton.addTarget(self, action: #selector(updateTapped), for: UIControl.Event.touchUpInside)
+        }
+        
+        let pndId = app.getPndId()
+        
+        if pndId.isEmpty {
+            app.checkPushNotificationAvailable(vc: self)
+            
+        } else {
+            let isAllowedFollow = app.getPushNotification(key: "FOLLOW")
+            let isAllowedMyPickComment = app.getPushNotification(key: "MY_PICK_COMMENT")
+            let isAllowedRecommendedPlace = app.getPushNotification(key: "RECOMMENDED_PLACE")
+            let isAllowedAd = app.getPushNotification(key: "AD")
+            let isAllowedEventNotice = app.getPushNotification(key: "EVENT_NOTICE")
+            
+            followPushView.push.setOn((isAllowedFollow == "Y") ? true : false, animated: true)
+            myPickCommentPushView.push.setOn((isAllowedMyPickComment == "Y") ? true : false, animated: true)
+            recommendedPlacePushView.push.setOn((isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
+            adPushView.push.setOn((isAllowedAd == "Y") ? true : false, animated: true)
+            eventNoticePushView.push.setOn((isAllowedEventNotice == "Y") ? true : false, animated: true)
+        }
     }
-    
-    
-//    // MARK: ViewWillAppear
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        let navHeight = navigationController?.navigationBar.frame.height ?? SPACE_XXXL
-//        scrollView.setContentOffset(CGPoint(x: 0, y: -navHeight), animated: false)
-//    }
     
     
     // MARK: ViewDidDisappear
@@ -332,13 +373,13 @@ class SettingViewController: UIViewController {
         pushContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         pushContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
-        pushContainerView.addSubview(newsPushView)
-        newsPushView.topAnchor.constraint(equalTo: pushContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        newsPushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        newsPushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
+        pushContainerView.addSubview(followPushView)
+        followPushView.topAnchor.constraint(equalTo: pushContainerView.topAnchor, constant: SPACE_XS).isActive = true
+        followPushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
+        followPushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
         
         pushContainerView.addSubview(myPickCommentPushView)
-        myPickCommentPushView.topAnchor.constraint(equalTo: newsPushView.bottomAnchor).isActive = true
+        myPickCommentPushView.topAnchor.constraint(equalTo: followPushView.bottomAnchor).isActive = true
         myPickCommentPushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
         myPickCommentPushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
         
@@ -496,7 +537,7 @@ class SettingViewController: UIViewController {
     @objc func editUserTapped() {
         isOpenedChildVC = true
         let editUserVC = EditUserViewController()
-//        editUserVC.authAccountVC = authAccountVC
+        editUserVC.authAccountVC = authAccountVC
         editUserVC.delegate = self
         navigationController?.pushViewController(editUserVC, animated: true)
     }
@@ -515,36 +556,12 @@ class SettingViewController: UIViewController {
     }
 }
 
-
-// MARK: Extension - GetPushNotificationDevice
-extension SettingViewController: GetPushNotificationDeviceRequestProtocol {
-    func response(isAllowedNews: String?, isAllowedMyPickComment: String?, isAllowedRecommendedPlace: String?, isAllowedAd: String?, isAllowedEventNotice: String?, getPushNotificationDevice status: String) {
-        if status == "OK" {
-            guard let isAllowedNews = isAllowedNews else { return }
-            guard let isAllowedMyPickComment = isAllowedMyPickComment else { return }
-            guard let isAllowedRecommendedPlace = isAllowedRecommendedPlace else { return }
-            guard let isAllowedAd = isAllowedAd else { return }
-            guard let isAllowedEventNotice = isAllowedEventNotice else { return }
-            
-            newsPushView.push.setOn((isAllowedNews == "Y") ? true : false, animated: true)
-            myPickCommentPushView.push.setOn((isAllowedMyPickComment == "Y") ? true : false, animated: true)
-            recommendedPlacePushView.push.setOn((isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
-            adPushView.push.setOn((isAllowedAd == "Y") ? true : false, animated: true)
-            eventNoticePushView.push.setOn((isAllowedEventNotice == "Y") ? true : false, animated: true)
-            
-        } else {
-            // 푸시 알림 권한 요청
-            app.checkPushNotificationAvailable(vc: self)
-        }
-    }
-}
-
 // MARK: Extension - PushView
 extension SettingViewController: PushViewProtocol {
     func switching(actionMode: String) {
         var isAllowed = "N"
-        if actionMode == "NEWS" {
-            isAllowed = newsPushView.push.isOn ? "Y" : "N"
+        if actionMode == "FOLLOW" {
+            isAllowed = followPushView.push.isOn ? "Y" : "N"
         } else if actionMode == "MY_PICK_COMMENT" {
             isAllowed = myPickCommentPushView.push.isOn ? "Y" : "N"
         } else if actionMode == "RECOMMENDED_PLACE" {
@@ -555,14 +572,12 @@ extension SettingViewController: PushViewProtocol {
             isAllowed = eventNoticePushView.push.isOn ? "Y" : "N"
         }
         
+        app.setPushNotification(key: actionMode, value: isAllowed)
+        
         let pndId = app.getPndId()
-        if pndId.isEmpty {
+        if pndId.isEmpty && isAllowed == "Y" {
             app.checkPushNotificationAvailable(vc: self)
             return
-        }
-        
-        if isAllowed == "Y" {
-            app.checkPushNotificationAvailable(vc: self)
         }
         
         editPushNotificationDeviceRequest.fetch(vc: self, paramDict: ["pndId": pndId, "isAllowed": isAllowed, "actionMode": actionMode])
@@ -576,62 +591,11 @@ extension SettingViewController: EditPushNotificationDeviceRequestProtocol {
     }
 }
 
-
-// MARK: Extension - GetVersion
-extension SettingViewController: GetVersionRequestProtocol {
-    func response(versionCode: Int?, versionName: String?, getVersion status: String) {
-        if status == "OK" {
-            guard let versionCode = versionCode else { return }
-            
-            guard let infoDictionary = Bundle.main.infoDictionary else { return }
-            let _version = infoDictionary["CFBundleShortVersionString"] as? String
-            let _build = infoDictionary["CFBundleVersion"] as? String
-            
-            guard let curVersionName = _version else { return }
-            guard let curVersionCode = _build else { return }
-            
-            versionLabel.text = "IOS App ver. \(curVersionName)"
-            
-            if versionCode == Int(curVersionCode) {
-                versionButton.setTitle("최신버전", for: UIControl.State.normal)
-                versionButton.isEnabled = false
-            } else {
-                versionButton.setTitle("업데이트", for: UIControl.State.normal)
-                versionButton.addTarget(self, action: #selector(updateTapped), for: UIControl.Event.touchUpInside)
-            }
-        }
-    }
-}
-
 // MARK: Extension - Logout
 extension SettingViewController: LogoutRequestProtocol {
     func response(logout status: String) {
         if status == "OK" {
             changeRootViewController(rootViewController: LoginViewController())
-        }
-    }
-}
-
-// MARK: Extension - GetPersonal
-extension SettingViewController: GetPersonalRequestProtocol {
-    func response(type: String?, email: String?, name: String?, getPersonal status: String) {
-        if status == "OK" {
-            guard let type = type else { return }
-            guard let email = email else { return }
-            guard let name = name else { return }
-            
-            if type == "KAKAO" {
-                typeLabel.text = "카카오 로그인"
-            } else if type == "APPLE" {
-                typeLabel.text = "애플 로그인"
-            } else if type == "NAVER" {
-                typeLabel.text = "네이버 로그인"
-            } else {
-                typeLabel.text = "이메일 로그인"
-            }
-            
-            emailLabel.text = email
-            nameLabel.text = name
         }
     }
 }

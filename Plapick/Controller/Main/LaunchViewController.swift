@@ -12,7 +12,9 @@ class LaunchViewController: UIViewController {
     
     // MARK: Property
     var app = App()
-    var loginRequest = LoginRequest()
+    let loginRequest = LoginRequest()
+    let getVersionRequest = GetVersionRequest()
+    let getPushNotificationDeviceRequest = GetPushNotificationDeviceRequest()
     
     
     // MARK: View
@@ -48,8 +50,10 @@ class LaunchViewController: UIViewController {
         configureView()
         
         loginRequest.delegate = self
+        getVersionRequest.delegate = self
+        getPushNotificationDeviceRequest.delegate = self
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
             if self.app.isLogined() {
                 let user = self.app.getUser()
                 guard let type = user.type else {
@@ -90,14 +94,61 @@ class LaunchViewController: UIViewController {
 }
 
 
-// MARK: Extension
+// MARK: Extension - Login
 extension LaunchViewController: LoginRequestProtocol {
     func response(user: User?, login status: String) {
         if status == "OK" {
             if let user = user {
                 app.login(user: user)
-                changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+                
+                getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
             }
         }
+    }
+}
+
+// MARK: Extension - GetVersion
+extension LaunchViewController: GetVersionRequestProtocol {
+    func response(versionCode: Int?, versionName: String?, getVersion status: String) {
+        if status == "OK" {
+            guard let versionCode = versionCode else { return }
+            guard let versionName = versionName else { return }
+            
+            app.setNewVersionCode(newVersionCode: versionCode)
+            app.setNewVersionName(newVersionName: versionName)
+            
+            guard let infoDictionary = Bundle.main.infoDictionary else { return }
+            let code = infoDictionary["CFBundleVersion"] as? String
+            let name = infoDictionary["CFBundleShortVersionString"] as? String
+            if let versionCode = code {
+                if let curVersionCode = Int(versionCode) {
+                    app.setCurVersionCode(curVersionCode: curVersionCode)
+                }
+            }
+            if let curVersionName = name {
+                app.setCurVersionName(curVersionName: curVersionName)
+            }
+            
+            let pndId = app.getPndId()
+            if pndId.isEmpty {
+                changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+            } else {
+                getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": pndId])
+            }
+        }
+    }
+}
+
+// MARK: Extension - GetPushNotificationDevice
+extension LaunchViewController: GetPushNotificationDeviceRequestProtocol {
+    func response(isAllowedFollow: String?, isAllowedMyPickComment: String?, isAllowedRecommendedPlace: String?, isAllowedAd: String?, isAllowedEventNotice: String?, getPushNotificationDevice status: String) {
+        
+        app.setPushNotification(key: "FOLLOW", value: isAllowedFollow ?? "Y")
+        app.setPushNotification(key: "MY_PICK_COMMENT", value: isAllowedMyPickComment ?? "Y")
+        app.setPushNotification(key: "RECOMMENDED_PLACE", value: isAllowedRecommendedPlace ?? "Y")
+        app.setPushNotification(key: "AD", value: isAllowedAd ?? "Y")
+        app.setPushNotification(key: "EVENT_NOTICE", value: isAllowedEventNotice ?? "Y")
+        
+        changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
     }
 }

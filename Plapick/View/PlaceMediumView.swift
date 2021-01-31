@@ -22,6 +22,7 @@ class PlaceMediumView: UIView {
     let ICON_WIDTH: CGFloat = 30
     var app = App()
     var index: Int?
+    var mostPickList: [MostPick] = []
     var place: Place? {
         didSet {
             guard let place = self.place else { return }
@@ -40,26 +41,68 @@ class PlaceMediumView: UIView {
             pickCntLabel.text = String(place.pickCnt)
             
             guard let mostPickList = place.mostPickList else { return }
+            self.mostPickList = mostPickList
+            collectionView.reloadData()
             
+            var nextBottomAnchor: NSLayoutYAxisAnchor = headerBottomLine.bottomAnchor
             if mostPickList.count > 0 {
-                noPickLabel.removeView()
+                containerView.addSubview(collectionView)
+                collectionView.topAnchor.constraint(equalTo: nextBottomAnchor).isActive = true
+                collectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+                collectionView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+                collectionView.heightAnchor.constraint(equalToConstant: SCREEN_WIDTH / 3).isActive = true
                 
-                scrollView.contentSize = CGSize(width: (slideWidth * CGFloat(mostPickList.count)) + (1 * (CGFloat(mostPickList.count) - 1)), height: slideHeight)
+                containerView.addSubview(collectionBottomLine)
+                collectionBottomLine.topAnchor.constraint(equalTo: collectionView.bottomAnchor).isActive = true
+                collectionBottomLine.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+                collectionBottomLine.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
                 
-                for (i, mostPick) in mostPickList.enumerated() {
-                    let pv = PhotoView(cons: true)
-                    if let url = URL(string: app.getPickUrl(id: mostPick.id, uId: mostPick.uId)) {
-                        pv.sd_setImage(with: url, completed: nil)
-                    }
-                    pv.frame = CGRect(x: (slideWidth * CGFloat(i)) + (CGFloat(i) * 1) , y: 0, width: slideWidth, height: slideHeight)
-                    scrollView.addSubview(pv)
-                }
-                
-            } else {
-                addSubview(noPickLabel)
-                noPickLabel.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor).isActive = true
-                noPickLabel.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor).isActive = true
+                nextBottomAnchor = collectionBottomLine.bottomAnchor
             }
+            
+            containerView.addSubview(footerView)
+            footerView.topAnchor.constraint(equalTo: nextBottomAnchor, constant: SPACE_S).isActive = true
+            footerView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: SPACE_L).isActive = true
+            footerView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -SPACE_L).isActive = true
+            footerView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -SPACE_S).isActive = true
+            
+            footerView.addSubview(pickCntLabel)
+            pickCntLabel.trailingAnchor.constraint(equalTo: footerView.trailingAnchor).isActive = true
+            
+            footerView.addSubview(pickCntImageView)
+            pickCntImageView.trailingAnchor.constraint(equalTo: pickCntLabel.leadingAnchor, constant: -SPACE_XXXXS).isActive = true
+            pickCntImageView.topAnchor.constraint(equalTo: footerView.topAnchor).isActive = true
+            pickCntImageView.widthAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
+            pickCntImageView.heightAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
+            pickCntImageView.bottomAnchor.constraint(equalTo: footerView.bottomAnchor).isActive = true
+            
+            footerView.addSubview(commentCntLabel)
+            commentCntLabel.trailingAnchor.constraint(equalTo: pickCntImageView.leadingAnchor, constant: -SPACE_S).isActive = true
+            
+            footerView.addSubview(commentCntImageView)
+            commentCntImageView.trailingAnchor.constraint(equalTo: commentCntLabel.leadingAnchor, constant: -SPACE_XXXXS).isActive = true
+            commentCntImageView.topAnchor.constraint(equalTo: footerView.topAnchor).isActive = true
+            commentCntImageView.widthAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
+            commentCntImageView.heightAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
+            commentCntImageView.bottomAnchor.constraint(equalTo: footerView.bottomAnchor).isActive = true
+            
+            footerView.addSubview(likeCntLabel)
+            likeCntLabel.trailingAnchor.constraint(equalTo: commentCntImageView.leadingAnchor, constant: -SPACE_S).isActive = true
+            
+            footerView.addSubview(likeCntImageView)
+            likeCntImageView.trailingAnchor.constraint(equalTo: likeCntLabel.leadingAnchor, constant: -SPACE_XXXXS).isActive = true
+            likeCntImageView.topAnchor.constraint(equalTo: footerView.topAnchor).isActive = true
+            likeCntImageView.widthAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
+            likeCntImageView.heightAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
+            likeCntImageView.bottomAnchor.constraint(equalTo: footerView.bottomAnchor).isActive = true
+            
+            pickCntLabel.centerYAnchor.constraint(equalTo: pickCntImageView.centerYAnchor).isActive = true
+            commentCntLabel.centerYAnchor.constraint(equalTo: commentCntImageView.centerYAnchor).isActive = true
+            likeCntLabel.centerYAnchor.constraint(equalTo: likeCntImageView.centerYAnchor).isActive = true
+            
+            footerView.addSubview(categoryNameLabel)
+            categoryNameLabel.centerYAnchor.constraint(equalTo: footerView.centerYAnchor).isActive = true
+            categoryNameLabel.leadingAnchor.constraint(equalTo: footerView.leadingAnchor).isActive = true
         }
     }
     
@@ -73,7 +116,9 @@ class PlaceMediumView: UIView {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    lazy var wrapperView: UIView = {
+    
+    // MARK: View - Header
+    lazy var headerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -101,37 +146,30 @@ class PlaceMediumView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    lazy var scrollView: UIScrollView = {
-        let sv = UIScrollView()
-        sv.backgroundColor = .systemBackground
-        sv.bounces = false
-        sv.showsHorizontalScrollIndicator = false
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        return sv
-    }()
-    
-    lazy var scrollTopLine: LineView = {
+    lazy var headerBottomLine: LineView = {
         let lv = LineView()
         return lv
     }()
     
-    lazy var scrollBottomLine: LineView = {
+    // MARK: View - CollectionView
+    lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        let cv = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        cv.register(MostPickSmallCVCell.self, forCellWithReuseIdentifier: "MostPickSmallCVCell")
+        cv.showsHorizontalScrollIndicator = false
+        cv.dataSource = self
+        cv.delegate = self
+        cv.translatesAutoresizingMaskIntoConstraints = false
+        return cv
+    }()
+    lazy var collectionBottomLine: LineView = {
         let lv = LineView()
         return lv
     }()
     
-    lazy var noPickLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .systemGray
-        label.text = "아직 등록된 픽이 없습니다"
-        label.font = UIFont.systemFont(ofSize: 15)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    // MARK: View - Cnt
-    lazy var cntContainerView: UIView = {
+    // MARK: View - Footer
+    lazy var footerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -209,9 +247,11 @@ class PlaceMediumView: UIView {
         if self.traitCollection.userInterfaceStyle == .dark {
             commentCntImageView.tintColor = .lightGray
             commentCntLabel.textColor = .lightGray
+            collectionView.backgroundColor = .black
         } else {
             commentCntImageView.tintColor = .systemGray
             commentCntLabel.textColor = .systemGray
+            collectionView.backgroundColor = .white
         }
     }
     
@@ -221,88 +261,62 @@ class PlaceMediumView: UIView {
         containerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         containerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         containerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+
+        // MARK: ConfigureView - Header
+        containerView.addSubview(headerView)
+        headerView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_L).isActive = true
+        headerView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: SPACE_L).isActive = true
+        headerView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -SPACE_L).isActive = true
         
-        containerView.addSubview(wrapperView)
-        wrapperView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_L).isActive = true
-        wrapperView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
-        wrapperView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
-        wrapperView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -SPACE_S).isActive = true
+        headerView.addSubview(nameLabel)
+        nameLabel.topAnchor.constraint(equalTo: headerView.topAnchor).isActive = true
+        nameLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor).isActive = true
+        nameLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor).isActive = true
 
-        wrapperView.addSubview(nameLabel)
-        nameLabel.topAnchor.constraint(equalTo: wrapperView.topAnchor).isActive = true
-        nameLabel.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor, constant: SPACE_L).isActive = true
-        nameLabel.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor, constant: -SPACE_L).isActive = true
-
-        wrapperView.addSubview(addressLabel)
+        headerView.addSubview(addressLabel)
         addressLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: SPACE_XS).isActive = true
-        addressLabel.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor, constant: SPACE_L).isActive = true
-        addressLabel.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor, constant: -SPACE_L).isActive = true
+        addressLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor).isActive = true
+        addressLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor).isActive = true
+        addressLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -SPACE_L).isActive = true
         
-        wrapperView.addSubview(scrollView)
-        scrollView.topAnchor.constraint(equalTo: addressLabel.bottomAnchor, constant: SPACE_L).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor).isActive = true
-        scrollView.heightAnchor.constraint(equalToConstant: slideHeight).isActive = true
-        
-        wrapperView.addSubview(scrollTopLine)
-        scrollTopLine.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        scrollTopLine.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor).isActive = true
-        scrollTopLine.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor).isActive = true
-
-        wrapperView.addSubview(scrollBottomLine)
-        scrollBottomLine.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        scrollBottomLine.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor).isActive = true
-        scrollBottomLine.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor).isActive = true
-        
-        // MARK: ConfigureView - Cnt
-        wrapperView.addSubview(cntContainerView)
-        cntContainerView.topAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: SPACE_S).isActive = true
-        cntContainerView.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor, constant: SPACE_L).isActive = true
-        cntContainerView.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor, constant: -SPACE_L).isActive = true
-        cntContainerView.bottomAnchor.constraint(equalTo: wrapperView.bottomAnchor).isActive = true
-        
-        cntContainerView.addSubview(pickCntLabel)
-        pickCntLabel.trailingAnchor.constraint(equalTo: cntContainerView.trailingAnchor).isActive = true
-        
-        cntContainerView.addSubview(pickCntImageView)
-        pickCntImageView.trailingAnchor.constraint(equalTo: pickCntLabel.leadingAnchor, constant: -SPACE_XXXXS).isActive = true
-        pickCntImageView.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
-        pickCntImageView.widthAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
-        pickCntImageView.heightAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
-        pickCntImageView.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
-        
-        cntContainerView.addSubview(commentCntLabel)
-        commentCntLabel.trailingAnchor.constraint(equalTo: pickCntImageView.leadingAnchor, constant: -SPACE_S).isActive = true
-        
-        cntContainerView.addSubview(commentCntImageView)
-        commentCntImageView.trailingAnchor.constraint(equalTo: commentCntLabel.leadingAnchor, constant: -SPACE_XXXXS).isActive = true
-        commentCntImageView.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
-        commentCntImageView.widthAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
-        commentCntImageView.heightAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
-        commentCntImageView.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
-        
-        cntContainerView.addSubview(likeCntLabel)
-        likeCntLabel.trailingAnchor.constraint(equalTo: commentCntImageView.leadingAnchor, constant: -SPACE_S).isActive = true
-        
-        cntContainerView.addSubview(likeCntImageView)
-        likeCntImageView.trailingAnchor.constraint(equalTo: likeCntLabel.leadingAnchor, constant: -SPACE_XXXXS).isActive = true
-        likeCntImageView.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
-        likeCntImageView.widthAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
-        likeCntImageView.heightAnchor.constraint(equalToConstant: ICON_WIDTH).isActive = true
-        likeCntImageView.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
-        
-        pickCntLabel.centerYAnchor.constraint(equalTo: pickCntImageView.centerYAnchor).isActive = true
-        commentCntLabel.centerYAnchor.constraint(equalTo: commentCntImageView.centerYAnchor).isActive = true
-        likeCntLabel.centerYAnchor.constraint(equalTo: likeCntImageView.centerYAnchor).isActive = true
-        
-        cntContainerView.addSubview(categoryNameLabel)
-        categoryNameLabel.centerYAnchor.constraint(equalTo: cntContainerView.centerYAnchor).isActive = true
-        categoryNameLabel.leadingAnchor.constraint(equalTo: cntContainerView.leadingAnchor).isActive = true
+        containerView.addSubview(headerBottomLine)
+        headerBottomLine.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
+        headerBottomLine.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        headerBottomLine.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
     @objc func selfTapped() {
         guard let place = self.place else { return }
         delegate?.openPlace(place: place)
+    }
+}
+
+
+// MARK: Extension - CollectionView
+extension PlaceMediumView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return mostPickList.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MostPickSmallCVCell", for: indexPath) as! MostPickSmallCVCell
+        cell.mostPick = mostPickList[indexPath.row]
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if indexPath.row == mostPickList.count - 1 {
+            return CGSize(width: SCREEN_WIDTH / 3, height: SCREEN_WIDTH / 3)
+        } else {
+            return CGSize(width: (SCREEN_WIDTH / 3) + 1, height: SCREEN_WIDTH / 3)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
     }
 }

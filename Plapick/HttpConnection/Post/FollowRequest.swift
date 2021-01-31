@@ -8,18 +8,18 @@
 import UIKit
 
 
-protocol NewsUserRequestProtocol {
-    func response(newsUser status: String)
+protocol FollowRequestProtocol {
+    func response(follow status: String)
 }
 
 
 // POST
-// 플레이스 좋아요/좋아요 취소
-class NewsUserRequest: HttpRequest {
+// 팔로우 / 팔로우 취소
+class FollowRequest: HttpRequest {
     
     // MARK: Properties
-    var delegate: NewsUserRequestProtocol?
-    let apiUrl = API_URL + "/news/user"
+    var delegate: FollowRequestProtocol?
+    let apiUrl = API_URL + "/follow"
     
     
     // MARK: Fetch
@@ -36,14 +36,14 @@ class NewsUserRequest: HttpRequest {
         // For POST method
         guard let paramData = paramString.data(using: .utf8) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_PARAM_DATA")}
-            delegate?.response(newsUser: "ERR_PARAM_DATA")
+            delegate?.response(follow: "ERR_PARAM_DATA")
             return
         }
         
         let httpUrl = apiUrl
         guard let url = URL(string: httpUrl) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL") }
-            delegate?.response(newsUser: "ERR_URL")
+            delegate?.response(follow: "ERR_URL")
             return
         }
         
@@ -56,43 +56,43 @@ class NewsUserRequest: HttpRequest {
                 
             if let _ = error {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_SERVER") }
-                self.delegate?.response(newsUser: "ERR_SERVER")
+                self.delegate?.response(follow: "ERR_SERVER")
                 return
             }
             
             guard let response = res as? HTTPURLResponse else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_RESPONSE") }
-                self.delegate?.response(newsUser: "ERR_RESPONSE")
+                self.delegate?.response(follow: "ERR_RESPONSE")
                 return
             }
             
             if response.statusCode != 200 {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_CODE") }
-                self.delegate?.response(newsUser: "ERR_STATUS_CODE")
+                self.delegate?.response(follow: "ERR_STATUS_CODE")
                 return
             }
             
             guard let data = data else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA") }
-                self.delegate?.response(newsUser: "ERR_DATA")
+                self.delegate?.response(follow: "ERR_DATA")
                 return
             }
             
             guard let status = self.getStatusCode(data: data) else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_DECODE") }
-                self.delegate?.response(newsUser: "ERR_STATUS_DECODE")
+                self.delegate?.response(follow: "ERR_STATUS_DECODE")
                 return
             }
             print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
-                self.delegate?.response(newsUser: status)
+                self.delegate?.response(follow: status)
                 return
             }
             
             // MARK: Response
-            self.delegate?.response(newsUser: "OK")
+            self.delegate?.response(follow: "OK")
         }})
         task.resume()
     }

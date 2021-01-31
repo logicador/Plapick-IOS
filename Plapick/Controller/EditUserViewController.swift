@@ -26,7 +26,7 @@ class EditUserViewController: UIViewController {
     var isUploadImage: Bool = false
     let checkUserNickNameRequest = CheckUserNickNameRequest()
     var imageName: String = ""
-//    var authAccountVC: AccountViewController?
+    var authAccountVC: AccountViewController?
     
     
     // MARK: View
@@ -104,15 +104,6 @@ class EditUserViewController: UIViewController {
         }
         textField.text = user.nickName
     }
-    
-    
-//    // MARK: ViewWillAppear
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        if textField.isFirstResponder {
-//            textField.resignFirstResponder()
-//        }
-//    }
     
     
     // MARK: ViewDidDisappear
@@ -283,16 +274,15 @@ extension EditUserViewController: EditUserRequestProtocol {
 //            guard let authAccountVC = self.authAccountVC else { return }
             
             app.setNickName(nickName: newNickName)
+            authAccountVC?.navigationItem.title = newNickName
+            
             if isUploadImage {
                 let profileImage = "/images/users/\(app.getUId())/\(imageName).jpg"
                 app.setProfileImage(profileImage: profileImage)
-//                if let url = URL(string: "\(PLAPICK_URL)\(profileImage)") {
-//                    accountVC.profileImagePhotoView.sd_setImage(with: url, completed: nil)
-//                }
+                if let url = URL(string: "\(PLAPICK_URL)\(profileImage)") {
+                    authAccountVC?.profileImagePhotoView.sd_setImage(with: url, completed: nil)
+                }
             }
-//            accountVC.navigationItem.title = newNickName
-            
-//            authAccountVC.getUser()
             
             navigationController?.popViewController(animated: true)
             

@@ -22,6 +22,7 @@ class PostingViewController: UIViewController {
     var delegate: PostingViewControllerProtocol?
 //    var searchKakaoPlaceVC = SearchKakaoPlaceViewController()
     var isOpenedChildVC: Bool = false
+    var authAccountVC: AccountViewController?
     var selectedImage: UIImage?
     var selectedPlace: Place?
     let addPlaceRequest = AddPlaceRequest()
@@ -363,7 +364,11 @@ extension PostingViewController: PlaceMediumViewProtocol {
         if messageTextView.isFirstResponder {
             messageTextView.resignFirstResponder()
         }
-        print("openPlace", place.id)
+        isOpenedChildVC = true
+        let placeVC = PlaceViewController()
+        placeVC.place = place
+        placeVC.delegate = self
+        navigationController?.pushViewController(placeVC, animated: true)
     }
 }
 
@@ -439,11 +444,19 @@ extension PostingViewController: AddPickRequestProtocol {
         hideIndicator(idv: indicatorView, bov: blurOverlayView)
         if status == "OK" {
             isUploaded = true
+            authAccountVC?.getPicks()
             let alert = UIAlertController(title: "픽 게시하기", message: "새로운 픽이 게시되었습니다.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
                 self.navigationController?.popViewController(animated: true)
             }))
             present(alert, animated: true)
         }
+    }
+}
+
+// MARK: Extension - PlaceVC
+extension PostingViewController: PlaceViewControllerProtocol {
+    func closePlaceVC() {
+        isOpenedChildVC = false
     }
 }

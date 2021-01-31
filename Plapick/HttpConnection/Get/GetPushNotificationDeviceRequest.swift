@@ -9,7 +9,7 @@ import UIKit
 
 
 protocol GetPushNotificationDeviceRequestProtocol {
-    func response(isAllowedNews: String?, isAllowedMyPickComment: String?, isAllowedRecommendedPlace: String?, isAllowedAd: String?, isAllowedEventNotice: String?, getPushNotificationDevice status: String)
+    func response(isAllowedFollow: String?, isAllowedMyPickComment: String?, isAllowedRecommendedPlace: String?, isAllowedAd: String?, isAllowedEventNotice: String?, getPushNotificationDevice status: String)
 }
 
 
@@ -37,14 +37,14 @@ class GetPushNotificationDeviceRequest: HttpRequest {
         let urlString = "\(apiUrl)?\(paramString)"
         guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL_ENCODE") }
-            delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_URL_ENCODE")
+            delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_URL_ENCODE")
             return
         }
         
         let httpUrl = encodedUrlString
         guard let url = URL(string: httpUrl) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL") }
-            delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_URL")
+            delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_URL")
             return
         }
         
@@ -57,38 +57,38 @@ class GetPushNotificationDeviceRequest: HttpRequest {
                 
             if let _ = error {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_SERVER") }
-                self.delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_SERVER")
+                self.delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_SERVER")
                 return
             }
             
             guard let response = res as? HTTPURLResponse else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_RESPONSE") }
-                self.delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_RESPONSE")
+                self.delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_RESPONSE")
                 return
             }
             
             if response.statusCode != 200 {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_CODE") }
-                self.delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_STATUS_CODE")
+                self.delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_STATUS_CODE")
                 return
             }
             
             guard let data = data else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA") }
-                self.delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_DATA")
+                self.delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_DATA")
                 return
             }
             
             guard let status = self.getStatusCode(data: data) else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_DECODE") }
-                self.delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_STATUS_DECODE")
+                self.delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_STATUS_DECODE")
                 return
             }
             print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
-                self.delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: status)
+                self.delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: status)
                 return
             }
             
@@ -97,11 +97,11 @@ class GetPushNotificationDeviceRequest: HttpRequest {
                 let response = try JSONDecoder().decode(PushNotificationDeviceRequestResult.self, from: data)
                 let resPushNotificationDevice = response.result
                 
-                self.delegate?.response(isAllowedNews: resPushNotificationDevice.pnd_is_allowed_news, isAllowedMyPickComment: resPushNotificationDevice.pnd_is_allowed_my_pick_comment, isAllowedRecommendedPlace: resPushNotificationDevice.pnd_is_allowed_recommended_place, isAllowedAd: resPushNotificationDevice.pnd_is_allowed_ad, isAllowedEventNotice: resPushNotificationDevice.pnd_is_allowed_event_notice, getPushNotificationDevice: "OK")
+                self.delegate?.response(isAllowedFollow: resPushNotificationDevice.pnd_is_allowed_follow, isAllowedMyPickComment: resPushNotificationDevice.pnd_is_allowed_my_pick_comment, isAllowedRecommendedPlace: resPushNotificationDevice.pnd_is_allowed_recommended_place, isAllowedAd: resPushNotificationDevice.pnd_is_allowed_ad, isAllowedEventNotice: resPushNotificationDevice.pnd_is_allowed_event_notice, getPushNotificationDevice: "OK")
                 
             } catch {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA_DECODE", message: "데이터 응답 오류가 발생했습니다.") }
-                self.delegate?.response(isAllowedNews: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_DATA_DECODE")
+                self.delegate?.response(isAllowedFollow: nil, isAllowedMyPickComment: nil, isAllowedRecommendedPlace: nil, isAllowedAd: nil, isAllowedEventNotice: nil, getPushNotificationDevice: "ERR_DATA_DECODE")
             }
         }})
         task.resume()

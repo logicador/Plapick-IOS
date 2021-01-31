@@ -44,12 +44,12 @@ class SearchUserTableViewController: UITableViewController {
                 navigationItem.searchController?.searchBar.text = "박재"
                 getUsers()
                 
-            } else if mode == "NEWS" {
-                navigationItem.title = "나의 소식을 듣는 사람들"
+            } else if mode == "FOLLOWER" {
+                navigationItem.title = "팔로워"
                 getUsers()
                 
-            } else if mode == "MY_NEWS" { // MY_NEWS일 경우 소식끊기 필요
-                navigationItem.title = "내가 소식듣는 사람들"
+            } else if mode == "FOLLOWING" {
+                navigationItem.title = "팔로잉"
                 getUsers()
             }
         }
@@ -63,6 +63,7 @@ class SearchUserTableViewController: UITableViewController {
         
         tableView.register(UserTVCell.self, forCellReuseIdentifier: "UserTVCell")
         tableView.separatorInset.left = SPACE
+        tableView.tableFooterView = UIView(frame: CGRect.zero) // 빈 셀 안보이게
         
         isModalInPresentation = true // 후....
         
@@ -180,7 +181,7 @@ extension SearchUserTableViewController: AccountViewControllerProtocol {
         isOpenedChildVC = false
     }
     
-    func changeNewsUser() {
+    func follow() {
         getUsers()
     }
 }

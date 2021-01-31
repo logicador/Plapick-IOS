@@ -79,7 +79,6 @@ class SearchViewController: UIViewController {
     lazy var recentPlaceCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
         let cv = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
         cv.backgroundColor = .systemBackground
         cv.register(PlaceCVCell.self, forCellWithReuseIdentifier: "PlaceCVCell")
@@ -111,7 +110,6 @@ class SearchViewController: UIViewController {
     lazy var recentUserCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 0
         let cv = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
         cv.backgroundColor = .systemBackground
         cv.showsHorizontalScrollIndicator = false
@@ -147,7 +145,7 @@ class SearchViewController: UIViewController {
         // MARK: For DEV_DEBUG
         user = app.getUser()
         guard let user = self.user else { return }
-        place = Place(id: 2, kId: 25855305, name: "아침고요수목원", categoryName: "수목원,식물원", categoryGroupName: "", categoryGroupCode: "", address: "", roadAddress: "경기 가평군 상면 수목원로 432", latitude: "", longitude: "", phone: "", likeCnt: 0, pickCnt: 9, commentCnt: 0, plocCode: "", clocCode: "", mostPickList: [MostPick(id: 2101180709242291, likeCnt: 0, commentCnt: 0, uId: user.id, uNickName: user.nickName, uProfileImage: user.profileImage)], isLike: "N", isComment: "N")
+        place = Place(id: 2, kId: 25855305, name: "아침고요수목원", categoryName: "수목원,식물원", categoryGroupName: "", categoryGroupCode: "", address: "", roadAddress: "경기 가평군 상면 수목원로 432", latitude: "", longitude: "", phone: "", plocCode: "", clocCode: "", mostPickList: [MostPick(id: 2101180709242291, uId: user.id, uNickName: user.nickName, uProfileImage: user.profileImage)], likeCnt: 0, commentCnt: 0, pickCnt: 0)
     }
     
     
@@ -326,5 +324,12 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
         } else {
             return CGSize(width: view.frame.width * 0.3, height: userSlideHeight)
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
     }
 }

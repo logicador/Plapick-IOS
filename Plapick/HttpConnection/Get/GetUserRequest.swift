@@ -97,7 +97,7 @@ class GetUserRequest: HttpRequest {
                 let response = try JSONDecoder().decode(UserRequestResult.self, from: data)
                 let resUser = response.result
                 
-                let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image ?? "", status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, newsCnt: resUser.newsCnt, myNewsCnt: resUser.myNewsCnt, myLikePickCnt: resUser.myLikePickCnt, myLikePlaceCnt: resUser.myLikePlaceCnt, isNewsUser: resUser.isNewsUser, pickCnt: resUser.pickCnt)
+                let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image ?? "", status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, followerCnt: resUser.followerCnt, isFollow: resUser.isFollow, pickCnt: resUser.pickCnt)
                 
                 self.delegate?.response(user: user, getUser: "OK")
                 

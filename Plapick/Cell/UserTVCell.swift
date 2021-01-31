@@ -20,12 +20,8 @@ class UserTVCell: UITableViewCell {
                 photoView.sd_setImage(with: url, completed: nil)
             }
             nickNameLabel.text = user.nickName
-            if let newsCnt = user.newsCnt {
-                newsCntLabel.text = String(newsCnt)
-            }
-            if let pickCnt = user.pickCnt {
-                pickCntLabel.text = String(pickCnt)
-            }
+            followerCntLabel.text = String(user.followerCnt)
+            pickCntLabel.text = String(user.pickCnt)
         }
     }
     
@@ -71,15 +67,15 @@ class UserTVCell: UITableViewCell {
         return label
     }()
     
-    lazy var newsCntTitleLabel: UILabel = {
+    lazy var followerCntTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "소식을 듣는 사람 "
+        label.text = "팔로워 "
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .systemGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    lazy var newsCntLabel: UILabel = {
+    lazy var followerCntLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -137,14 +133,14 @@ class UserTVCell: UITableViewCell {
         pickCntLabel.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
         pickCntLabel.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
         
-        cntContainerView.addSubview(newsCntTitleLabel)
-        newsCntTitleLabel.leadingAnchor.constraint(equalTo: pickCntLabel.trailingAnchor, constant: SPACE_XXS).isActive = true
-        newsCntTitleLabel.centerYAnchor.constraint(equalTo: cntContainerView.centerYAnchor).isActive = true
+        cntContainerView.addSubview(followerCntTitleLabel)
+        followerCntTitleLabel.leadingAnchor.constraint(equalTo: pickCntLabel.trailingAnchor, constant: SPACE_XXS).isActive = true
+        followerCntTitleLabel.centerYAnchor.constraint(equalTo: cntContainerView.centerYAnchor).isActive = true
         
-        cntContainerView.addSubview(newsCntLabel)
-        newsCntLabel.leadingAnchor.constraint(equalTo: newsCntTitleLabel.trailingAnchor).isActive = true
-        newsCntLabel.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
-        newsCntLabel.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
+        cntContainerView.addSubview(followerCntLabel)
+        followerCntLabel.leadingAnchor.constraint(equalTo: followerCntTitleLabel.trailingAnchor).isActive = true
+        followerCntLabel.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
+        followerCntLabel.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
         
         labelContainerView.addSubview(nickNameLabel)
         nickNameLabel.topAnchor.constraint(equalTo: cntContainerView.bottomAnchor, constant: SPACE_XXS).isActive = true

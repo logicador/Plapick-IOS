@@ -101,10 +101,10 @@ class GetPicksRequest: HttpRequest {
                 for resPick in resPickList {
 
                     let user = User(id: resPick.u_id, nickName: resPick.u_nick_name, profileImage: resPick.u_profile_image ?? "", connectedDate: resPick.u_connected_date)
-
-                    let place = Place(id: resPick.p_id, kId: resPick.p_k_id, name: resPick.p_name, categoryName: resPick.p_category_name, categoryGroupName: resPick.p_category_group_name, categoryGroupCode: resPick.p_category_group_code, address: resPick.p_address, roadAddress: resPick.p_road_address, latitude: resPick.p_latitude, longitude: resPick.p_longitude, phone: resPick.p_phone, likeCnt: resPick.p_like_cnt, pickCnt: resPick.p_pick_cnt, commentCnt: resPick.p_comment_cnt, plocCode: resPick.p_ploc_code, clocCode: resPick.p_cloc_code)
-
-                    let pick = Pick(user: user, place: place, id: resPick.pi_id, pId: resPick.pi_p_id, uId: resPick.pi_u_id, message: resPick.pi_message, likeCnt: resPick.pi_like_cnt, commentCnt: resPick.pi_comment_cnt, createdDate: resPick.pi_created_date, updatedDate: resPick.pi_updated_date)
+                    
+                    let place = Place(id: resPick.p_id, kId: resPick.p_k_id, name: resPick.p_name, categoryName: resPick.p_category_name, categoryGroupName: resPick.p_category_group_name, categoryGroupCode: resPick.p_category_group_code, address: resPick.p_address, roadAddress: resPick.p_road_address, latitude: resPick.p_latitude, longitude: resPick.p_longitude, phone: resPick.p_phone, plocCode: resPick.p_ploc_code, clocCode: resPick.p_cloc_code)
+                    
+                    let pick = Pick(user: user, place: place, id: resPick.pi_id, uId: resPick.u_id, pId: resPick.p_id, message: resPick.pi_message ?? "", createdDate: resPick.pi_created_date, updatedDate: resPick.pi_updated_date, likeCnt: resPick.piLikeCnt, commentCnt: resPick.piCommentCnt)
 
                     pickList.append(pick)
                 }
