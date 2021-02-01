@@ -16,20 +16,17 @@ class PlaceCVCell: UICollectionViewCell {
         didSet {
             guard let place = self.place else { return }
             
-            if let mostPickList = place.mostPickList {
-                if mostPickList.count > 0 {
-                    let uId = mostPickList[0].uId
-                    let piId = mostPickList[0].id
-                    
-                    if let url = URL(string: app.getPickUrl(id: piId, uId: uId)) {
-                        photoView.sd_setImage(with: url, completed: nil)
-                    }
-                } else {
-                    
-                    photoView.addSubview(noPickLabel)
-                    noPickLabel.centerXAnchor.constraint(equalTo: photoView.centerXAnchor).isActive = true
-                    noPickLabel.centerYAnchor.constraint(equalTo: photoView.centerYAnchor).isActive = true
+            if place.mostPickList.count > 0 {
+                let uId = place.mostPickList[0].uId
+                let piId = place.mostPickList[0].id
+                if let url = URL(string: app.getPickUrl(id: piId, uId: uId)) {
+                    photoView.sd_setImage(with: url, completed: nil)
                 }
+                
+            } else {
+                photoView.addSubview(noPickLabel)
+                noPickLabel.centerXAnchor.constraint(equalTo: photoView.centerXAnchor).isActive = true
+                noPickLabel.centerYAnchor.constraint(equalTo: photoView.centerYAnchor).isActive = true
             }
             nameLabel.text = place.name
         }

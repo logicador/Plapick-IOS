@@ -201,7 +201,7 @@ class PickViewController: UIViewController {
             let removeAlert = UIAlertController(title: "삭제하기", message: "정말 해당 픽을 삭제하시겠습니까? 삭제된 픽은 다시 복구하실 수 없습니다.", preferredStyle: UIAlertController.Style.alert)
             removeAlert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
             removeAlert.addAction(UIAlertAction(title: "삭제", style: UIAlertAction.Style.destructive, handler: { (_) in
-                let piId = self.pick?.id
+//                let piId = self.pick?.id
 //                self.removePickRequest.fetch(vc: self, piId: piId!)
             }))
             self.present(removeAlert, animated: true, completion: nil)

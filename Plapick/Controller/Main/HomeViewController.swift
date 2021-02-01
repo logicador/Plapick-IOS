@@ -17,11 +17,16 @@ class HomeViewController: UIViewController {
     var getHotPlacesRequest = GetHotPlacesRequest()
     var photoGroupViewList: [PhotoGroupView] = []
     var placeLargeViewList: [PlaceLargeView] = []
+    var getCnt = 0
     
     
     // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
+        
+        sv.refreshControl = UIRefreshControl()
+        sv.refreshControl?.addTarget(self, action: #selector(refreshed), for: UIControl.Event.valueChanged)
+        
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
@@ -103,8 +108,8 @@ class HomeViewController: UIViewController {
         getRecentPicksRequest.delegate = self
         getHotPlacesRequest.delegate = self
         
-        getRecentPicksRequest.fetch(vc: self, paramDict: [:])
-        getHotPlacesRequest.fetch(vc: self, paramDict: [:])
+        getRecentPicks()
+        getHotPlaces()
     }
     
     
@@ -154,6 +159,20 @@ class HomeViewController: UIViewController {
         hotPlaceContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         hotPlaceContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
     }
+    
+    func getRecentPicks() {
+        getRecentPicksRequest.fetch(vc: self, paramDict: [:])
+    }
+    
+    func getHotPlaces() {
+        getHotPlacesRequest.fetch(vc: self, paramDict: [:])
+    }
+    
+    // MARK: Function - @OBJC
+    @objc func refreshed() {
+        getRecentPicks()
+        getHotPlaces()
+    }
 }
 
 
@@ -174,8 +193,7 @@ extension HomeViewController: PhotoGroupViewProtocol {
 // MARK: Extension - PlaceLargeView
 extension HomeViewController: PlaceLargeViewProtocol {
     func openPlace(place: Place) {
-        let placeVC = PlaceViewController()
-        placeVC.place = place
+        let placeVC = PlaceViewController(place: place)
         navigationController?.pushViewController(placeVC, animated: true)
     }
     
@@ -219,6 +237,12 @@ extension HomeViewController: GetRecentPicksRequestProtocol {
                 }
             }
         }
+        
+        getCnt += 1
+        if getCnt == 2 {
+            getCnt = 0
+            scrollView.refreshControl?.endRefreshing()
+        }
     }
 }
 
@@ -250,11 +274,14 @@ extension HomeViewController: GetHotPlacesRequestProtocol {
                         
                         placeLargeViewList.append(plv)
                     }
-                    
-                } else {
-                    
                 }
             }
+        }
+        
+        getCnt += 1
+        if getCnt == 2 {
+            getCnt = 0
+            scrollView.refreshControl?.endRefreshing()
         }
     }
 }

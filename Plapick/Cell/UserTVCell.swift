@@ -16,9 +16,8 @@ class UserTVCell: UITableViewCell {
         didSet {
             guard let user = self.user else { return }
             
-            if let url = URL(string: ((user.profileImage.contains(String(user.id))) ? (PLAPICK_URL + user.profileImage) : user.profileImage)) {
-                photoView.sd_setImage(with: url, completed: nil)
-            }
+            photoView.setProfileImage(uId: user.id, profileImage: user.profileImage)
+            
             nickNameLabel.text = user.nickName
             followerCntLabel.text = String(user.followerCnt)
             pickCntLabel.text = String(user.pickCnt)

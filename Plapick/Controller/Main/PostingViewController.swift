@@ -257,7 +257,7 @@ class PostingViewController: UIViewController {
         showIndicator(idv: indicatorView, bov: blurOverlayView)
         
         if place.id == 0 {
-            addPlaceRequest.fetch(vc: self, paramDict: ["kId": String(place.kId), "name": place.name ?? "", "categoryName": place.categoryName ?? "", "categoryGroupCode": place.categoryGroupCode ?? "", "categoryGroupName": place.categoryGroupName ?? "", "address": place.address ?? "", "roadAddress": place.roadAddress ?? "", "latitude": place.latitude ?? "", "longitude": place.longitude ?? "", "phone": place.phone ?? ""])
+            addPlaceRequest.fetch(vc: self, paramDict: ["kId": String(place.kId), "name": place.name, "categoryName": place.categoryName, "categoryGroupCode": place.categoryGroupCode, "categoryGroupName": place.categoryGroupName, "address": place.address, "roadAddress": place.roadAddress, "latitude": place.latitude, "longitude": place.longitude, "phone": place.phone])
             
         } else {
             guard let image = selectedImage else {
@@ -365,8 +365,7 @@ extension PostingViewController: PlaceMediumViewProtocol {
             messageTextView.resignFirstResponder()
         }
         isOpenedChildVC = true
-        let placeVC = PlaceViewController()
-        placeVC.place = place
+        let placeVC = PlaceViewController(place: place)
         placeVC.delegate = self
         navigationController?.pushViewController(placeVC, animated: true)
     }
@@ -459,4 +458,5 @@ extension PostingViewController: PlaceViewControllerProtocol {
     func closePlaceVC() {
         isOpenedChildVC = false
     }
+    func likePlace() { }
 }

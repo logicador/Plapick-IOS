@@ -104,13 +104,10 @@ class GetPlacesRequest: HttpRequest {
                         let splittedPMostPickList = pMostPicks.split(separator: "|")
                         for splittedPMostPick in splittedPMostPickList {
                             let splitted = splittedPMostPick.split(separator: ":")
-                            if splitted.count != 4 { continue }
                             guard let id = Int(splitted[0]) else { continue }
-//                            guard let likeCnt = Int(splitted[1]) else { continue }
-//                            guard let commentCnt = Int(splitted[2]) else { continue }
                             guard let uId = Int(splitted[1]) else { continue }
                             let uNickName = String(splitted[2])
-                            let uProfileImage = String(splitted[3])
+                            let uProfileImage = (splitted.count < 4) ? "" : String(splitted[3])
                             let mostPick = MostPick(id: id, uId: uId, uNickName: uNickName, uProfileImage: uProfileImage)
                             mostPickList.append(mostPick)
                         }

@@ -25,9 +25,8 @@ class MostPickLargeCVCell: UICollectionViewCell {
             
             nickNameLabel.text = mostPick.uNickName
             
-            if let url = URL(string: ((mostPick.uProfileImage.contains(String(mostPick.uId))) ? (PLAPICK_URL + mostPick.uProfileImage) : mostPick.uProfileImage)) {
-                profileImageView.sd_setImage(with: url, completed: nil)
-            }
+            profilePhotoView.setProfileImage(uId: mostPick.uId, profileImage: mostPick.uProfileImage)
+            
             if let url = URL(string: app.getPickUrl(id: mostPick.id, uId: mostPick.uId)) {
                 photoView.sd_setImage(with: url, completed: nil)
             }
@@ -44,13 +43,10 @@ class MostPickLargeCVCell: UICollectionViewCell {
         return view
     }()
     
-    lazy var profileImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.clipsToBounds = true
-        iv.layer.cornerRadius = 20
-        iv.contentMode = .scaleAspectFill
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
+    lazy var profilePhotoView: PhotoView = {
+        let pv = PhotoView()
+        pv.layer.cornerRadius = 20
+        return pv
     }()
     
     lazy var nickNameLabel: UILabel = {
@@ -98,15 +94,15 @@ class MostPickLargeCVCell: UICollectionViewCell {
         headerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         headerView.heightAnchor.constraint(equalToConstant: 40 + (SPACE_XS * 2)).isActive = true
         
-        headerView.addSubview(profileImageView)
-        profileImageView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
-        profileImageView.leadingAnchor.constraint(equalTo: headerView.leadingAnchor).isActive = true
-        profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        headerView.addSubview(profilePhotoView)
+        profilePhotoView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
+        profilePhotoView.leadingAnchor.constraint(equalTo: headerView.leadingAnchor).isActive = true
+        profilePhotoView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        profilePhotoView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         headerView.addSubview(nickNameLabel)
         nickNameLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
-        nickNameLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
+        nickNameLabel.leadingAnchor.constraint(equalTo: profilePhotoView.trailingAnchor, constant: SPACE_XS).isActive = true
         
         addSubview(photoView)
         photoView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true

@@ -18,9 +18,7 @@ class SettingViewController: UIViewController {
     // MARK: Property
     var delegate: SettingViewControllerProtocol?
     let app = App()
-//    let getPushNotificationDeviceRequest = GetPushNotificationDeviceRequest()
     let editPushNotificationDeviceRequest = EditPushNotificationDeviceRequest()
-//    let getVersionRequest = GetVersionRequest()
     let logoutRequest = LogoutRequest()
     var authAccountVC: AccountViewController?
     var isOpenedChildVC: Bool = false
@@ -263,17 +261,8 @@ class SettingViewController: UIViewController {
         
         setThemeColor()
         
-//        editUserVC.delegate = self
-        
-//        getPushNotificationDeviceRequest.delegate = self
         editPushNotificationDeviceRequest.delegate = self
-//        getVersionRequest.delegate = self
         logoutRequest.delegate = self
-        
-//        editUserVC.accountVC = accountVC
-        
-//        getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": app.getPndId()])
-//        getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
         
         let user = app.getUser()
         if let type = user.type {

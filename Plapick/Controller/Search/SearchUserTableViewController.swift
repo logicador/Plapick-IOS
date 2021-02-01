@@ -103,6 +103,12 @@ class SearchUserTableViewController: UITableViewController {
     func configureView() {
         
     }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if let _ = navigationItem.searchController?.searchBar.isFirstResponder {
+            navigationItem.searchController?.searchBar.resignFirstResponder()
+        }
+    }
 }
 
 
@@ -128,6 +134,10 @@ extension SearchUserTableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let _ = navigationItem.searchController?.searchBar.isFirstResponder {
+            navigationItem.searchController?.searchBar.resignFirstResponder()
+        }
+        
         isOpenedChildVC = true
         let user = userList[indexPath.row]
         let accountVC = AccountViewController(uId: user.id)

@@ -10,6 +10,7 @@ import SystemConfiguration
 import UIKit
 import Photos
 import CoreLocation
+import SDWebImage
 
 
 protocol AppProtocol {

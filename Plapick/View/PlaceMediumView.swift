@@ -27,21 +27,18 @@ class PlaceMediumView: UIView {
         didSet {
             guard let place = self.place else { return }
             
-            let categoryName = app.getCategoryString(categoryName: place.categoryName ?? "")
+            let categoryName = app.getCategoryString(categoryName: place.categoryName)
             categoryNameLabel.text = categoryName
 
             nameLabel.text = place.name
 
-            let address = place.address ?? ""
-            let roadAddress = place.roadAddress ?? ""
-            addressLabel.text = (roadAddress.isEmpty) ? address : roadAddress
+            addressLabel.text = (place.roadAddress.isEmpty) ? place.address : place.roadAddress
             
             likeCntLabel.text = String(place.likeCnt)
             commentCntLabel.text = String(place.commentCnt)
             pickCntLabel.text = String(place.pickCnt)
             
-            guard let mostPickList = place.mostPickList else { return }
-            self.mostPickList = mostPickList
+            mostPickList = place.mostPickList
             collectionView.reloadData()
             
             var nextBottomAnchor: NSLayoutYAxisAnchor = headerBottomLine.bottomAnchor
@@ -110,7 +107,7 @@ class PlaceMediumView: UIView {
     // MARK: View
     lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray6
+//        view.backgroundColor = .systemGray6
         view.layer.cornerRadius = 20
         view.layer.borderWidth = LINE_WIDTH
         view.translatesAutoresizingMaskIntoConstraints = false

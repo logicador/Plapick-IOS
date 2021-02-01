@@ -16,9 +16,8 @@ class UserCVCell: UICollectionViewCell {
         didSet {
             guard let user = self.user else { return }
             
-            if let url = URL(string: ((user.profileImage.contains(String(user.id))) ? (PLAPICK_URL + user.profileImage) : user.profileImage)) {
-                photoView.sd_setImage(with: url, completed: nil)
-            }
+            photoView.setProfileImage(uId: user.id, profileImage: user.profileImage)
+            
             label.text = user.nickName
         }
     }
@@ -27,7 +26,7 @@ class UserCVCell: UICollectionViewCell {
     // MARK: View
     lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray6
+//        view.backgroundColor = .systemGray6
         view.layer.cornerRadius = SPACE_XS
         view.layer.borderWidth = LINE_WIDTH
         view.translatesAutoresizingMaskIntoConstraints = false

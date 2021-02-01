@@ -28,6 +28,7 @@ class AccountViewController: UIViewController {
     var photoGroupViewList: [PhotoGroupView] = []
     let followRequest = FollowRequest()
     
+    
     // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
@@ -54,7 +55,7 @@ class AccountViewController: UIViewController {
     }()
     lazy var profileImagePhotoView: PhotoView = {
         let pv = PhotoView()
-        pv.layer.borderWidth = 2
+        pv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageTapped)))
         pv.layer.cornerRadius = profileImageWidth / 2
         return pv
     }()
@@ -250,8 +251,6 @@ class AccountViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
-        
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(closeTapped))
@@ -268,11 +267,6 @@ class AccountViewController: UIViewController {
         configureView(isAuthUser: isAuthUser)
         
         setThemeColor()
-        
-//        settingVC.delegate = self
-//        settingVC.accountVC = self
-        
-//        postingVC.delegate = self
         
         getPicksRequest.delegate = self
         getUserReuqest.delegate = self
@@ -297,12 +291,10 @@ class AccountViewController: UIViewController {
     func setThemeColor() {
         if self.traitCollection.userInterfaceStyle == .dark {
             view.backgroundColor = .black
-            profileImagePhotoView.layer.borderColor = UIColor.systemGray3.cgColor
             followImageView.tintColor = .white
             likeImageView.tintColor = .white
         } else {
             view.backgroundColor = .white
-            profileImagePhotoView.layer.borderColor = UIColor.systemGray3.cgColor
             followImageView.tintColor = .black
             likeImageView.tintColor = .black
         }
@@ -550,6 +542,17 @@ class AccountViewController: UIViewController {
         postingVC.delegate = self
         navigationController?.pushViewController(postingVC, animated: true)
     }
+    
+    @objc func profileImageTapped() {
+        isOpenedChildVC = true
+        let photoVC = PhotoViewController()
+        photoVC.image = profileImagePhotoView.image
+        if let nickName = navigationItem.title {
+            photoVC.navigationItem.title = "\(nickName)님의 사진"
+        }
+        photoVC.delegate = self
+        navigationController?.pushViewController(photoVC, animated: true)
+    }
 }
 
 
@@ -622,9 +625,8 @@ extension AccountViewController: GetUserRequestProtocol {
         if status == "OK" {
             if let user = user {
                 navigationItem.title = user.nickName
-                if let url = URL(string: ((user.profileImage.contains(String(user.id))) ? (PLAPICK_URL + user.profileImage) : user.profileImage)) {
-                    profileImagePhotoView.sd_setImage(with: url, completed: nil)
-                }
+                
+                profileImagePhotoView.setProfileImage(uId: user.id, profileImage: user.profileImage)
                 
                 followerCntLabel.text = String(user.followerCnt)
                 pickCntLabel.text = String(user.pickCnt)
@@ -675,6 +677,13 @@ extension AccountViewController: FollowRequestProtocol {
 // MARK: Extension - SearchPlaceVC
 extension AccountViewController: SearchPlaceViewControllerProtocol {
     func closeSearchPlaceVC(place: Place?) {
+        isOpenedChildVC = false
+    }
+}
+
+// MARK: Extension - PhotoVC
+extension AccountViewController: PhotoViewControllerProtocol {
+    func closePhotoViewVC() {
         isOpenedChildVC = false
     }
 }

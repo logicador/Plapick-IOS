@@ -8,20 +8,27 @@
 import UIKit
 
 
+protocol PhotoViewControllerProtocol {
+    func closePhotoViewVC()
+}
+
+
 class PhotoViewController: UIViewController {
     
-    // MARK: Properties
+    // MARK: Property
+    var delegate: PhotoViewControllerProtocol?
     var app = App()
     var image: UIImage? {
         didSet {
-            let imageScrollView = ImageScrollView(frame: view.bounds)
-            imageScrollView.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(imageScrollView)
-            imageScrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-            imageScrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            imageScrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            imageScrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-            imageScrollView.set(image: image!)
+            guard let image = self.image else { return }
+            
+            let isv = ImageScrollView(frame: view.bounds)
+            view.addSubview(isv)
+            isv.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+            isv.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            isv.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            isv.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+            isv.set(image: image)
         }
     }
     
@@ -30,25 +37,28 @@ class PhotoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(backTapped))
+        isModalInPresentation = true // 후....
         
-        adjustColors()
+        setThemeColor()
     }
     
     
-    // MARK: Functions
+    // MARK: ViewDidDisappear
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        delegate?.closePhotoViewVC()
+    }
+    
+    
+    // MARK: Function
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        adjustColors()
+        setThemeColor()
     }
-    func adjustColors() {
+    func setThemeColor() {
         if self.traitCollection.userInterfaceStyle == .dark {
-            view.backgroundColor = .systemBackground
+            view.backgroundColor = .black
         } else {
-            view.backgroundColor = .tertiarySystemGroupedBackground
+            view.backgroundColor = .white
         }
     }
-    
-//    @objc func backTapped() {
-//        self.dismiss(animated: true, completion: nil)
-//    }
 }

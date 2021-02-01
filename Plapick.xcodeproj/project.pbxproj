@@ -15,6 +15,7 @@
 		570B3AE525BF34F60028424D /* PlaceMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570B3AE425BF34F60028424D /* PlaceMediumView.swift */; };
 		57266D3225C6BE82004C8187 /* MostPickLargeCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57266D3125C6BE82004C8187 /* MostPickLargeCVCell.swift */; };
 		57266D3625C6C3D3004C8187 /* MostPickSmallCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57266D3525C6C3D3004C8187 /* MostPickSmallCVCell.swift */; };
+		57266D4025C70FB8004C8187 /* GetPlaceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57266D3F25C70FB8004C8187 /* GetPlaceRequest.swift */; };
 		572D31E125A579AD00A93FD9 /* Pick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572D31E025A579AD00A93FD9 /* Pick.swift */; };
 		572D31E725A5AAFF00A93FD9 /* ParentLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572D31E625A5AAFF00A93FD9 /* ParentLocationView.swift */; };
 		572D31EA25A5AB0900A93FD9 /* ChildLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572D31E925A5AB0900A93FD9 /* ChildLocationView.swift */; };
@@ -95,6 +96,7 @@
 		570B3AE425BF34F60028424D /* PlaceMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceMediumView.swift; sourceTree = "<group>"; };
 		57266D3125C6BE82004C8187 /* MostPickLargeCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPickLargeCVCell.swift; sourceTree = "<group>"; };
 		57266D3525C6C3D3004C8187 /* MostPickSmallCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPickSmallCVCell.swift; sourceTree = "<group>"; };
+		57266D3F25C70FB8004C8187 /* GetPlaceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPlaceRequest.swift; sourceTree = "<group>"; };
 		572D31E025A579AD00A93FD9 /* Pick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pick.swift; sourceTree = "<group>"; };
 		572D31E625A5AAFF00A93FD9 /* ParentLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentLocationView.swift; sourceTree = "<group>"; };
 		572D31E925A5AB0900A93FD9 /* ChildLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildLocationView.swift; sourceTree = "<group>"; };
@@ -271,11 +273,11 @@
 				5738648F25BD26EE0025AF1A /* Login */,
 				5780FD9725C181CC002F89F2 /* SettingViewController.swift */,
 				57DCD7BD25C27D080040AC01 /* EditUserViewController.swift */,
+				57A5527525B682BC009EABA3 /* PhotoViewController.swift */,
 				57D9552625C3D69100CD2C6F /* PlaceViewController.swift */,
 				57755BD425B47F4B00CF0849 /* PickViewController.swift */,
 				57C04134259A13E900856F61 /* LocationListViewController.swift */,
 				57C04137259A13F300856F61 /* LocationMapViewController.swift */,
-				57A5527525B682BC009EABA3 /* PhotoViewController.swift */,
 				57E56BFC25B09629002C2059 /* TermsViewController.swift */,
 				5708BF9F25C009F700C3271E /* TestViewController.swift */,
 			);
@@ -358,6 +360,7 @@
 				57D9552925C3DBCD00CD2C6F /* GetUsersRequest.swift */,
 				57DCD7B925C2710F0040AC01 /* GetUserRequest.swift */,
 				5759EBD625BEE7F4007497F6 /* GetPlacesRequest.swift */,
+				57266D3F25C70FB8004C8187 /* GetPlaceRequest.swift */,
 				573864B625BD93990025AF1A /* GetHotPlacesRequest.swift */,
 				5780FD9225C17C9B002F89F2 /* GetPicksRequest.swift */,
 				573864A525BD652B0025AF1A /* GetRecentPicksRequest.swift */,
@@ -541,6 +544,7 @@
 				5780FD9325C17C9B002F89F2 /* GetPicksRequest.swift in Sources */,
 				573864B725BD93990025AF1A /* GetHotPlacesRequest.swift in Sources */,
 				5701EFD125BFD22600AA4E0F /* LikePlaceRequest.swift in Sources */,
+				57266D4025C70FB8004C8187 /* GetPlaceRequest.swift in Sources */,
 				57D9555325C4445F00CD2C6F /* FollowRequest.swift in Sources */,
 				57D9554C25C4098A00CD2C6F /* UserCVCell.swift in Sources */,
 				57C040D925998CCA00856F61 /* AppDelegate.swift in Sources */,

@@ -10,17 +10,17 @@ import UIKit
 
 class ImageScrollView: UIScrollView, UIScrollViewDelegate {
     
-    // MARK: Properties
+    // MARK: Property
     var app = App()
-    
     var imageZoomView: UIImageView!
-    
     lazy var zoomingTap: UITapGestureRecognizer = {
         let zoomingTap = UITapGestureRecognizer(target: self, action: #selector(handleZoomingTap))
         zoomingTap.numberOfTapsRequired = 2
         return zoomingTap
     }()
     
+    
+    // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -28,12 +28,16 @@ class ImageScrollView: UIScrollView, UIScrollViewDelegate {
         self.showsVerticalScrollIndicator = false
         self.showsHorizontalScrollIndicator = false
         self.decelerationRate = UIScrollView.DecelerationRate.fast
+        
+        self.translatesAutoresizingMaskIntoConstraints = false
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
+    // MARK: Function
     func set(image: UIImage) {
         imageZoomView?.removeFromSuperview()
         imageZoomView = nil

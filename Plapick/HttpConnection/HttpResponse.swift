@@ -56,7 +56,7 @@ struct UserResultResponse: Codable {
     var u_nick_name: String
     var u_email: String? = ""
     var u_password: String? = ""
-    var u_profile_image: String? = ""
+    var u_profile_image: String
     var u_status: String? = ""
     var u_last_login_platform: String? = ""
     var u_is_logined: String? = ""
@@ -75,25 +75,24 @@ struct UserResultResponse: Codable {
 struct PlaceResultResponse: Codable {
     var p_id: Int
     var p_k_id: Int
-    var p_name: String? = ""
-    var p_category_name: String? = ""
-    var p_category_group_code: String? = ""
-    var p_category_group_name: String? = ""
-    var p_address: String? = ""
-    var p_road_address: String? = ""
-    var p_latitude: String? = ""
-    var p_longitude: String? = ""
-    var p_phone: String? = ""
-    var p_ploc_code: String? = ""
-    var p_cloc_code: String? = ""
+    var p_name: String
+    var p_category_name: String
+    var p_category_group_code: String
+    var p_category_group_name: String
+    var p_address: String
+    var p_road_address: String
+    var p_latitude: String
+    var p_longitude: String
+    var p_phone: String
+    var p_ploc_code: String
+    var p_cloc_code: String
     
     var pMostPicks: String? = ""
-    
     var pLikeCnt: Int = 0
     var pCommentCnt: Int = 0
     var pPickCnt: Int = 0
     
-//    var isLike: String? = "N"
+    var pIsLike: String? = "N"
 }
 
 
@@ -111,22 +110,22 @@ struct PickResultResponse: Codable {
     // Place
     var p_id: Int
     var p_k_id: Int
-    var p_name: String? = ""
-    var p_category_name: String? = ""
-    var p_category_group_code: String? = ""
-    var p_category_group_name: String? = ""
-    var p_address: String? = ""
-    var p_road_address: String? = ""
-    var p_latitude: String? = ""
-    var p_longitude: String? = ""
-    var p_phone: String? = ""
-    var p_ploc_code: String? = ""
-    var p_cloc_code: String? = ""
+    var p_name: String
+    var p_category_name: String
+    var p_category_group_code: String
+    var p_category_group_name: String
+    var p_address: String
+    var p_road_address: String
+    var p_latitude: String
+    var p_longitude: String
+    var p_phone: String
+    var p_ploc_code: String
+    var p_cloc_code: String
     
     // User
     var u_id: Int
     var u_nick_name: String
-    var u_profile_image: String? = ""
+    var u_profile_image: String
     var u_connected_date: String
 }
 

@@ -13,13 +13,13 @@ class LocationTabViewCVCell: UICollectionViewCell {
     // MARK: Properties
     var tabIndex: Int? {
         didSet {
-            let viewController: UIViewController?
-            
-            if tabIndex == 0 {
-//                viewController = LocationListViewController()
-            } else {
-                viewController = LocationMapViewController()
-            }
+//            let viewController: UIViewController?
+//            
+//            if tabIndex == 0 {
+////                viewController = LocationListViewController()
+//            } else {
+//                viewController = LocationMapViewController()
+//            }
             
 //            guard let vc = viewController else { return }
 //            

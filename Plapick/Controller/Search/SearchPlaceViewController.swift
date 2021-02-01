@@ -255,8 +255,7 @@ extension SearchPlaceViewController: PlaceMediumViewProtocol {
             }))
             alert.addAction(UIAlertAction(title: "자세히 보기", style: UIAlertAction.Style.default, handler: { (_) in
                 self.isOpenedChildVC = true
-                let placeVC = PlaceViewController()
-                placeVC.place = place
+                let placeVC = PlaceViewController(place: place)
                 placeVC.delegate = self
                 self.navigationController?.pushViewController(placeVC, animated: true)
             }))
@@ -264,8 +263,7 @@ extension SearchPlaceViewController: PlaceMediumViewProtocol {
             
         } else {
             isOpenedChildVC = true
-            let placeVC = PlaceViewController()
-            placeVC.place = place
+            let placeVC = PlaceViewController(place: place)
             placeVC.delegate = self
             self.navigationController?.pushViewController(placeVC, animated: true)
         }
@@ -276,5 +274,8 @@ extension SearchPlaceViewController: PlaceMediumViewProtocol {
 extension SearchPlaceViewController: PlaceViewControllerProtocol {
     func closePlaceVC() {
         isOpenedChildVC = false
+    }
+    func likePlace() {
+        getPlaces()
     }
 }

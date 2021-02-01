@@ -1,5 +1,5 @@
 //
-//  GetUserRequest.swift
+//  LoginRequest.swift
 //  Plapick
 //
 //  Created by 서원영 on 2021/01/11.
@@ -8,18 +8,18 @@
 import UIKit
 
 
-protocol GetUserRequestProtocol {
-    func response(user: User?, getUser status: String)
+protocol GetPlaceRequestProtocol {
+    func response(place: Place?, getPlace status: String)
 }
 
 
 // GET
-// 유저 정보 가져오기
-class GetUserRequest: HttpRequest {
+// 카카오 플레이스 가져오기
+class GetPlaceRequest: HttpRequest {
     
     // MARK: Properties
-    var delegate: GetUserRequestProtocol?
-    let apiUrl = API_URL + "/get/user"
+    var delegate: GetPlaceRequestProtocol?
+    let apiUrl = API_URL + "/get/place"
     
     
     // MARK: Fetch
@@ -37,14 +37,14 @@ class GetUserRequest: HttpRequest {
         let urlString = "\(apiUrl)?\(paramString)"
         guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL_ENCODE") }
-            delegate?.response(user: nil, getUser: "ERR_URL_ENCODE")
+            delegate?.response(place: nil, getPlace: "ERR_URL_ENCODE")
             return
         }
         
         let httpUrl = encodedUrlString
         guard let url = URL(string: httpUrl) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL") }
-            delegate?.response(user: nil, getUser: "ERR_URL")
+            delegate?.response(place: nil, getPlace: "ERR_URL")
             return
         }
         
@@ -57,53 +57,67 @@ class GetUserRequest: HttpRequest {
                 
             if let _ = error {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_SERVER") }
-                self.delegate?.response(user: nil, getUser: "ERR_SERVER")
+                self.delegate?.response(place: nil, getPlace: "ERR_SERVER")
                 return
             }
             
             guard let response = res as? HTTPURLResponse else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_RESPONSE") }
-                self.delegate?.response(user: nil, getUser: "ERR_RESPONSE")
+                self.delegate?.response(place: nil, getPlace: "ERR_RESPONSE")
                 return
             }
             
             if response.statusCode != 200 {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_CODE") }
-                self.delegate?.response(user: nil, getUser: "ERR_STATUS_CODE")
+                self.delegate?.response(place: nil, getPlace: "ERR_STATUS_CODE")
                 return
             }
             
             guard let data = data else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA") }
-                self.delegate?.response(user: nil, getUser: "ERR_DATA")
+                self.delegate?.response(place: nil, getPlace: "ERR_DATA")
                 return
             }
             
             guard let status = self.getStatusCode(data: data) else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_DECODE") }
-                self.delegate?.response(user: nil, getUser: "ERR_STATUS_DECODE")
+                self.delegate?.response(place: nil, getPlace: "ERR_STATUS_DECODE")
                 return
             }
             print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
-                self.delegate?.response(user: nil, getUser: status)
+                self.delegate?.response(place: nil, getPlace: status)
                 return
             }
             
             // MARK: Response
             do {
-                let response = try JSONDecoder().decode(UserRequestResult.self, from: data)
-                let resUser = response.result
+                let response = try JSONDecoder().decode(PlaceRequestResult.self, from: data)
+                let resPlace = response.result
                 
-                let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image, status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, followerCnt: resUser.followerCnt, isFollow: resUser.isFollow, pickCnt: resUser.pickCnt)
+                var mostPickList: [MostPick] = []
+                if let pMostPicks = resPlace.pMostPicks {
+                    let splittedPMostPickList = pMostPicks.split(separator: "|")
+                    for splittedPMostPick in splittedPMostPickList {
+                        let splitted = splittedPMostPick.split(separator: ":")
+                        guard let id = Int(splitted[0]) else { continue }
+                        guard let uId = Int(splitted[1]) else { continue }
+                        let uNickName = String(splitted[2])
+                        let uProfileImage = (splitted.count < 4) ? "" : String(splitted[3])
+                        let mostPick = MostPick(id: id, uId: uId, uNickName: uNickName, uProfileImage: uProfileImage)
+                        mostPickList.append(mostPick)
+                    }
+                }
                 
-                self.delegate?.response(user: user, getUser: "OK")
+                let place = Place(id: resPlace.p_id, kId: resPlace.p_k_id, name: resPlace.p_name, categoryName: resPlace.p_category_name, categoryGroupName: resPlace.p_category_group_name, categoryGroupCode: resPlace.p_category_group_code, address: resPlace.p_address, roadAddress: resPlace.p_road_address, latitude: resPlace.p_latitude, longitude: resPlace.p_longitude, phone: resPlace.p_phone, plocCode: resPlace.p_ploc_code, clocCode: resPlace.p_cloc_code, mostPickList: mostPickList, likeCnt: resPlace.pLikeCnt, commentCnt: resPlace.pCommentCnt, pickCnt: resPlace.pPickCnt, isLike: resPlace.pIsLike)
+                
+                self.delegate?.response(place: place, getPlace: "OK")
                 
             } catch {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA_DECODE", message: "데이터 응답 오류가 발생했습니다.") }
-                self.delegate?.response(user: nil, getUser: "ERR_DATA_DECODE")
+                self.delegate?.response(place: nil, getPlace: "ERR_DATA_DECODE")
             }
         }})
         task.resume()

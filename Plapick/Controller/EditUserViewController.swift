@@ -32,7 +32,6 @@ class EditUserViewController: UIViewController {
     // MARK: View
     lazy var photoView: PhotoView = {
         let pv = PhotoView()
-        pv.layer.borderWidth = 2
         pv.layer.cornerRadius = profileImageWidth / 2
         pv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(uploadImageTapped)))
         return pv
@@ -99,9 +98,9 @@ class EditUserViewController: UIViewController {
         
         user = app.getUser()
         guard let user = self.user else { return }
-        if let url = URL(string: ((user.profileImage.contains(String(user.id))) ? (PLAPICK_URL + user.profileImage) : user.profileImage)) {
-            photoView.sd_setImage(with: url, completed: nil)
-        }
+        
+        photoView.setProfileImage(uId: user.id, profileImage: user.profileImage)
+        
         textField.text = user.nickName
     }
     
@@ -118,10 +117,8 @@ class EditUserViewController: UIViewController {
     func setThemeColor() {
         if self.traitCollection.userInterfaceStyle == .dark {
             view.backgroundColor = .black
-            photoView.layer.borderColor = UIColor.systemGray3.cgColor
         } else {
             view.backgroundColor = .white
-            photoView.layer.borderColor = UIColor.systemGray3.cgColor
         }
     }
     
@@ -152,7 +149,16 @@ class EditUserViewController: UIViewController {
     
     // MARK: Function - @OBJC
     @objc func uploadImageTapped() {
-        app.checkPhotoGallaryAvailable(vc: self)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)
+        alert.addAction(UIAlertAction(title: "닫기", style: UIAlertAction.Style.cancel))
+        alert.addAction(UIAlertAction(title: "사진 선택", style: UIAlertAction.Style.default, handler: { (_) in
+            self.app.checkPhotoGallaryAvailable(vc: self)
+        }))
+        alert.addAction(UIAlertAction(title: "프로필 사진 삭제", style: UIAlertAction.Style.destructive, handler: { (_) in
+            self.photoView.image = nil
+            self.isUploadImage = true
+        }))
+        present(alert, animated: true)
     }
     
     @objc func saveTapped() {
@@ -222,7 +228,8 @@ extension EditUserViewController: CheckUserNickNameRequestProtocol {
             // 이미지 업로드 했을때
             if isUploadImage {
                 guard let image = photoView.image else {
-                    hideIndicator(idv: indicatorView, bov: blurOverlayView)
+                    // 이미지를 제거함
+                    editUserRequest.fetch(vc: self, paramDict: ["nickName": newNickName, "profileImage": ""])
                     return
                 }
                 uploadImageRequest.fetch(vc: self, image: image)
@@ -279,8 +286,12 @@ extension EditUserViewController: EditUserRequestProtocol {
             if isUploadImage {
                 let profileImage = "/images/users/\(app.getUId())/\(imageName).jpg"
                 app.setProfileImage(profileImage: profileImage)
-                if let url = URL(string: "\(PLAPICK_URL)\(profileImage)") {
-                    authAccountVC?.profileImagePhotoView.sd_setImage(with: url, completed: nil)
+                if imageName.isEmpty {
+                    authAccountVC?.profileImagePhotoView.image = nil
+                } else {
+                    if let url = URL(string: "\(PLAPICK_URL)\(profileImage)") {
+                        authAccountVC?.profileImagePhotoView.sd_setImage(with: url, completed: nil)
+                    }
                 }
             }
             

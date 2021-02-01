@@ -99,7 +99,7 @@ class GetRecentPicksRequest: HttpRequest {
                 var pickList: [Pick] = []
                 for resPick in resPickList {
 
-                    let user = User(id: resPick.u_id, nickName: resPick.u_nick_name, profileImage: resPick.u_profile_image ?? "", connectedDate: resPick.u_connected_date)
+                    let user = User(id: resPick.u_id, nickName: resPick.u_nick_name, profileImage: resPick.u_profile_image, connectedDate: resPick.u_connected_date)
 
                     let place = Place(id: resPick.p_id, kId: resPick.p_k_id, name: resPick.p_name, categoryName: resPick.p_category_name, categoryGroupName: resPick.p_category_group_name, categoryGroupCode: resPick.p_category_group_code, address: resPick.p_address, roadAddress: resPick.p_road_address, latitude: resPick.p_latitude, longitude: resPick.p_longitude, phone: resPick.p_phone, plocCode: resPick.p_ploc_code, clocCode: resPick.p_cloc_code)
                     

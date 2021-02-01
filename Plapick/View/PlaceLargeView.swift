@@ -30,23 +30,20 @@ class PlaceLargeView: UIView {
         didSet {
             guard let place = self.place else { return }
             
-            let categoryName = app.getCategoryString(categoryName: place.categoryName ?? "")
+            let categoryName = app.getCategoryString(categoryName: place.categoryName)
             categoryNameLabel.text = categoryName
             
             nameLabel.text = place.name
             
-            let address = place.address ?? ""
-            let roadAddress = place.roadAddress ?? ""
-            addressLabel.text = (roadAddress.isEmpty) ? address : roadAddress
+            addressLabel.text = (place.roadAddress.isEmpty) ? place.address : place.roadAddress
             
             likeCntButton.setTitle("좋아요 \(place.likeCnt)개", for: UIControl.State.normal)
             commentCntButton.setTitle("댓글 \(place.commentCnt)개", for: UIControl.State.normal)
             pickCntButton.setTitle("픽 \(place.pickCnt)개", for: UIControl.State.normal)
             
-            guard let mostPickList = place.mostPickList else { return }
-            self.mostPickList = mostPickList
+            mostPickList = place.mostPickList
             collectionView.reloadData()
-            pageControl.numberOfPages = mostPickList.count
+            pageControl.numberOfPages = place.mostPickList.count
         }
     }
     
@@ -56,8 +53,8 @@ class PlaceLargeView: UIView {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let cv = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        cv.backgroundColor = .systemBackground
         cv.isPagingEnabled = true
-        cv.backgroundColor = .tertiarySystemGroupedBackground
         cv.register(MostPickLargeCVCell.self, forCellWithReuseIdentifier: "MostPickLargeCVCell")
         cv.showsHorizontalScrollIndicator = false
         cv.dataSource = self

@@ -7,6 +7,7 @@
 
 import UIKit
 import SystemConfiguration
+import SDWebImage
 
 
 // MARK: UIColor
@@ -35,6 +36,21 @@ extension UIColor {
     }
     
     static let mainColor = UIColor(hexString: "#F8A13F")
+}
+
+
+// MARK: UIImageView
+extension UIImageView {
+    func setProfileImage(uId: Int, profileImage: String) {
+        let urlString = ((profileImage.contains(String(uId))) ? (PLAPICK_URL + profileImage) : profileImage)
+        if urlString.isEmpty {
+            self.image = nil
+        } else {
+            if let url = URL(string: urlString) {
+                self.sd_setImage(with: url, completed: nil)
+            }
+        }
+    }
 }
 
 
