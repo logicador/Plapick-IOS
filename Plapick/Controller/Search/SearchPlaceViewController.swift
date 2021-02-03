@@ -20,12 +20,14 @@ class SearchPlaceViewController: UIViewController {
     var prevVC: UIViewController?
     var currentKeyword: String = ""
     var selectedPlace: Place?
-    var placeList: [Place] = []
-    var placeMediumViewList: [PlaceMediumView] = []
     let getPlacesRequest = GetPlacesRequest()
     let likePlaceRequest = LikePlaceRequest()
     var isOpenedChildVC: Bool = false
     var paramDict: [String: String] = [:]
+    var latitude: String?
+    var longitude: String?
+    var plocCode: String?
+    var clocCode: String?
     var mode: String? {
         didSet {
             paramDict["mode"] = mode
@@ -47,13 +49,32 @@ class SearchPlaceViewController: UIViewController {
                 navigationItem.hidesSearchBarWhenScrolling = false // 스크롤 해도 검색창 안사라지게
                 
                 // MARK: For DEV_DEBUG
-                currentKeyword = "가평"
-                paramDict["keyword"] = "가평"
-                navigationItem.searchController?.searchBar.text = "가평"
+                currentKeyword = "석모도"
+                paramDict["keyword"] = "석모도"
+                navigationItem.searchController?.searchBar.text = "석모도"
                 getPlaces()
                 
             } else if mode == "MY_LIKE_PLACE" {
                 navigationItem.title = "좋아요한 플레이스"
+                getPlaces()
+            
+            } else if mode == "COORD" {
+                navigationItem.title = "플레이스 검색"
+                
+                guard let latitude = self.latitude else { return }
+                guard let longitude = self.longitude else { return }
+                paramDict["latitude"] = latitude
+                paramDict["longitude"] = longitude
+                paramDict["zoom"] = "5"
+                getPlaces()
+                
+            } else if mode == "LOCATION" {
+                navigationItem.title = "플레이스 검색"
+                
+                guard let plocCode = self.plocCode else { return }
+                guard let clocCode = self.clocCode else { return }
+                paramDict["plocCode"] = plocCode
+                paramDict["clocCode"] = clocCode
                 getPlaces()
             }
         }
@@ -73,10 +94,19 @@ class SearchPlaceViewController: UIViewController {
         return view
     }()
     
-    lazy var emptyView: UIView = {
+    lazy var placeContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
+    }()
+    
+    lazy var noPlaceLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.text = "검색 결과가 없습니다."
+        label.textColor = .systemGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     
@@ -95,8 +125,6 @@ class SearchPlaceViewController: UIViewController {
         }
         
         configureView()
-        
-        setEmptyView()
         
         setThemeColor()
         
@@ -148,15 +176,16 @@ class SearchPlaceViewController: UIViewController {
         contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
         contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-    }
-    
-    func setEmptyView() {
-        contentView.addSubview(emptyView)
-        emptyView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        emptyView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        emptyView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        emptyView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        emptyView.heightAnchor.constraint(equalTo: contentView.widthAnchor).isActive = true
+        
+        contentView.addSubview(placeContainerView)
+        placeContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        placeContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        placeContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        placeContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        
+        contentView.addSubview(noPlaceLabel)
+        noPlaceLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: SCREEN_WIDTH / 2).isActive = true
+        noPlaceLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
     }
     
     func getPlaces() {
@@ -197,33 +226,31 @@ extension SearchPlaceViewController: GetPlacesRequestProtocol {
     func response(placeList: [Place]?, getPlaces status: String) {
         if status == "OK" {
             if let placeList = placeList {
-                contentView.removeAllChildView()
-                self.placeList = placeList
-                placeMediumViewList.removeAll()
+                placeContainerView.removeAllChildView()
                 
                 if placeList.count > 0 {
+                    noPlaceLabel.isHidden = true
                     for (i, place) in placeList.enumerated() {
                         let pmv = PlaceMediumView()
                         pmv.index = i
                         pmv.place = place
                         pmv.delegate = self
                         
-                        contentView.addSubview(pmv)
-                        pmv.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-                        pmv.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+                        placeContainerView.addSubview(pmv)
+                        pmv.centerXAnchor.constraint(equalTo: placeContainerView.centerXAnchor).isActive = true
+                        pmv.widthAnchor.constraint(equalTo: placeContainerView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
                         if i == 0 {
-                            pmv.topAnchor.constraint(equalTo: contentView.topAnchor, constant: SPACE_XXL).isActive = true
+                            pmv.topAnchor.constraint(equalTo: placeContainerView.topAnchor, constant: SPACE_XXL).isActive = true
                         } else {
-                            pmv.topAnchor.constraint(equalTo: contentView.subviews[contentView.subviews.count - 2].bottomAnchor, constant: SPACE_XXL).isActive = true
+                            pmv.topAnchor.constraint(equalTo: placeContainerView.subviews[placeContainerView.subviews.count - 2].bottomAnchor, constant: SPACE_XXL).isActive = true
                         }
                         if i == placeList.count - 1 {
-                            pmv.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -SPACE_XXL).isActive = true
+                            pmv.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor, constant: -SPACE_XXL).isActive = true
                         }
-                        
-                        placeMediumViewList.append(pmv)
                     }
+                    
                 } else {
-                    setEmptyView()
+                    noPlaceLabel.isHidden = false
                 }
             }
         }
@@ -232,7 +259,7 @@ extension SearchPlaceViewController: GetPlacesRequestProtocol {
 
 // MARK: Extension - ScrollView
 extension SearchPlaceViewController: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if let _ = navigationItem.searchController?.searchBar.isFirstResponder {
             navigationItem.searchController?.searchBar.resignFirstResponder()
         }
@@ -275,7 +302,7 @@ extension SearchPlaceViewController: PlaceViewControllerProtocol {
     func closePlaceVC() {
         isOpenedChildVC = false
     }
-    func likePlace() {
+    func reloadPlace() {
         getPlaces()
     }
 }

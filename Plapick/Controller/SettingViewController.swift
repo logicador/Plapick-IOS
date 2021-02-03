@@ -20,7 +20,7 @@ class SettingViewController: UIViewController {
     let app = App()
     let editPushNotificationDeviceRequest = EditPushNotificationDeviceRequest()
     let logoutRequest = LogoutRequest()
-    var authAccountVC: AccountViewController?
+//    var authAccountVC: AccountViewController?
     var isOpenedChildVC: Bool = false
     
     
@@ -526,7 +526,7 @@ class SettingViewController: UIViewController {
     @objc func editUserTapped() {
         isOpenedChildVC = true
         let editUserVC = EditUserViewController()
-        editUserVC.authAccountVC = authAccountVC
+//        editUserVC.authAccountVC = authAccountVC
         editUserVC.delegate = self
         navigationController?.pushViewController(editUserVC, animated: true)
     }

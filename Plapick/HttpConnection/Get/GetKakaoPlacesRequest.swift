@@ -1,5 +1,5 @@
 //
-//  GetUserRequest.swift
+//  LoginRequest.swift
 //  Plapick
 //
 //  Created by 서원영 on 2021/01/11.
@@ -8,18 +8,18 @@
 import UIKit
 
 
-protocol GetUserRequestProtocol {
-    func response(user: User?, getUser status: String)
+protocol GetKakaoPlacesRequestProtocol {
+    func response(kakaoPlaceList: [KakaoPlace]?, getKakaoPlaces status: String)
 }
 
 
 // GET
-// 유저 정보 가져오기
-class GetUserRequest: HttpRequest {
+// 카카오 플레이스 가져오기
+class GetKakaoPlacesRequest: HttpRequest {
     
     // MARK: Properties
-    var delegate: GetUserRequestProtocol?
-    let apiUrl = API_URL + "/get/user"
+    var delegate: GetKakaoPlacesRequestProtocol?
+    let apiUrl = API_URL + "/get/kakao/places"
     
     
     // MARK: Fetch
@@ -37,14 +37,14 @@ class GetUserRequest: HttpRequest {
         let urlString = "\(apiUrl)?\(paramString)"
         guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL_ENCODE") }
-            delegate?.response(user: nil, getUser: "ERR_URL_ENCODE")
+            delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_URL_ENCODE")
             return
         }
         
         let httpUrl = encodedUrlString
         guard let url = URL(string: httpUrl) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL") }
-            delegate?.response(user: nil, getUser: "ERR_URL")
+            delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_URL")
             return
         }
         
@@ -57,53 +57,56 @@ class GetUserRequest: HttpRequest {
                 
             if let _ = error {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_SERVER") }
-                self.delegate?.response(user: nil, getUser: "ERR_SERVER")
+                self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_SERVER")
                 return
             }
             
             guard let response = res as? HTTPURLResponse else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_RESPONSE") }
-                self.delegate?.response(user: nil, getUser: "ERR_RESPONSE")
+                self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_RESPONSE")
                 return
             }
             
             if response.statusCode != 200 {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_CODE") }
-                self.delegate?.response(user: nil, getUser: "ERR_STATUS_CODE")
+                self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_STATUS_CODE")
                 return
             }
             
             guard let data = data else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA") }
-                self.delegate?.response(user: nil, getUser: "ERR_DATA")
+                self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_DATA")
                 return
             }
             
             guard let status = self.getStatusCode(data: data) else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_DECODE") }
-                self.delegate?.response(user: nil, getUser: "ERR_STATUS_DECODE")
+                self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_STATUS_DECODE")
                 return
             }
             print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
-                self.delegate?.response(user: nil, getUser: status)
+                self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: status)
                 return
             }
             
             // MARK: Response
             do {
-                let response = try JSONDecoder().decode(UserRequestResult.self, from: data)
-                let resUser = response.result
+                let response = try JSONDecoder().decode(KakaoPlacesRequestResult.self, from: data)
+                let resKakaoPlaceList = response.result
                 
-                let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image, status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, followerCnt: resUser.uFollowerCnt, pickCnt: resUser.uPickCnt, isFollow: resUser.uIsFollow)
-                
-                self.delegate?.response(user: user, getUser: "OK")
+                var kakaoPlaceList: [KakaoPlace] = []
+                for resKakaoPlace in resKakaoPlaceList {
+                    let kakaoPlace = KakaoPlace(id: resKakaoPlace.id, placeName: resKakaoPlace.place_name, categoryName: resKakaoPlace.category_name, categoryGroupCode: resKakaoPlace.category_group_code, categoryGroupName: resKakaoPlace.category_group_name, addressName: resKakaoPlace.address_name, roadAddressName: resKakaoPlace.road_address_name, phone: resKakaoPlace.phone, latitude: resKakaoPlace.y, longitude: resKakaoPlace.x)
+                    kakaoPlaceList.append(kakaoPlace)
+                }
+                self.delegate?.response(kakaoPlaceList: kakaoPlaceList, getKakaoPlaces: "OK")
                 
             } catch {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA_DECODE", message: "데이터 응답 오류가 발생했습니다.") }
-                self.delegate?.response(user: nil, getUser: "ERR_DATA_DECODE")
+                self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_DATA_DECODE")
             }
         }})
         task.resume()

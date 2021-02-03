@@ -17,10 +17,8 @@ class SearchViewController: UIViewController {
     var app = App()
     var mainVC: MainViewController?
     let locationManager = CLLocationManager()
-    
-    // MARK: For DEV_DEBUG
-    var user: User?
-    var place: Place?
+    var recentPlaceList: [Place] = []
+    var recentUserList: [User] = []
     
     
     // MARK: VIew
@@ -52,27 +50,69 @@ class SearchViewController: UIViewController {
         ib.addTarget(self, action: #selector(searchPlaceKeywordTapped), for: UIControl.Event.touchUpInside)
         return ib
     }()
+    
+    lazy var warningContainerView: UIView = {
+        let view = UIView()
+        view.layer.borderWidth = 1
+        view.layer.borderColor = UIColor.mainColor.cgColor
+        view.layer.cornerRadius = SPACE_XS
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var warningImageView: UIImageView = {
+        let img = UIImage(systemName: "exclamationmark.circle.fill")
+        let iv = UIImageView(image: img)
+        iv.contentMode = .scaleAspectFit
+        iv.tintColor = .mainColor
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    lazy var warningLabel: UILabel = {
+        let label = UILabel()
+
+        let attrString = NSMutableAttributedString()
+            .thin("[", fontSize: 14)
+            .bold("내 위치 주변 탐색", fontSize: 14)
+            .thin(" / ", fontSize: 14)
+            .bold("지역으로 찾기", fontSize: 14)
+            .thin(" / ", fontSize: 14)
+            .bold("지도에서 찾기", fontSize: 14)
+            .thin("] 기능은 픽이 ", fontSize: 14)
+            .bold("1개 이상", fontSize: 14)
+            .thin(" 게시된 플레이스만 찾을 수 있습니다.", fontSize: 14)
+
+        label.attributedText = attrString
+        label.numberOfLines = 0
+        label.setLineSpacing(lineSpacing: SPACE_XXS)
+        label.textColor = .mainColor
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     lazy var searchPlaceGPSIconButton: IconButton = {
         let ib = IconButton(type: UIButton.ButtonType.system)
         ib.text = "내 위치 주변 탐색"
         ib.icon = "scope"
+        ib.addTarget(self, action: #selector(gpsTapped), for: UIControl.Event.touchUpInside)
         return ib
     }()
     lazy var searchPlaceLocationIconButton: IconButton = {
         let ib = IconButton(type: UIButton.ButtonType.system)
         ib.text = "지역으로 찾기"
         ib.icon = "location"
+        ib.addTarget(self, action: #selector(locationTapped), for: UIControl.Event.touchUpInside)
         return ib
     }()
     lazy var searchPlaceMapIconButton: IconButton = {
         let ib = IconButton(type: UIButton.ButtonType.system)
         ib.text = "지도에서 찾기"
         ib.icon = "map"
+        ib.addTarget(self, action: #selector(mapTapped), for: UIControl.Event.touchUpInside)
         return ib
     }()
     
     lazy var recentPlaceTitleView: TitleView = {
-        let tv = TitleView(text: "최근에 본 플레이스", style: .ultraSmall)
+        let tv = TitleView(text: "최근 본 플레이스", style: .ultraSmall, isAction: true, actionText: "모두 삭제", actionMode: "REMOVE_RECENT_PLACES")
         tv.delegate = self
         return tv
     }()
@@ -91,7 +131,7 @@ class SearchViewController: UIViewController {
     
     // MARK: View - User
     lazy var searchUserTitleView: TitleView = {
-        let tv = TitleView(text: "다른 사람", style: .large)
+        let tv = TitleView(text: "다른사람", style: .large)
         return tv
     }()
     lazy var searchUserNickNameIconButton: IconButton = {
@@ -103,7 +143,7 @@ class SearchViewController: UIViewController {
     }()
     
     lazy var recentUserTitleView: TitleView = {
-        let tv = TitleView(text: "최근에 본 사람", style: .ultraSmall)
+        let tv = TitleView(text: "최근 본 다른사람", style: .ultraSmall, isAction: true, actionText: "모두 삭제", actionMode: "REMOVE_RECENT_USERS")
         tv.delegate = self
         return tv
     }()
@@ -141,11 +181,6 @@ class SearchViewController: UIViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
         configureView()
-        
-        // MARK: For DEV_DEBUG
-        user = app.getUser()
-        guard let user = self.user else { return }
-        place = Place(id: 2, kId: 25855305, name: "아침고요수목원", categoryName: "수목원,식물원", categoryGroupName: "", categoryGroupCode: "", address: "", roadAddress: "경기 가평군 상면 수목원로 432", latitude: "", longitude: "", phone: "", plocCode: "", clocCode: "", mostPickList: [MostPick(id: 2101180709242291, uId: user.id, uNickName: user.nickName, uProfileImage: user.profileImage)], likeCnt: 0, commentCnt: 0, pickCnt: 0)
     }
     
     
@@ -156,6 +191,12 @@ class SearchViewController: UIViewController {
         mainVC?.title = "검색"
         if mainVC?.navigationItem.leftBarButtonItem != nil { mainVC?.navigationItem.leftBarButtonItem = nil }
         if mainVC?.navigationItem.rightBarButtonItem != nil { mainVC?.navigationItem.rightBarButtonItem = nil }
+        
+        recentPlaceList = app.getRecentPlaceList().reversed()
+        recentPlaceCollectionView.reloadData()
+        
+        recentUserList = app.getRecentUserList().reversed()
+        recentUserCollectionView.reloadData()
     }
     
     
@@ -190,8 +231,27 @@ class SearchViewController: UIViewController {
         searchPlaceKeywordIconButton.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
         searchPlaceKeywordIconButton.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
         
+        searchPlaceContainerView.addSubview(warningContainerView)
+        warningContainerView.topAnchor.constraint(equalTo: searchPlaceKeywordIconButton.bottomAnchor, constant: SPACE_L).isActive = true
+        warningContainerView.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
+        warningContainerView.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
+
+        warningContainerView.addSubview(warningImageView)
+        warningImageView.leadingAnchor.constraint(equalTo: warningContainerView.leadingAnchor, constant: SPACE).isActive = true
+        warningImageView.widthAnchor.constraint(equalToConstant: 25).isActive = true
+        warningImageView.heightAnchor.constraint(equalToConstant: 25).isActive = true
+
+        warningContainerView.addSubview(warningLabel)
+        warningLabel.topAnchor.constraint(equalTo: warningContainerView.topAnchor, constant: SPACE_XS).isActive = true
+        warningLabel.leadingAnchor.constraint(equalTo: warningImageView.trailingAnchor, constant: SPACE_S).isActive = true
+        warningLabel.trailingAnchor.constraint(equalTo: warningContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
+        warningLabel.bottomAnchor.constraint(equalTo: warningContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+
+        warningImageView.centerYAnchor.constraint(equalTo: warningLabel.centerYAnchor).isActive = true
+        
         searchPlaceContainerView.addSubview(searchPlaceGPSIconButton)
-        searchPlaceGPSIconButton.topAnchor.constraint(equalTo: searchPlaceKeywordIconButton.bottomAnchor, constant: SPACE_S).isActive = true
+        searchPlaceGPSIconButton.topAnchor.constraint(equalTo: warningContainerView.bottomAnchor, constant: SPACE_S).isActive = true
+//        searchPlaceGPSIconButton.topAnchor.constraint(equalTo: searchPlaceKeywordIconButton.bottomAnchor, constant: SPACE_S).isActive = true
         searchPlaceGPSIconButton.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
         searchPlaceGPSIconButton.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
         
@@ -273,49 +333,111 @@ class SearchViewController: UIViewController {
                 present(alert, animated: true, completion: nil)
                 return
             }
-            let coordinate = location.coordinate
-            print(coordinate.latitude, coordinate.longitude)
+            let coord = location.coordinate
+            let lat = coord.latitude
+            let lng = coord.longitude
+            app.setLatitude(latitude: String(lat))
+            app.setLongitude(longitude: String(lng))
+            
+            let searchPlaceVC = SearchPlaceViewController()
+            searchPlaceVC.latitude = String(lat)
+            searchPlaceVC.longitude = String(lng)
+            searchPlaceVC.mode = "COORD"
+            navigationController?.pushViewController(searchPlaceVC, animated: true)
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == recentPlaceCollectionView {
+    @objc func locationTapped() {
+        let locationVC = LocationViewController()
+        navigationController?.pushViewController(locationVC, animated: true)
+    }
+    
+    @objc func mapTapped() {
+        let searchPlaceMapVC = SearchPlaceMapViewController()
+        navigationController?.pushViewController(searchPlaceMapVC, animated: true)
+    }
+}
+
+
+// MARK: TitleView
+extension SearchViewController: TitleViewProtocol {
+    func action(actionMode: String) {
+        if actionMode == "REMOVE_RECENT_PLACES" {
+            app.removeAllRecentPlaceList()
+            recentPlaceList.removeAll()
+            recentPlaceCollectionView.reloadData()
             
-        } else {
-            
+        } else if actionMode == "REMOVE_RECENT_USERS" {
+            app.removeAllRecentUserList()
+            recentUserList.removeAll()
+            recentUserCollectionView.reloadData()
         }
     }
 }
 
-
-// MARK: Extension - TitleView
-extension SearchViewController: TitleViewProtocol {
-    func action(actionMode: String) {
-        print(actionMode)
-    }
-}
-
-// MARK: Extension - RecentPlaceCollection
+// MARK: CollectionView
 extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == recentPlaceCollectionView {
-            return 10
+            if recentPlaceList.count > 0 {
+                collectionView.backgroundView = nil
+            } else {
+                let bgView = UIView()
+                
+                let label = UILabel()
+                label.text = "최근 본 플레이스가 없습니다."
+                label.font = UIFont.systemFont(ofSize: 14)
+                label.textColor = .systemGray
+                label.translatesAutoresizingMaskIntoConstraints = false
+                
+                bgView.addSubview(label)
+                label.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
+                label.centerYAnchor.constraint(equalTo: bgView.centerYAnchor).isActive = true
+                
+                collectionView.backgroundView = bgView
+            }
+            return recentPlaceList.count
+            
         } else {
-            return 5
+            if recentUserList.count > 0 {
+                collectionView.backgroundView = nil
+            } else {
+                let bgView = UIView()
+                
+                let label = UILabel()
+                label.text = "최근 본 다른사람이 없습니다."
+                label.font = UIFont.systemFont(ofSize: 14)
+                label.textColor = .systemGray
+                label.translatesAutoresizingMaskIntoConstraints = false
+                
+                bgView.addSubview(label)
+                label.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
+                label.centerYAnchor.constraint(equalTo: bgView.centerYAnchor).isActive = true
+                
+                collectionView.backgroundView = bgView
+            }
+            return recentUserList.count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == recentPlaceCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PlaceCVCell", for: indexPath) as! PlaceCVCell
-            cell.place = place
+            cell.place = recentPlaceList[indexPath.row]
             return cell
             
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "UserCVCell", for: indexPath) as! UserCVCell
-            cell.user = user
+            cell.user = recentUserList[indexPath.row]
             return cell
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -326,10 +448,13 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
-    }
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == recentPlaceCollectionView {
+            let placeVC = PlaceViewController(place: recentPlaceList[indexPath.row])
+            navigationController?.pushViewController(placeVC, animated: true)
+        } else {
+            let accountVC = AccountViewController(uId: recentUserList[indexPath.row].id)
+            present(UINavigationController(rootViewController: accountVC), animated: true, completion: nil)
+        }
     }
 }

@@ -20,7 +20,7 @@ class SearchUserTableViewController: UITableViewController {
     var userList: [User] = []
     var currentKeyword: String = ""
     var paramDict: [String: String] = [:]
-    var isOpenedChildVC: Bool = false
+//    var isOpenedChildVC: Bool = false
     var mode: String? {
         didSet {
             paramDict["mode"] = mode
@@ -67,8 +67,6 @@ class SearchUserTableViewController: UITableViewController {
         
         isModalInPresentation = true // 후....
         
-        configureView()
-        
         setThemeColor()
         
         getUsersRequest.delegate = self
@@ -78,9 +76,9 @@ class SearchUserTableViewController: UITableViewController {
     // MARK: ViewDidDisappear
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        if !isOpenedChildVC {
+//        if !isOpenedChildVC {
             delegate?.closeSearchUserTVC()
-        }
+//        }
     }
     
     
@@ -100,11 +98,7 @@ class SearchUserTableViewController: UITableViewController {
         }
     }
     
-    func configureView() {
-        
-    }
-    
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if let _ = navigationItem.searchController?.searchBar.isFirstResponder {
             navigationItem.searchController?.searchBar.resignFirstResponder()
         }
@@ -112,9 +106,27 @@ class SearchUserTableViewController: UITableViewController {
 }
 
 
-// MARK: Extension - TableView
+// MARK: TableView
 extension SearchUserTableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if userList.count > 0 {
+            tableView.backgroundView = nil
+        } else {
+            let bgView = UIView()
+            
+            let label = UILabel()
+            label.text = "검색 결과가 없습니다."
+            label.font = UIFont.systemFont(ofSize: 16)
+            label.textColor = .systemGray
+            label.translatesAutoresizingMaskIntoConstraints = false
+            
+            bgView.addSubview(label)
+            label.topAnchor.constraint(equalTo: bgView.topAnchor, constant: SCREEN_WIDTH / 2).isActive = true
+            label.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
+            
+            tableView.backgroundView = bgView
+        }
+        
         return userList.count
     }
     
@@ -128,7 +140,6 @@ extension SearchUserTableViewController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50 + (SPACE_XS * 2)
     }
-    
     override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50 + (SPACE_XS * 2)
     }
@@ -138,7 +149,7 @@ extension SearchUserTableViewController {
             navigationItem.searchController?.searchBar.resignFirstResponder()
         }
         
-        isOpenedChildVC = true
+//        isOpenedChildVC = true
         let user = userList[indexPath.row]
         let accountVC = AccountViewController(uId: user.id)
         accountVC.delegate = self
@@ -146,19 +157,7 @@ extension SearchUserTableViewController {
     }
 }
 
-// MARK: Extension - GetUsers
-extension SearchUserTableViewController: GetUsersRequestProtocol {
-    func response(userList: [User]?, getUsers status: String) {
-        if status == "OK" {
-            if let userList = userList {
-                self.userList = userList
-                tableView.reloadData()
-            }
-        }
-    }
-}
-
-// MARK: Extension - SearchBar
+// MARK: SearchBar
 extension SearchUserTableViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -185,13 +184,25 @@ extension SearchUserTableViewController: UISearchBarDelegate {
     }
 }
 
-// MARK: Extension - AccountVC
+// MARK: HTTP - GetUsers
+extension SearchUserTableViewController: GetUsersRequestProtocol {
+    func response(userList: [User]?, getUsers status: String) {
+        if status == "OK" {
+            if let userList = userList {
+                self.userList = userList
+                tableView.reloadData()
+            }
+        }
+    }
+}
+
+// MARK: VC - AccountVC
 extension SearchUserTableViewController: AccountViewControllerProtocol {
     func closeAccountVC() {
-        isOpenedChildVC = false
+//        isOpenedChildVC = false
     }
     
-    func follow() {
+    func reloadUser() {
         getUsers()
     }
 }

@@ -60,7 +60,7 @@ class MainViewController: UITabBarController {
                 accountVC!
             ], animated: false)
         
-        postingVC?.authAccountVC = accountVC
+//        postingVC?.authAccountVC = accountVC
         
         self.delegate = self
         postingVC?.delegate = self
@@ -83,11 +83,11 @@ class MainViewController: UITabBarController {
 // MARK: Extension - TabBar
 extension MainViewController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        if viewController == postingVC {
+        if viewController is PostingViewController {
             navigationController?.pushViewController(viewController, animated: true)
             return false
         }
-        if viewController == accountVC {
+        if viewController is AccountViewController {
             present(UINavigationController(rootViewController: viewController), animated: true, completion: nil)
             return false
         }
@@ -99,10 +99,9 @@ extension MainViewController: UITabBarControllerDelegate {
 extension MainViewController: PostingViewControllerProtocol {
     func closePostingVC(isUploaded: Bool) {
         postingVC = PostingViewController()
-        postingVC?.authAccountVC = accountVC
+//        postingVC?.authAccountVC = accountVC
         postingVC?.delegate = self
         postingVC?.tabBarItem.image = UIImage(systemName: "plus.circle")
-        
         viewControllers?.insert(postingVC!, at: 2) // 원위치에 삽입
     }
 }
@@ -110,10 +109,11 @@ extension MainViewController: PostingViewControllerProtocol {
 // MARK: Extension - Account
 extension MainViewController: AccountViewControllerProtocol {
     func closeAccountVC() {
+//        accountVC = AccountViewController(uId: uId!)
         accountVC?.delegate = self
         accountVC?.tabBarItem.image = UIImage(systemName: "person")
         viewControllers?.insert(accountVC!, at: 4) // 원위치에 삽입
     }
     
-    func follow() { }
+    func reloadUser() { }
 }

@@ -25,8 +25,6 @@ struct User: Codable {
     var connectedDate: String
     
     var followerCnt: Int = 0
-    
-    var isFollow: String? = "N"
-    
     var pickCnt: Int = 0
+    var isFollow: String? = "N"
 }

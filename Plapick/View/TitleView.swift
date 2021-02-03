@@ -59,7 +59,7 @@ class TitleView: UIView {
         
         if style == .ultraSmall {
             label.font = UIFont.boldSystemFont(ofSize: 20)
-            button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
             topConstant = SPACE_L
             bottomConstant = -SPACE
             

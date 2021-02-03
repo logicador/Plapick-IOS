@@ -71,7 +71,7 @@ class UploadImageRequest: HttpRequest {
                     }
                     
                     do {
-                        let response = try JSONDecoder().decode(IdRequestResult.self, from: data)
+                        let response = try JSONDecoder().decode(IntRequestResult.self, from: data)
                         self.delegate?.response(imageName: response.result, uploadImage: status)
                         
                     } catch {

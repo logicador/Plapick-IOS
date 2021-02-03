@@ -26,7 +26,7 @@ class EditUserViewController: UIViewController {
     var isUploadImage: Bool = false
     let checkUserNickNameRequest = CheckUserNickNameRequest()
     var imageName: String = ""
-    var authAccountVC: AccountViewController?
+//    var authAccountVC: AccountViewController?
     
     
     // MARK: View
@@ -281,18 +281,18 @@ extension EditUserViewController: EditUserRequestProtocol {
 //            guard let authAccountVC = self.authAccountVC else { return }
             
             app.setNickName(nickName: newNickName)
-            authAccountVC?.navigationItem.title = newNickName
+//            authAccountVC?.navigationItem.title = newNickName
             
             if isUploadImage {
                 let profileImage = "/images/users/\(app.getUId())/\(imageName).jpg"
                 app.setProfileImage(profileImage: profileImage)
-                if imageName.isEmpty {
-                    authAccountVC?.profileImagePhotoView.image = nil
-                } else {
-                    if let url = URL(string: "\(PLAPICK_URL)\(profileImage)") {
-                        authAccountVC?.profileImagePhotoView.sd_setImage(with: url, completed: nil)
-                    }
-                }
+//                if imageName.isEmpty {
+//                    authAccountVC?.profileImagePhotoView.image = nil
+//                } else {
+//                    if let url = URL(string: "\(PLAPICK_URL)\(profileImage)") {
+//                        authAccountVC?.profileImagePhotoView.sd_setImage(with: url, completed: nil)
+//                    }
+//                }
             }
             
             navigationController?.popViewController(animated: true)

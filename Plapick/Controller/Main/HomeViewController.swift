@@ -16,7 +16,7 @@ class HomeViewController: UIViewController {
     var getRecentPicksRequest = GetRecentPicksRequest()
     var getHotPlacesRequest = GetHotPlacesRequest()
     var photoGroupViewList: [PhotoGroupView] = []
-    var placeLargeViewList: [PlaceLargeView] = []
+//    var placeLargeViewList: [PlaceLargeView] = []
     var getCnt = 0
     
     
@@ -198,7 +198,8 @@ extension HomeViewController: PlaceLargeViewProtocol {
     }
     
     func openPlaceAllComments(place: Place) {
-        print("openAllComments", place.id)
+        let commentVC = CommentViewController(mode: "PLACE", id: place.id)
+        navigationController?.pushViewController(commentVC, animated: true)
     }
     
     func openPlaceAllPicks(place: Place) {
@@ -210,14 +211,14 @@ extension HomeViewController: PlaceLargeViewProtocol {
     }
     
     func openUser(uId: Int) {
-        let authUId = app.getUId()
-        
-        if authUId == uId {
-            let accountVC = mainVC?.accountVC
-            mainVC?.present(UINavigationController(rootViewController: accountVC!), animated: true, completion: nil)
-        } else {
+//        let authUId = app.getUId()
+//
+//        if authUId == uId {
+//            let accountVC = mainVC?.accountVC
+//            mainVC?.present(UINavigationController(rootViewController: accountVC!), animated: true, completion: nil)
+//        } else {
             present(UINavigationController(rootViewController: AccountViewController(uId: uId)), animated: true, completion: nil)
-        }
+//        }
     }
 }
 
@@ -272,7 +273,7 @@ extension HomeViewController: GetHotPlacesRequestProtocol {
                             plv.bottomAnchor.constraint(equalTo: hotPlaceContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
                         }
                         
-                        placeLargeViewList.append(plv)
+//                        placeLargeViewList.append(plv)
                     }
                 }
             }

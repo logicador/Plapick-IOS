@@ -22,13 +22,29 @@ class PostingViewController: UIViewController {
     var delegate: PostingViewControllerProtocol?
 //    var searchKakaoPlaceVC = SearchKakaoPlaceViewController()
     var isOpenedChildVC: Bool = false
-    var authAccountVC: AccountViewController?
+//    var authAccountVC: AccountViewController?
     var selectedImage: UIImage?
-    var selectedPlace: Place?
     let addPlaceRequest = AddPlaceRequest()
     let uploadImageRequest = UploadImageRequest()
     let addPickRequest = AddPickRequest()
     var isUploaded: Bool = false
+    var selectedPlace: Place? {
+        didSet {
+            guard let place = selectedPlace else { return }
+            
+            placeContainerView.removeAllChildView()
+            
+            let pmv = PlaceMediumView()
+            pmv.place = place
+            pmv.delegate = self
+            
+            placeContainerView.addSubview(pmv)
+            pmv.topAnchor.constraint(equalTo: placeContainerView.topAnchor).isActive = true
+            pmv.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
+            pmv.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
+            pmv.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor).isActive = true
+        }
+    }
     
     
     // MARK: View
@@ -50,7 +66,7 @@ class PostingViewController: UIViewController {
         return tv
     }()
     
-    lazy var messageTextFieldView: UIView = {
+    lazy var messageTextContainerView: UIView = {
         let view = UIView()
         view.layer.borderWidth = 1
         view.layer.cornerRadius = 10
@@ -98,12 +114,16 @@ class PostingViewController: UIViewController {
     
     lazy var placeContainerView: UIView = {
         let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var noPlaceContainerView: UIView = {
+        let view = UIView()
         view.layer.cornerRadius = 20
         view.backgroundColor = .systemGray6
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
     lazy var noPlaceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 18)
@@ -171,7 +191,7 @@ class PostingViewController: UIViewController {
         setThemeColor()
     }
     func setThemeColor() {
-        messageTextFieldView.layer.borderColor = UIColor.separator.cgColor
+        messageTextContainerView.layer.borderColor = UIColor.separator.cgColor
         if messageTextView.textColor != UIColor.lightGray {
             messageTextView.textColor = UIColor.systemBackground.inverted
         }
@@ -205,17 +225,17 @@ class PostingViewController: UIViewController {
         messageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         messageTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        contentView.addSubview(messageTextFieldView)
-        messageTextFieldView.topAnchor.constraint(equalTo: messageTitleView.bottomAnchor).isActive = true
-        messageTextFieldView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        messageTextFieldView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        messageTextFieldView.heightAnchor.constraint(equalToConstant: SCREEN_WIDTH * 0.33).isActive = true
+        contentView.addSubview(messageTextContainerView)
+        messageTextContainerView.topAnchor.constraint(equalTo: messageTitleView.bottomAnchor).isActive = true
+        messageTextContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        messageTextContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        messageTextContainerView.heightAnchor.constraint(equalToConstant: SCREEN_WIDTH * 0.33).isActive = true
         
-        messageTextFieldView.addSubview(messageTextView)
-        messageTextView.topAnchor.constraint(equalTo: messageTextFieldView.topAnchor, constant: SPACE_XS).isActive = true
-        messageTextView.leadingAnchor.constraint(equalTo: messageTextFieldView.leadingAnchor, constant: SPACE_XS).isActive = true
-        messageTextView.trailingAnchor.constraint(equalTo: messageTextFieldView.trailingAnchor, constant: -SPACE_XS).isActive = true
-        messageTextView.bottomAnchor.constraint(equalTo: messageTextFieldView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        messageTextContainerView.addSubview(messageTextView)
+        messageTextView.topAnchor.constraint(equalTo: messageTextContainerView.topAnchor, constant: SPACE_XS).isActive = true
+        messageTextView.leadingAnchor.constraint(equalTo: messageTextContainerView.leadingAnchor, constant: SPACE_XS).isActive = true
+        messageTextView.trailingAnchor.constraint(equalTo: messageTextContainerView.trailingAnchor, constant: -SPACE_XS).isActive = true
+        messageTextView.bottomAnchor.constraint(equalTo: messageTextContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
         
         // MARK: ConfigureView - Image
         contentView.addSubview(imageTitleView)
@@ -245,10 +265,18 @@ class PostingViewController: UIViewController {
         placeContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         placeContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -SPACE_XL).isActive = true
         
-        placeContainerView.addSubview(noPlaceLabel)
-        noPlaceLabel.centerXAnchor.constraint(equalTo: placeContainerView.centerXAnchor).isActive = true
-        noPlaceLabel.topAnchor.constraint(equalTo: placeContainerView.topAnchor, constant: SPACE_XXXXL).isActive = true
-        noPlaceLabel.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor, constant: -SPACE_XXXXL).isActive = true
+        if selectedPlace == nil {
+            placeContainerView.addSubview(noPlaceContainerView)
+            noPlaceContainerView.topAnchor.constraint(equalTo: placeTitleView.bottomAnchor).isActive = true
+            noPlaceContainerView.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
+            noPlaceContainerView.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
+            noPlaceContainerView.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor).isActive = true
+        
+            noPlaceContainerView.addSubview(noPlaceLabel)
+            noPlaceLabel.centerXAnchor.constraint(equalTo: noPlaceContainerView.centerXAnchor).isActive = true
+            noPlaceLabel.topAnchor.constraint(equalTo: noPlaceContainerView.topAnchor, constant: NO_DATA_SPACE).isActive = true
+            noPlaceLabel.bottomAnchor.constraint(equalTo: noPlaceContainerView.bottomAnchor, constant: -NO_DATA_SPACE).isActive = true
+        }
     }
     
     // MARK: Function - @OBJC
@@ -339,17 +367,6 @@ extension PostingViewController: SearchPlaceViewControllerProtocol {
             }
             
             selectedPlace = place
-            placeContainerView.removeAllChildView()
-            
-            let pmv = PlaceMediumView()
-            pmv.place = place
-            pmv.delegate = self
-            
-            placeContainerView.addSubview(pmv)
-            pmv.topAnchor.constraint(equalTo: placeContainerView.topAnchor).isActive = true
-            pmv.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
-            pmv.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
-            pmv.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor).isActive = true
             
             if selectedImage != nil {
                 navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시하기", style: UIBarButtonItem.Style.plain, target: self, action: #selector(postingTapped))
@@ -373,7 +390,7 @@ extension PostingViewController: PlaceMediumViewProtocol {
 
 // MARK: Extension - ScrollView
 extension PostingViewController: UIScrollViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         if messageTextView.isFirstResponder {
             messageTextView.resignFirstResponder()
         }
@@ -403,13 +420,14 @@ extension PostingViewController: UITextViewDelegate {
 extension PostingViewController: AddPlaceRequestProtocol {
     func response(place: Place?, addPlace status: String) {
         if status == "OK" {
-            guard let image = selectedImage else {
-                hideIndicator(idv: indicatorView, bov: blurOverlayView)
-                return
+            if let place = place {
+                guard let image = selectedImage else {
+                    hideIndicator(idv: indicatorView, bov: blurOverlayView)
+                    return
+                }
+                selectedPlace = place
+                uploadImageRequest.fetch(vc: self, image: image)
             }
-            selectedPlace = place
-            uploadImageRequest.fetch(vc: self, image: image)
-            
         } else {
             hideIndicator(idv: indicatorView, bov: blurOverlayView)
         }
@@ -443,7 +461,7 @@ extension PostingViewController: AddPickRequestProtocol {
         hideIndicator(idv: indicatorView, bov: blurOverlayView)
         if status == "OK" {
             isUploaded = true
-            authAccountVC?.getPicks()
+//            authAccountVC?.getPicks()
             let alert = UIAlertController(title: "픽 게시하기", message: "새로운 픽이 게시되었습니다.", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
                 self.navigationController?.popViewController(animated: true)
@@ -458,5 +476,5 @@ extension PostingViewController: PlaceViewControllerProtocol {
     func closePlaceVC() {
         isOpenedChildVC = false
     }
-    func likePlace() { }
+    func reloadPlace() {}
 }

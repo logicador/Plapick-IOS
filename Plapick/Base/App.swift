@@ -231,4 +231,86 @@ class App {
     func setPushNotification(key: String, value: String) {
         userDefaults.set(value, forKey: key)
     }
+    
+    func getLatitude() -> String {
+        return userDefaults.string(forKey: "latitude") ?? DEFAULT_LATITUDE
+    }
+    func setLatitude(latitude: String) {
+        userDefaults.set(latitude, forKey: "latitude")
+    }
+    
+    func getLongitude() -> String {
+        return userDefaults.string(forKey: "longitude") ?? DEFAULT_LONGITUDE
+    }
+    func setLongitude(longitude: String) {
+        userDefaults.set(longitude, forKey: "longitude")
+    }
+    
+    func getRecentPlaceList() -> [Place] {
+        guard let obj = userDefaults.object(forKey: "recentPlaceList") as? Data else { return [] }
+        let decoder = JSONDecoder()
+        guard let recentPlaceList = try? decoder.decode(Array<Place>.self, from: obj) else { return [] }
+        return recentPlaceList
+    }
+    func addRecentPlace(place: Place) {
+        var recentPlaceList: [Place] = getRecentPlaceList()
+        
+        // 이미 마지막 인덱스에 있으면
+        if recentPlaceList.count > 0 && recentPlaceList[recentPlaceList.count - 1].id == place.id { return }
+        
+        // 중복되었을 경우 기존 플레이스 제거
+        for (i, recentPlace) in recentPlaceList.enumerated() {
+            if recentPlace.id == place.id {
+                recentPlaceList.remove(at: i)
+                break
+            }
+        }
+        
+        recentPlaceList.append(place)
+        
+        // 최대 10개까지 저장 첫번째(오래된) 플레이스 제거
+        if recentPlaceList.count > 10 { recentPlaceList.remove(at: 0) }
+        
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(recentPlaceList) {
+            userDefaults.set(encoded, forKey: "recentPlaceList")
+        }
+    }
+    func removeAllRecentPlaceList() {
+        userDefaults.removeObject(forKey: "recentPlaceList")
+    }
+    
+    func getRecentUserList() -> [User] {
+        guard let obj = userDefaults.object(forKey: "recentUserList") as? Data else { return [] }
+        let decoder = JSONDecoder()
+        guard let recentUserList = try? decoder.decode(Array<User>.self, from: obj) else { return [] }
+        return recentUserList
+    }
+    func addRecentUser(user: User) {
+        var recentUserList: [User] = getRecentUserList()
+        
+        // 이미 마지막 인덱스에 있으면
+        if recentUserList.count > 0 && recentUserList[recentUserList.count - 1].id == user.id { return }
+        
+        // 중복되었을 경우 기존 유저 제거
+        for (i, recentUser) in recentUserList.enumerated() {
+            if recentUser.id == user.id {
+                recentUserList.remove(at: i)
+                break
+            }
+        }
+        
+        recentUserList.append(user)
+        
+        // 최대 10개까지 저장 첫번째(오래된) 유저 제거
+        if recentUserList.count > 10 { recentUserList.remove(at: 0) }
+        
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(recentUserList) {
+            userDefaults.set(encoded, forKey: "recentUserList")
+        }
+    }
+    func removeAllRecentUserList() {
+        userDefaults.removeObject(forKey: "recentUserList")
+    }
 }

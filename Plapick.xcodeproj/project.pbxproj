@@ -26,6 +26,9 @@
 		573864B725BD93990025AF1A /* GetHotPlacesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573864B625BD93990025AF1A /* GetHotPlacesRequest.swift */; };
 		573864CA25BDD4A60025AF1A /* MostPick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573864C925BDD4A60025AF1A /* MostPick.swift */; };
 		573864CE25BDDEEE0025AF1A /* LineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573864CD25BDDEEE0025AF1A /* LineView.swift */; };
+		573E42EB25CAB69300D6231A /* ParentLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E42EA25CAB69300D6231A /* ParentLocation.swift */; };
+		573E42EE25CAB6DA00D6231A /* ChildLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E42ED25CAB6DA00D6231A /* ChildLocation.swift */; };
+		573E42FF25CAF67A00D6231A /* RemoveCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E42FE25CAF67A00D6231A /* RemoveCommentRequest.swift */; };
 		5757008625A5DA6B006D5931 /* SearchPlaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5757008525A5DA6B006D5931 /* SearchPlaceView.swift */; };
 		5759EBC625BEA1DF007497F6 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5759EBC525BEA1DF007497F6 /* SearchViewController.swift */; };
 		5759EBD725BEE7F4007497F6 /* GetPlacesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5759EBD625BEE7F4007497F6 /* GetPlacesRequest.swift */; };
@@ -34,6 +37,8 @@
 		57755BBD25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */; };
 		57755BCF25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BCE25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift */; };
 		57755BD525B47F4B00CF0849 /* PickViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BD425B47F4B00CF0849 /* PickViewController.swift */; };
+		577A87CD25C9228900ABC145 /* AddCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577A87CC25C9228900ABC145 /* AddCommentRequest.swift */; };
+		577A87D125C9634300ABC145 /* SearchPlaceMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577A87D025C9634300ABC145 /* SearchPlaceMapViewController.swift */; };
 		5780FD8F25C13DE0002F89F2 /* PlaceSmallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5780FD8E25C13DE0002F89F2 /* PlaceSmallView.swift */; };
 		5780FD9325C17C9B002F89F2 /* GetPicksRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5780FD9225C17C9B002F89F2 /* GetPicksRequest.swift */; };
 		5780FD9825C181CC002F89F2 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5780FD9725C181CC002F89F2 /* SettingViewController.swift */; };
@@ -49,13 +54,22 @@
 		57A5527625B682BC009EABA3 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A5527525B682BC009EABA3 /* PhotoViewController.swift */; };
 		57A97D4F25AD6A4300E8F982 /* LogoutRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A97D4E25AD6A4300E8F982 /* LogoutRequest.swift */; };
 		57A97D5525AD9A6E00E8F982 /* NoticeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A97D5425AD9A6E00E8F982 /* NoticeViewController.swift */; };
+		57A9966825C7E64C0016CDA5 /* PlaceMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A9966725C7E64C0016CDA5 /* PlaceMapViewController.swift */; };
+		57A9966F25C815F70016CDA5 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A9966E25C815F70016CDA5 /* Comment.swift */; };
+		57A9967425C8468D0016CDA5 /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A9967325C8468D0016CDA5 /* CommentView.swift */; };
+		57A9967825C860C90016CDA5 /* GetCommentsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A9967725C860C90016CDA5 /* GetCommentsRequest.swift */; };
+		57A9967B25C86F3A0016CDA5 /* CommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A9967A25C86F3A0016CDA5 /* CommentViewController.swift */; };
+		57B0E8E225CA85B500F123E7 /* GetKakaoPlacesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8E125CA85B500F123E7 /* GetKakaoPlacesRequest.swift */; };
+		57B0E8E525CA870E00F123E7 /* KakaoPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8E425CA870E00F123E7 /* KakaoPlace.swift */; };
+		57B0E8EA25CA899D00F123E7 /* KakaoPlaceTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8E925CA899D00F123E7 /* KakaoPlaceTVCell.swift */; };
+		57B0E8EE25CAA49D00F123E7 /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8ED25CAA49D00F123E7 /* LocationViewController.swift */; };
 		57C040D925998CCA00856F61 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040D825998CCA00856F61 /* AppDelegate.swift */; };
 		57C040DB25998CCA00856F61 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040DA25998CCA00856F61 /* SceneDelegate.swift */; };
 		57C040E225998CCB00856F61 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 57C040E125998CCB00856F61 /* Assets.xcassets */; };
 		57C040F92599963800856F61 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040F82599963800856F61 /* Extension.swift */; };
 		57C040FC259996AD00856F61 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040FB259996AD00856F61 /* HomeViewController.swift */; };
 		57C040FF259996B600856F61 /* PostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040FE259996B600856F61 /* PostingViewController.swift */; };
-		57C04102259996CE00856F61 /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04101259996CE00856F61 /* LocationViewController.swift */; };
+		57C04102259996CE00856F61 /* _LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04101259996CE00856F61 /* _LocationViewController.swift */; };
 		57C04105259996DF00856F61 /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04104259996DF00856F61 /* AccountViewController.swift */; };
 		57C0410B2599C16800856F61 /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C0410A2599C16800856F61 /* TitleView.swift */; };
 		57C041142599CD7600856F61 /* PhotoGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C041132599CD7600856F61 /* PhotoGroupView.swift */; };
@@ -107,6 +121,9 @@
 		573864B625BD93990025AF1A /* GetHotPlacesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetHotPlacesRequest.swift; sourceTree = "<group>"; };
 		573864C925BDD4A60025AF1A /* MostPick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPick.swift; sourceTree = "<group>"; };
 		573864CD25BDDEEE0025AF1A /* LineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineView.swift; sourceTree = "<group>"; };
+		573E42EA25CAB69300D6231A /* ParentLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentLocation.swift; sourceTree = "<group>"; };
+		573E42ED25CAB6DA00D6231A /* ChildLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildLocation.swift; sourceTree = "<group>"; };
+		573E42FE25CAF67A00D6231A /* RemoveCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveCommentRequest.swift; sourceTree = "<group>"; };
 		5757008525A5DA6B006D5931 /* SearchPlaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceView.swift; sourceTree = "<group>"; };
 		5759EBC525BEA1DF007497F6 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		5759EBD625BEE7F4007497F6 /* GetPlacesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPlacesRequest.swift; sourceTree = "<group>"; };
@@ -115,6 +132,8 @@
 		57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPushNotificationDeviceRequest.swift; sourceTree = "<group>"; };
 		57755BCE25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPushNotificationDeviceRequest.swift; sourceTree = "<group>"; };
 		57755BD425B47F4B00CF0849 /* PickViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickViewController.swift; sourceTree = "<group>"; };
+		577A87CC25C9228900ABC145 /* AddCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCommentRequest.swift; sourceTree = "<group>"; };
+		577A87D025C9634300ABC145 /* SearchPlaceMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceMapViewController.swift; sourceTree = "<group>"; };
 		5780FD8E25C13DE0002F89F2 /* PlaceSmallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSmallView.swift; sourceTree = "<group>"; };
 		5780FD9225C17C9B002F89F2 /* GetPicksRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPicksRequest.swift; sourceTree = "<group>"; };
 		5780FD9725C181CC002F89F2 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
@@ -130,6 +149,15 @@
 		57A5527525B682BC009EABA3 /* PhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		57A97D4E25AD6A4300E8F982 /* LogoutRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutRequest.swift; sourceTree = "<group>"; };
 		57A97D5425AD9A6E00E8F982 /* NoticeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeViewController.swift; sourceTree = "<group>"; };
+		57A9966725C7E64C0016CDA5 /* PlaceMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceMapViewController.swift; sourceTree = "<group>"; };
+		57A9966E25C815F70016CDA5 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		57A9967325C8468D0016CDA5 /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
+		57A9967725C860C90016CDA5 /* GetCommentsRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetCommentsRequest.swift; sourceTree = "<group>"; };
+		57A9967A25C86F3A0016CDA5 /* CommentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentViewController.swift; sourceTree = "<group>"; };
+		57B0E8E125CA85B500F123E7 /* GetKakaoPlacesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetKakaoPlacesRequest.swift; sourceTree = "<group>"; };
+		57B0E8E425CA870E00F123E7 /* KakaoPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoPlace.swift; sourceTree = "<group>"; };
+		57B0E8E925CA899D00F123E7 /* KakaoPlaceTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoPlaceTVCell.swift; sourceTree = "<group>"; };
+		57B0E8ED25CAA49D00F123E7 /* LocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
 		57C040D525998CCA00856F61 /* Plapick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plapick.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		57C040D825998CCA00856F61 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		57C040DA25998CCA00856F61 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -138,7 +166,7 @@
 		57C040F82599963800856F61 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		57C040FB259996AD00856F61 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		57C040FE259996B600856F61 /* PostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostingViewController.swift; sourceTree = "<group>"; };
-		57C04101259996CE00856F61 /* LocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
+		57C04101259996CE00856F61 /* _LocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _LocationViewController.swift; sourceTree = "<group>"; };
 		57C04104259996DF00856F61 /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
 		57C0410A2599C16800856F61 /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
 		57C041132599CD7600856F61 /* PhotoGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGroupView.swift; sourceTree = "<group>"; };
@@ -275,6 +303,9 @@
 				57DCD7BD25C27D080040AC01 /* EditUserViewController.swift */,
 				57A5527525B682BC009EABA3 /* PhotoViewController.swift */,
 				57D9552625C3D69100CD2C6F /* PlaceViewController.swift */,
+				57A9966725C7E64C0016CDA5 /* PlaceMapViewController.swift */,
+				57A9967A25C86F3A0016CDA5 /* CommentViewController.swift */,
+				57B0E8ED25CAA49D00F123E7 /* LocationViewController.swift */,
 				57755BD425B47F4B00CF0849 /* PickViewController.swift */,
 				57C04134259A13E900856F61 /* LocationListViewController.swift */,
 				57C04137259A13F300856F61 /* LocationMapViewController.swift */,
@@ -294,7 +325,7 @@
 				57C040FE259996B600856F61 /* PostingViewController.swift */,
 				57A97D5425AD9A6E00E8F982 /* NoticeViewController.swift */,
 				57C04104259996DF00856F61 /* AccountViewController.swift */,
-				57C04101259996CE00856F61 /* LocationViewController.swift */,
+				57C04101259996CE00856F61 /* _LocationViewController.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -311,6 +342,7 @@
 				57C041252599FA1C00856F61 /* PlaceLargeView.swift */,
 				5780FD9B25C1845B002F89F2 /* PushView.swift */,
 				57D9554325C3F16800CD2C6F /* IconButton.swift */,
+				57A9967325C8468D0016CDA5 /* CommentView.swift */,
 				57C04128259A09EF00856F61 /* TabBarView.swift */,
 				572D31E625A5AAFF00A93FD9 /* ParentLocationView.swift */,
 				572D31E925A5AB0900A93FD9 /* ChildLocationView.swift */,
@@ -325,8 +357,12 @@
 			children = (
 				57EFB3CF25AC353B0001CF59 /* User.swift */,
 				57C0411D2599E8A200856F61 /* Place.swift */,
+				57B0E8E425CA870E00F123E7 /* KakaoPlace.swift */,
 				572D31E025A579AD00A93FD9 /* Pick.swift */,
 				573864C925BDD4A60025AF1A /* MostPick.swift */,
+				57A9966E25C815F70016CDA5 /* Comment.swift */,
+				573E42EA25CAB69300D6231A /* ParentLocation.swift */,
+				573E42ED25CAB6DA00D6231A /* ChildLocation.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -337,6 +373,7 @@
 				57D9554025C3E25200CD2C6F /* UserTVCell.swift */,
 				57D9554B25C4098A00CD2C6F /* UserCVCell.swift */,
 				57D9554725C401B600CD2C6F /* PlaceCVCell.swift */,
+				57B0E8E925CA899D00F123E7 /* KakaoPlaceTVCell.swift */,
 				57266D3525C6C3D3004C8187 /* MostPickSmallCVCell.swift */,
 				57266D3125C6BE82004C8187 /* MostPickLargeCVCell.swift */,
 				57C0412C259A0B6F00856F61 /* TabBarCVCell.swift */,
@@ -349,6 +386,7 @@
 			isa = PBXGroup;
 			children = (
 				570B3ADF25BF333C0028424D /* SearchPlaceViewController.swift */,
+				577A87D025C9634300ABC145 /* SearchPlaceMapViewController.swift */,
 				57D9552C25C3DF3200CD2C6F /* SearchUserTableViewController.swift */,
 			);
 			path = Search;
@@ -362,10 +400,12 @@
 				5759EBD625BEE7F4007497F6 /* GetPlacesRequest.swift */,
 				57266D3F25C70FB8004C8187 /* GetPlaceRequest.swift */,
 				573864B625BD93990025AF1A /* GetHotPlacesRequest.swift */,
+				57B0E8E125CA85B500F123E7 /* GetKakaoPlacesRequest.swift */,
 				5780FD9225C17C9B002F89F2 /* GetPicksRequest.swift */,
 				573864A525BD652B0025AF1A /* GetRecentPicksRequest.swift */,
 				5780FDA325C1C305002F89F2 /* GetVersionRequest.swift */,
 				57755BCE25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift */,
+				57A9967725C860C90016CDA5 /* GetCommentsRequest.swift */,
 			);
 			path = Get;
 			sourceTree = "<group>";
@@ -384,6 +424,8 @@
 				57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */,
 				5780FD9F25C1AFBE002F89F2 /* EditPushNotificationDeviceRequest.swift */,
 				5792854925AF48A10060F00C /* UploadImageRequest.swift */,
+				577A87CC25C9228900ABC145 /* AddCommentRequest.swift */,
+				573E42FE25CAF67A00D6231A /* RemoveCommentRequest.swift */,
 			);
 			path = Post;
 			sourceTree = "<group>";
@@ -522,20 +564,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				57C04102259996CE00856F61 /* LocationViewController.swift in Sources */,
+				57C04102259996CE00856F61 /* _LocationViewController.swift in Sources */,
+				577A87CD25C9228900ABC145 /* AddCommentRequest.swift in Sources */,
 				5792F5BF25AB493C00015FE9 /* LaunchViewController.swift in Sources */,
 				573864CA25BDD4A60025AF1A /* MostPick.swift in Sources */,
 				57D68C8E25B579DF00DE8242 /* ImageScrollView.swift in Sources */,
+				573E42FF25CAF67A00D6231A /* RemoveCommentRequest.swift in Sources */,
 				5757008625A5DA6B006D5931 /* SearchPlaceView.swift in Sources */,
+				573E42EB25CAB69300D6231A /* ParentLocation.swift in Sources */,
 				57C04131259A12BA00856F61 /* LocationTabViewCVCell.swift in Sources */,
 				570B3AE025BF333C0028424D /* SearchPlaceViewController.swift in Sources */,
 				57C040FC259996AD00856F61 /* HomeViewController.swift in Sources */,
 				57D9552725C3D69100CD2C6F /* PlaceViewController.swift in Sources */,
 				57C04129259A09EF00856F61 /* TabBarView.swift in Sources */,
+				57A9966F25C815F70016CDA5 /* Comment.swift in Sources */,
 				57FB7F8125AC6681007BE142 /* App.swift in Sources */,
 				57755BD525B47F4B00CF0849 /* PickViewController.swift in Sources */,
+				57B0E8E225CA85B500F123E7 /* GetKakaoPlacesRequest.swift in Sources */,
 				57C04138259A13F300856F61 /* LocationMapViewController.swift in Sources */,
 				57266D3225C6BE82004C8187 /* MostPickLargeCVCell.swift in Sources */,
+				57B0E8EE25CAA49D00F123E7 /* LocationViewController.swift in Sources */,
 				5780FDA025C1AFBE002F89F2 /* EditPushNotificationDeviceRequest.swift in Sources */,
 				57C04105259996DF00856F61 /* AccountViewController.swift in Sources */,
 				57D9554425C3F16800CD2C6F /* IconButton.swift in Sources */,
@@ -545,9 +593,13 @@
 				573864B725BD93990025AF1A /* GetHotPlacesRequest.swift in Sources */,
 				5701EFD125BFD22600AA4E0F /* LikePlaceRequest.swift in Sources */,
 				57266D4025C70FB8004C8187 /* GetPlaceRequest.swift in Sources */,
+				577A87D125C9634300ABC145 /* SearchPlaceMapViewController.swift in Sources */,
+				57A9967825C860C90016CDA5 /* GetCommentsRequest.swift in Sources */,
 				57D9555325C4445F00CD2C6F /* FollowRequest.swift in Sources */,
+				57A9967B25C86F3A0016CDA5 /* CommentViewController.swift in Sources */,
 				57D9554C25C4098A00CD2C6F /* UserCVCell.swift in Sources */,
 				57C040D925998CCA00856F61 /* AppDelegate.swift in Sources */,
+				57A9966825C7E64C0016CDA5 /* PlaceMapViewController.swift in Sources */,
 				5792854D25AF4C750060F00C /* AddPickRequest.swift in Sources */,
 				57DCD7D325C289630040AC01 /* CheckUserNickNameRequest.swift in Sources */,
 				5792F5C225AB494E00015FE9 /* LoginViewController.swift in Sources */,
@@ -577,15 +629,19 @@
 				57755BCF25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift in Sources */,
 				5780FDA425C1C305002F89F2 /* GetVersionRequest.swift in Sources */,
 				572D31E725A5AAFF00A93FD9 /* ParentLocationView.swift in Sources */,
+				57A9967425C8468D0016CDA5 /* CommentView.swift in Sources */,
 				57D9552A25C3DBCD00CD2C6F /* GetUsersRequest.swift in Sources */,
 				5738649E25BD4E320025AF1A /* MainViewController.swift in Sources */,
 				57A97D5525AD9A6E00E8F982 /* NoticeViewController.swift in Sources */,
 				57C041142599CD7600856F61 /* PhotoGroupView.swift in Sources */,
+				57B0E8EA25CA899D00F123E7 /* KakaoPlaceTVCell.swift in Sources */,
+				57B0E8E525CA870E00F123E7 /* KakaoPlace.swift in Sources */,
 				57E56BFD25B09629002C2059 /* TermsViewController.swift in Sources */,
 				57DCD7D025C2834D0040AC01 /* EditUserRequest.swift in Sources */,
 				57DCD7BE25C27D080040AC01 /* EditUserViewController.swift in Sources */,
 				57A97D4F25AD6A4300E8F982 /* LogoutRequest.swift in Sources */,
 				5738649225BD29F10025AF1A /* HttpResponse.swift in Sources */,
+				573E42EE25CAB6DA00D6231A /* ChildLocation.swift in Sources */,
 				572D31E125A579AD00A93FD9 /* Pick.swift in Sources */,
 				57C041262599FA1C00856F61 /* PlaceLargeView.swift in Sources */,
 				57C040F92599963800856F61 /* Extension.swift in Sources */,

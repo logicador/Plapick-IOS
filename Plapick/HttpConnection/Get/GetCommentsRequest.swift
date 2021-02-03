@@ -1,5 +1,5 @@
 //
-//  GetUserRequest.swift
+//  GetPicksRequest.swift
 //  Plapick
 //
 //  Created by 서원영 on 2021/01/11.
@@ -8,18 +8,18 @@
 import UIKit
 
 
-protocol GetUserRequestProtocol {
-    func response(user: User?, getUser status: String)
+protocol GetCommentsRequestProtocol {
+    func response(commentList: [Comment]?, getComments status: String)
 }
 
 
 // GET
-// 유저 정보 가져오기
-class GetUserRequest: HttpRequest {
+// 픽 리스트 가져오기
+class GetCommentsRequest: HttpRequest {
     
     // MARK: Properties
-    var delegate: GetUserRequestProtocol?
-    let apiUrl = API_URL + "/get/user"
+    var delegate: GetCommentsRequestProtocol?
+    let apiUrl = API_URL + "/get/comments"
     
     
     // MARK: Fetch
@@ -37,14 +37,14 @@ class GetUserRequest: HttpRequest {
         let urlString = "\(apiUrl)?\(paramString)"
         guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL_ENCODE") }
-            delegate?.response(user: nil, getUser: "ERR_URL_ENCODE")
+            delegate?.response(commentList: nil, getComments: "ERR_URL_ENCODE")
             return
         }
         
         let httpUrl = encodedUrlString
         guard let url = URL(string: httpUrl) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL") }
-            delegate?.response(user: nil, getUser: "ERR_URL")
+            delegate?.response(commentList: nil, getComments: "ERR_URL")
             return
         }
         
@@ -57,53 +57,57 @@ class GetUserRequest: HttpRequest {
                 
             if let _ = error {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_SERVER") }
-                self.delegate?.response(user: nil, getUser: "ERR_SERVER")
+                self.delegate?.response(commentList: nil, getComments: "ERR_SERVER")
                 return
             }
             
             guard let response = res as? HTTPURLResponse else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_RESPONSE") }
-                self.delegate?.response(user: nil, getUser: "ERR_RESPONSE")
+                self.delegate?.response(commentList: nil, getComments: "ERR_RESPONSE")
                 return
             }
             
             if response.statusCode != 200 {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_CODE") }
-                self.delegate?.response(user: nil, getUser: "ERR_STATUS_CODE")
+                self.delegate?.response(commentList: nil, getComments: "ERR_STATUS_CODE")
                 return
             }
             
             guard let data = data else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA") }
-                self.delegate?.response(user: nil, getUser: "ERR_DATA")
+                self.delegate?.response(commentList: nil, getComments: "ERR_DATA")
                 return
             }
             
             guard let status = self.getStatusCode(data: data) else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_DECODE") }
-                self.delegate?.response(user: nil, getUser: "ERR_STATUS_DECODE")
+                self.delegate?.response(commentList: nil, getComments: "ERR_STATUS_DECODE")
                 return
             }
             print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
-                self.delegate?.response(user: nil, getUser: status)
+                self.delegate?.response(commentList: nil, getComments: status)
                 return
             }
             
             // MARK: Response
             do {
-                let response = try JSONDecoder().decode(UserRequestResult.self, from: data)
-                let resUser = response.result
+                let response = try JSONDecoder().decode(CommentsRequestResult.self, from: data)
+                let resCommentList = response.result
                 
-                let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image, status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, followerCnt: resUser.uFollowerCnt, pickCnt: resUser.uPickCnt, isFollow: resUser.uIsFollow)
+                var commentList: [Comment] = []
+                for resComment in resCommentList {
+                    let comment = Comment(id: resComment.id, uId: resComment.u_id, pId: resComment.p_id, piId: resComment.pi_id,  comment: resComment.comment, createdDate: resComment.created_date, updatedDate: resComment.updated_date, nickName: resComment.u_nick_name, profileImage: resComment.u_profile_image)
+                    commentList.append(comment)
+                }
                 
-                self.delegate?.response(user: user, getUser: "OK")
+                self.delegate?.response(commentList: commentList, getComments: "OK")
                 
             } catch {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA_DECODE", message: "데이터 응답 오류가 발생했습니다.") }
-                self.delegate?.response(user: nil, getUser: "ERR_DATA_DECODE")
+                self.delegate?.response(commentList: nil, getComments: "ERR_DATA_DECODE")
             }
         }})
         task.resume()

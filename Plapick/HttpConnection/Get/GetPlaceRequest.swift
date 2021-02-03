@@ -108,6 +108,8 @@ class GetPlaceRequest: HttpRequest {
                         let uProfileImage = (splitted.count < 4) ? "" : String(splitted[3])
                         let mostPick = MostPick(id: id, uId: uId, uNickName: uNickName, uProfileImage: uProfileImage)
                         mostPickList.append(mostPick)
+                        
+                        if mostPickList.count == MOST_PICKS_MAX_COUNT { break }
                     }
                 }
                 

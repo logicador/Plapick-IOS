@@ -9,8 +9,8 @@ import Foundation
 
 
 struct Pick: Codable {
-    var user: User? = nil
-    var place: Place? = nil
+//    var user: User? = nil
+//    var place: Place? = nil
     
     var id: Int
     var uId: Int
@@ -19,6 +19,7 @@ struct Pick: Codable {
     var createdDate: String
     var updatedDate: String
     
-    var likeCnt: Int? = 0
-    var commentCnt: Int? = 0
+    var likeCnt: Int = 0
+    var commentCnt: Int = 0
+    var isLike: String? = "N"
 }

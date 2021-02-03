@@ -17,6 +17,7 @@ class PlaceCVCell: UICollectionViewCell {
             guard let place = self.place else { return }
             
             if place.mostPickList.count > 0 {
+                noPickLabel.isHidden = true
                 let uId = place.mostPickList[0].uId
                 let piId = place.mostPickList[0].id
                 if let url = URL(string: app.getPickUrl(id: piId, uId: uId)) {
@@ -24,9 +25,8 @@ class PlaceCVCell: UICollectionViewCell {
                 }
                 
             } else {
-                photoView.addSubview(noPickLabel)
-                noPickLabel.centerXAnchor.constraint(equalTo: photoView.centerXAnchor).isActive = true
-                noPickLabel.centerYAnchor.constraint(equalTo: photoView.centerYAnchor).isActive = true
+                photoView.image = nil
+                noPickLabel.isHidden = false
             }
             nameLabel.text = place.name
         }
@@ -51,9 +51,9 @@ class PlaceCVCell: UICollectionViewCell {
     
     lazy var noPickLabel: UILabel = {
         let label = UILabel()
-        label.text = "등록된 픽이 없습니다"
+        label.text = "등록된 픽이 없습니다."
         label.textColor = .systemGray
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = UIFont.systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -121,5 +121,9 @@ class PlaceCVCell: UICollectionViewCell {
         nameLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: SPACE_S).isActive = true
         nameLabel.trailingAnchor.constraint(equalTo: headerView.trailingAnchor, constant: -SPACE_S).isActive = true
         nameLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor, constant: -SPACE_S).isActive = true
+        
+        photoView.addSubview(noPickLabel)
+        noPickLabel.centerXAnchor.constraint(equalTo: photoView.centerXAnchor).isActive = true
+        noPickLabel.centerYAnchor.constraint(equalTo: photoView.centerYAnchor, constant: -SPACE_S).isActive = true
     }
 }

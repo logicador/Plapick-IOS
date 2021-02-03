@@ -11,7 +11,7 @@ import SDWebImage
 
 protocol AccountViewControllerProtocol {
     func closeAccountVC()
-    func follow()
+    func reloadUser()
 }
 
 
@@ -20,6 +20,7 @@ class AccountViewController: UIViewController {
     // MARK: Property
     var delegate: AccountViewControllerProtocol?
     var app = App()
+    var authUId: Int?
     var uId: Int?
     let getPicksRequest = GetPicksRequest()
     let getUserReuqest = GetUserRequest()
@@ -214,6 +215,7 @@ class AccountViewController: UIViewController {
     }()
     lazy var noPickContainerView: UIView = {
         let view = UIView()
+        view.isHidden = true
         view.layer.cornerRadius = 20
         view.backgroundColor = .systemGray6
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -221,7 +223,7 @@ class AccountViewController: UIViewController {
     }()
     lazy var noPickLabel: UILabel = {
         let label = UILabel()
-        label.text = "등록된 픽이 없습니다"
+        label.text = "등록된 픽이 없습니다."
         label.textColor = .systemGray
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -255,16 +257,9 @@ class AccountViewController: UIViewController {
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(closeTapped))
         
-        guard let uId = self.uId else { return }
-        let appUser = app.getUser()
+        authUId = app.getUId()
         
-        var isAuthUser = false
-        if appUser.id == uId {
-            isAuthUser = true
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "설정", style: UIBarButtonItem.Style.plain, target: self, action: #selector(settingTapped))
-        }
-        
-        configureView(isAuthUser: isAuthUser)
+        configureView()
         
         setThemeColor()
         
@@ -272,8 +267,30 @@ class AccountViewController: UIViewController {
         getUserReuqest.delegate = self
         followRequest.delegate = self
         
-        getUser()
-        getPicks()
+        guard let uId = self.uId else { return }
+        guard let authUId = self.authUId else { return }
+        
+        if authUId == uId {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "설정", style: UIBarButtonItem.Style.plain, target: self, action: #selector(settingTapped))
+        } else {
+            getUser()
+            getPicks()
+        }
+    }
+    
+    
+    // MARK: ViewWillAppear
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        guard let uId = self.uId else { return }
+        guard let authUId = self.authUId else { return }
+        
+        // 내 프로필일 경우에만 새로고침
+        if authUId == uId {
+            getUser()
+            getPicks()
+        }
     }
     
     
@@ -300,7 +317,7 @@ class AccountViewController: UIViewController {
         }
     }
     
-    func configureView(isAuthUser: Bool) {
+    func configureView() {
         view.addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
@@ -360,8 +377,11 @@ class AccountViewController: UIViewController {
         profileLine.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         profileLine.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         
+        guard let uId = self.uId else { return }
+        guard let authUId = self.authUId else { return }
+        
         var nextBottomAnchor: NSLayoutYAxisAnchor = profileLine.bottomAnchor
-        if isAuthUser {
+        if authUId == uId {
             
             // MARK: ConfigureView - Follow
             contentView.addSubview(followContainerView)
@@ -427,7 +447,7 @@ class AccountViewController: UIViewController {
         pickTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         pickTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        if isAuthUser {
+        if authUId == uId {
             pickTitleView.addSubview(addPickbutton)
             addPickbutton.trailingAnchor.constraint(equalTo: pickTitleView.containerView.trailingAnchor).isActive = true
             addPickbutton.centerYAnchor.constraint(equalTo: pickTitleView.label.centerYAnchor).isActive = true
@@ -443,6 +463,17 @@ class AccountViewController: UIViewController {
         pickContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         pickContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         pickContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        
+        contentView.addSubview(noPickContainerView)
+        noPickContainerView.topAnchor.constraint(equalTo: pickTitleView.bottomAnchor).isActive = true
+        noPickContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        noPickContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        noPickContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        
+        noPickContainerView.addSubview(noPickLabel)
+        noPickLabel.topAnchor.constraint(equalTo: noPickContainerView.topAnchor, constant: NO_DATA_SPACE).isActive = true
+        noPickLabel.centerXAnchor.constraint(equalTo: noPickContainerView.centerXAnchor).isActive = true
+        noPickLabel.bottomAnchor.constraint(equalTo: noPickContainerView.bottomAnchor, constant: -NO_DATA_SPACE).isActive = true
     }
     
     func getUser() {
@@ -455,24 +486,11 @@ class AccountViewController: UIViewController {
         getPicksRequest.fetch(vc: self, paramDict: ["uId": String(uId)])
     }
     
-    func setNoPickView() {
-        pickContainerView.addSubview(noPickContainerView)
-        noPickContainerView.topAnchor.constraint(equalTo: pickContainerView.topAnchor).isActive = true
-        noPickContainerView.centerXAnchor.constraint(equalTo: pickContainerView.centerXAnchor).isActive = true
-        noPickContainerView.widthAnchor.constraint(equalTo: pickContainerView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        noPickContainerView.bottomAnchor.constraint(equalTo: pickContainerView.bottomAnchor).isActive = true
-        
-        noPickContainerView.addSubview(noPickLabel)
-        noPickLabel.topAnchor.constraint(equalTo: noPickContainerView.topAnchor, constant: SPACE_XXXXL).isActive = true
-        noPickLabel.centerXAnchor.constraint(equalTo: noPickContainerView.centerXAnchor).isActive = true
-        noPickLabel.bottomAnchor.constraint(equalTo: noPickContainerView.bottomAnchor, constant: -SPACE_XXXXL).isActive = true
-    }
-    
     // MARK: Function - @OBJC
     @objc func settingTapped() {
         isOpenedChildVC = true
         let settingVC = SettingViewController()
-        settingVC.authAccountVC = self
+//        settingVC.authAccountVC = self
         settingVC.delegate = self
         navigationController?.pushViewController(settingVC, animated: true)
     }
@@ -538,7 +556,7 @@ class AccountViewController: UIViewController {
     @objc func addPickTapped() {
         isOpenedChildVC = true
         let postingVC = PostingViewController()
-        postingVC.authAccountVC = self
+//        postingVC.authAccountVC = self
         postingVC.delegate = self
         navigationController?.pushViewController(postingVC, animated: true)
     }
@@ -564,6 +582,7 @@ extension AccountViewController: GetPicksRequestProtocol {
                 pickContainerView.removeAllChildView()
                 
                 if pickList.count > 0 {
+                    noPickContainerView.isHidden = true
                     var _pickList: [Pick] = []
                     for (i, pick) in pickList.enumerated() {
                         let index = i + 1
@@ -595,7 +614,13 @@ extension AccountViewController: GetPicksRequestProtocol {
                                 pickContainerView.addSubview(pgv)
                                 pgv.leadingAnchor.constraint(equalTo: pickContainerView.leadingAnchor).isActive = true
                                 pgv.trailingAnchor.constraint(equalTo: pickContainerView.trailingAnchor).isActive = true
-                                pgv.topAnchor.constraint(equalTo: pickContainerView.subviews[pickContainerView.subviews.count - 2].bottomAnchor, constant: 1).isActive = true
+                                
+                                if pickContainerView.subviews.count == 1 { // 첫번째 pgv
+                                    pgv.topAnchor.constraint(equalTo: pickContainerView.topAnchor, constant: 1).isActive = true
+                                } else {
+                                    pgv.topAnchor.constraint(equalTo: pickContainerView.subviews[pickContainerView.subviews.count - 2].bottomAnchor, constant: 1).isActive = true
+                                }
+                                
                                 pgv.bottomAnchor.constraint(equalTo: pickContainerView.bottomAnchor).isActive = true
                                 
                             } else { // 없다면 마지막 pgv bottom cons 잡아주기
@@ -605,7 +630,7 @@ extension AccountViewController: GetPicksRequestProtocol {
                     }
                     
                 } else {
-                    setNoPickView()
+                    noPickContainerView.isHidden = false
                 }
             }
         }
@@ -639,6 +664,10 @@ extension AccountViewController: GetUserRequestProtocol {
                     followButton.setTitle("팔로우", for: UIControl.State.normal)
                     followButton.tag = 1
                 }
+                
+                if user.id != app.getUId() {
+                    app.addRecentUser(user: user)
+                }
             }
         }
     }
@@ -669,7 +698,7 @@ extension AccountViewController: SearchUserTableViewControllerProtocol {
 extension AccountViewController: FollowRequestProtocol {
     func response(follow status: String) {
         if status == "OK" {
-            delegate?.follow()
+            delegate?.reloadUser()
         }
     }
 }

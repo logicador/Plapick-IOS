@@ -47,6 +47,9 @@ class LocationMapViewController: UIViewController {
     
     lazy var naverMap: NMFMapView = {
         let map = NMFMapView()
+        map.allowsRotating = false
+        map.allowsTilting = false
+        map.logoInteractionEnabled = false
         map.translatesAutoresizingMaskIntoConstraints = false
         return map
     }()
