@@ -16,7 +16,7 @@ struct User: Codable {
     var nickName: String
     var email: String? = ""
     var password: String? = ""
-    var profileImage: String
+    var profileImage: String? = ""
     var status: String? = ""
     var lastLoginPlatform: String? = ""
     var isLogined: String? = ""
@@ -24,7 +24,10 @@ struct User: Codable {
     var updatedDate: String? = ""
     var connectedDate: String
     
-    var followerCnt: Int = 0
-    var pickCnt: Int = 0
-    var isFollow: String? = "N"
+    var isFollow: String
+    var followerCnt: Int
+    var followingCnt: Int
+    var pickCnt: Int
+    var likePickCnt: Int
+    var likePlaceCnt: Int
 }

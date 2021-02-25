@@ -8,6 +8,7 @@
 import UIKit
 import SystemConfiguration
 import SDWebImage
+import Photos
 
 
 // MARK: UIColor
@@ -42,43 +43,17 @@ extension UIColor {
 // MARK: UIImageView
 extension UIImageView {
     func setProfileImage(uId: Int, profileImage: String) {
-        let urlString = ((profileImage.contains(String(uId))) ? (PLAPICK_URL + profileImage) : profileImage)
-        if urlString.isEmpty {
-            self.image = nil
-        } else {
-            if let url = URL(string: urlString) {
-                self.sd_setImage(with: url, completed: nil)
+        if profileImage.isEmpty { image = nil }
+        else {
+            let urlString = ((profileImage.contains(String(uId))) ? (PLAPICK_URL + profileImage) : profileImage)
+            if urlString.isEmpty { image = nil }
+            else {
+                guard let url = URL(string: urlString) else { return }
+                sd_setImage(with: url, completed: nil)
             }
         }
     }
 }
-
-
-//extension UIImageView {
-//    func load(urlString: String) {
-//        guard let url = URL(string: urlString) else { return }
-//        DispatchQueue.global().async { [weak self] in
-//            if let data = try? Data(contentsOf: url) {
-//                if let image = UIImage(data: data) {
-//                    DispatchQueue.main.async {
-//                        self?.image = image
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-
-
-//extension UIViewController {
-//    
-//    // 한번 dismiss로 안됨.. why?
-//    func dismissWithAnim() {
-//        self.dismiss(animated: true) {
-//            self.dismiss(animated: true, completion: nil)
-//        }
-//    }
-//}
 
 
 // MARK: UIScrollView
@@ -120,16 +95,55 @@ extension UIViewController {
         view.window?.makeKeyAndVisible()
     }
     
+    func checkPushNotificationAvailable() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { (isAllowed, error) in DispatchQueue.main.async {
+            if let _ = error {
+                self.requestSettingAlert(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.")
+                return
+            }
+            
+            if isAllowed {
+                UIApplication.shared.registerForRemoteNotifications()
+            } else {
+                self.requestSettingAlert(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.")
+            }
+        }})
+    }
+    
+    func checkPhotoGallaryAvailable(allow: (() -> Void)?) {
+        let status = PHPhotoLibrary.authorizationStatus()
+        if status == .notDetermined || status == .denied {
+            PHPhotoLibrary.requestAuthorization({ (status) in DispatchQueue.main.async {
+                if status == .notDetermined || status == .denied {
+                    let alert = UIAlertController(title: "앨범 액세스 허용하기", message: "'펫프로젝트'에서 앨범에 접근하고자 합니다.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+                    alert.addAction(UIAlertAction(title: "설정", style: .default, handler: { (_) in
+                        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                        }
+                    }))
+                    self.present(alert, animated: true)
+                    return
+                }
+                allow?()
+            }})
+            return
+        }
+        allow?()
+    }
+    
     func hideKeyboardWhenTappedAround() {
-        // onClick 이벤트 추가하기
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        // 이거 해주면 버튼같은 component 눌러도 실행됨
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
+//        // onClick 이벤트 추가하기
+//        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+//        // 이거 해주면 버튼같은 component 눌러도 실행됨
+//        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard)))
     }
     
     @objc func dismissKeyboard() {
-        // 키보드 숨기는거
+        if let _ = navigationItem.searchController?.searchBar.isFirstResponder {
+            navigationItem.searchController?.searchBar.resignFirstResponder()
+        }
         view.endEditing(true)
     }
     
@@ -196,15 +210,12 @@ extension UIViewController {
         idv.removeView()
         bov.removeView()
     }
-    
-    func isValidStrLength(max: Int, kMin: Int, kMax: Int, value: String) -> Bool {
-        let cnt = value.count
-        let utf8Cnt = value.utf8.count
-        if utf8Cnt >= (kMin * 3) && utf8Cnt <= (kMax * 3) {
-            if cnt <= max {
-                return true
-            } else { return false }
-        } else { return false }
+}
+
+
+extension UIViewController: UIScrollViewDelegate {
+    public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        dismissKeyboard()
     }
 }
 
@@ -230,21 +241,38 @@ extension UILabel {
 
 // MARK: NSMutableAttributedString
 extension NSMutableAttributedString {
-    func bold(_ text: String, fontSize: CGFloat) -> NSMutableAttributedString {
-        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: fontSize)]
+    func bold(_ text: String, size: CGFloat, color: UIColor? = nil) -> NSMutableAttributedString {
+        var attrs: [NSAttributedString.Key: Any] = [.font: UIFont.boldSystemFont(ofSize: size)]
+        if let color = color { attrs[.foregroundColor] = color }
         self.append(NSMutableAttributedString(string: text, attributes: attrs))
         return self
     }
 
-    func normal(_ text: String, fontSize: CGFloat) -> NSMutableAttributedString {
-        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: fontSize)]
+    func normal(_ text: String, size: CGFloat, color: UIColor? = nil) -> NSMutableAttributedString {
+        var attrs: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: size)]
+        if let color = color { attrs[.foregroundColor] = color }
         self.append(NSMutableAttributedString(string: text, attributes: attrs))
         return self
     }
     
-    func thin(_ text: String, fontSize: CGFloat) -> NSMutableAttributedString {
-        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: fontSize, weight: .thin)]
+    func thin(_ text: String, size: CGFloat, color: UIColor? = nil) -> NSMutableAttributedString {
+        var attrs: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: size, weight: .thin)]
+        if let color = color { attrs[.foregroundColor] = color }
         self.append(NSMutableAttributedString(string: text, attributes: attrs))
         return self
+    }
+}
+
+
+// MARK: String
+extension String {
+    func toCategory() -> String {
+        if trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return "-" }
+        if let splittedCategoryName = split(separator: ">").last {
+            let str = String(splittedCategoryName).trimmingCharacters(in: .whitespacesAndNewlines)
+            if str.isEmpty { return "-" }
+            else { return str }
+        }
+        return "-"
     }
 }

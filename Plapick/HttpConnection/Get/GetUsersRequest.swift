@@ -84,7 +84,6 @@ class GetUsersRequest: HttpRequest {
                 self.delegate?.response(userList: nil, getUsers: "ERR_STATUS_DECODE")
                 return
             }
-            print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
@@ -99,7 +98,7 @@ class GetUsersRequest: HttpRequest {
                 
                 var userList: [User] = []
                 for resUser in resUserList {
-                    let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image, status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, followerCnt: resUser.uFollowerCnt, pickCnt: resUser.uPickCnt, isFollow: resUser.uIsFollow)
+                    let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image, status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, isFollow: resUser.isFollow, followerCnt: resUser.followerCnt, followingCnt: resUser.followingCnt, pickCnt: resUser.pickCnt, likePickCnt: resUser.likePickCnt, likePlaceCnt: resUser.likePlaceCnt)
                     userList.append(user)
                 }
                 

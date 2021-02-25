@@ -83,7 +83,6 @@ class CheckUserNickNameRequest: HttpRequest {
                 self.delegate?.response(checkUserNickName: "ERR_STATUS_DECODE")
                 return
             }
-            print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if status != "WRONG_NICKNAME" && status != "EXISTS_NICKNAME" {

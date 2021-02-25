@@ -84,7 +84,6 @@ class GetVersionRequest: HttpRequest {
                 self.delegate?.response(versionCode: nil, versionName: nil, getVersion: "ERR_STATUS_DECODE")
                 return
             }
-            print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
@@ -94,7 +93,7 @@ class GetVersionRequest: HttpRequest {
             
             // MARK: Response
             do {
-                let response = try JSONDecoder().decode(GetVersionRequestResult.self, from: data)
+                let response = try JSONDecoder().decode(VersionRequestResult.self, from: data)
                 let resVersion = response.result
                 
                 self.delegate?.response(versionCode: resVersion.versionCode, versionName: resVersion.versionName, getVersion: "OK")

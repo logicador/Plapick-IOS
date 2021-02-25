@@ -11,13 +11,12 @@ import UIKit
 class MainViewController: UITabBarController {
     
     // MARK: Property
-    var app = App()
-    var uId: Int?
-    var homeVC: HomeViewController?
-    var searchVC: SearchViewController?
-    var noticeVC: NoticeViewController?
-    var accountVC: AccountViewController?
-    var postingVC: PostingViewController?
+    let app = App()
+    let homeVC = HomeViewController()
+    let searchVC = SearchViewController()
+    var postingVC = PostingViewController()
+    let noticeVC = NoticeViewController()
+    let accountVC = AccountViewController()
     
     
     // MARK: ViewDidLoad
@@ -26,45 +25,30 @@ class MainViewController: UITabBarController {
         
         view.backgroundColor = .systemBackground
         
+        title = "플레픽"
+        
         // 이거 설정 해줘야 nav가 투명할때 보이는 검정부분 안보임
         UINavigationBar.appearance().barTintColor = .systemBackground // 필수 (nav 배경색)
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
-        uId = app.getUId()
-        guard let uId = self.uId else { return }
+        noticeVC.mainVC = self
+        
+        accountVC.user = app.getUser()
         
         // 투명도 없애면 크기 다른 nav pushview할때 배경중 일부분 검정색 됨..
 //        UINavigationBar.appearance().isTranslucent = false // nav 투명도 없애기
         
-        homeVC = HomeViewController(mainVC: self)
-        postingVC = PostingViewController()
-        searchVC = SearchViewController(mainVC: self)
-        noticeVC = NoticeViewController(mainVC: self)
-        accountVC = AccountViewController(uId: uId)
+        homeVC.tabBarItem.image = UIImage(systemName: "house")
+        searchVC.tabBarItem.image = UIImage(systemName: "magnifyingglass")
+        postingVC.tabBarItem.image = UIImage(systemName: "plus.circle")
+        noticeVC.tabBarItem.image = UIImage(systemName: "bell")
+        accountVC.tabBarItem.image = UIImage(systemName: "person")
         
-//        accountNavVC = UINavigationController(rootViewController: accountVC!)
+        setViewControllers([homeVC, searchVC, postingVC, noticeVC, accountVC], animated: false)
         
-        homeVC?.tabBarItem.image = UIImage(systemName: "house")
-        searchVC?.tabBarItem.image = UIImage(systemName: "magnifyingglass")
-        noticeVC?.tabBarItem.image = UIImage(systemName: "bell")
-        accountVC?.tabBarItem.image = UIImage(systemName: "person")
-        postingVC?.tabBarItem.image = UIImage(systemName: "plus.circle")
-        
-        setViewControllers(
-            [
-                homeVC!,
-                searchVC!,
-                postingVC!,
-                noticeVC!,
-                accountVC!
-            ], animated: false)
-        
-//        postingVC?.authAccountVC = accountVC
-        
-        self.delegate = self
-        postingVC?.delegate = self
-        accountVC?.delegate = self
+        delegate = self
+        postingVC.delegate = self
         
         setThemeColor()
     }
@@ -73,47 +57,67 @@ class MainViewController: UITabBarController {
     // MARK: Function
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
     func setThemeColor() {
-        homeVC?.tabBarItem.selectedImage = UIImage(systemName: "house.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
-        searchVC?.tabBarItem.selectedImage = UIImage(systemName: "magnifyingglass")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
-        noticeVC?.tabBarItem.selectedImage = UIImage(systemName: "bell.fill")?.withTintColor(UIColor.systemBackground.inverted, renderingMode: UIImage.RenderingMode.alwaysOriginal)
+        homeVC.tabBarItem.selectedImage = UIImage(systemName: "house.fill")
+        noticeVC.tabBarItem.selectedImage = UIImage(systemName: "bell.fill")
+        accountVC.tabBarItem.selectedImage = UIImage(systemName: "person.fill")
+    }
+    
+    // MARK: Function - @OBJC
+    @objc func settingTapped() {
+        navigationController?.pushViewController(SettingViewController(), animated: true)
+    }
+    
+    @objc func removeAllNoticeTapped() {
+        
     }
 }
 
 
-// MARK: Extension - TabBar
+// MARK: TabBar
 extension MainViewController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        if viewController is PostingViewController {
-            navigationController?.pushViewController(viewController, animated: true)
+        if viewController is HomeViewController {
+            title = "플레픽"
+            navigationItem.leftBarButtonItem = nil
+            navigationItem.rightBarButtonItem = nil
+            
+        } else if viewController is PostingViewController {
+            postingVC = PostingViewController()
+            postingVC.delegate = self
+            navigationController?.pushViewController(postingVC, animated: true)
             return false
+            
+        } else if viewController is SearchViewController {
+            title = "검색"
+            navigationItem.leftBarButtonItem = nil
+            navigationItem.rightBarButtonItem = nil
+            
+        } else if viewController is NoticeViewController {
+            title = "알림"
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "설정", style: .plain, target: self, action: #selector(settingTapped))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "모두 삭제", style: .plain, target: self, action: #selector(removeAllNoticeTapped))
+        
+        } else if viewController is AccountViewController {
+            title = "사용자"
+            navigationItem.leftBarButtonItem = nil
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "설정", style: .plain, target: self, action: #selector(settingTapped))
         }
-        if viewController is AccountViewController {
-            present(UINavigationController(rootViewController: viewController), animated: true, completion: nil)
-            return false
-        }
+        
         return true
     }
 }
 
-// MARK: Extension - Posting
+// MARK: PostingVC
 extension MainViewController: PostingViewControllerProtocol {
-    func closePostingVC(isUploaded: Bool) {
-        postingVC = PostingViewController()
-//        postingVC?.authAccountVC = accountVC
-        postingVC?.delegate = self
-        postingVC?.tabBarItem.image = UIImage(systemName: "plus.circle")
-        viewControllers?.insert(postingVC!, at: 2) // 원위치에 삽입
+    func addPick() {
+        for v in accountVC.pickStackView.subviews {
+            if v == accountVC.noPickContainerView { continue }
+            v.removeFromSuperview()
+        }
+        
+        accountVC.scrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: false) // 스크롤 맨 위로
+        accountVC.page = 1
+        accountVC.isEnded = false
+        accountVC.getPicks()
     }
-}
-
-// MARK: Extension - Account
-extension MainViewController: AccountViewControllerProtocol {
-    func closeAccountVC() {
-//        accountVC = AccountViewController(uId: uId!)
-        accountVC?.delegate = self
-        accountVC?.tabBarItem.image = UIImage(systemName: "person")
-        viewControllers?.insert(accountVC!, at: 4) // 원위치에 삽입
-    }
-    
-    func reloadUser() { }
 }

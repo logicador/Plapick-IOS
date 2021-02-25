@@ -1,5 +1,5 @@
 //
-//  LocationViewController.swift
+//  SearchPlaceLocationViewController.swift
 //  Plapick
 //
 //  Created by 서원영 on 2021/02/03.
@@ -8,7 +8,7 @@
 import UIKit
 
 
-class LocationViewController: UIViewController {
+class SearchPlaceLocationViewController: UIViewController {
     
     // MARK: Property
     var parentLocationList: [ParentLocation] = LOCATIONS
@@ -82,7 +82,7 @@ class LocationViewController: UIViewController {
 
 
 // MARK: TableView
-extension LocationViewController: UITableViewDelegate, UITableViewDataSource {
+extension SearchPlaceLocationViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == parentLocationTableView { return parentLocationList.count }
         else { return selectedChildLocationList.count }

@@ -11,65 +11,40 @@ import UIKit
 class HomeViewController: UIViewController {
     
     // MARK: Property
-    var app = App()
-    var mainVC: MainViewController?
-    var getRecentPicksRequest = GetRecentPicksRequest()
-    var getHotPlacesRequest = GetHotPlacesRequest()
-    var photoGroupViewList: [PhotoGroupView] = []
-//    var placeLargeViewList: [PlaceLargeView] = []
-    var getCnt = 0
+    let app = App()
+    let getPicksRequest = GetPicksRequest()
+    var isEnded = false
+    var isLoading = false
+    var page = 1
     
     
     // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
-        
-        sv.refreshControl = UIRefreshControl()
-        sv.refreshControl?.addTarget(self, action: #selector(refreshed), for: UIControl.Event.valueChanged)
-        
+        sv.delegate = self
+        sv.alwaysBounceVertical = true
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
-    lazy var contentView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = 0
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     
-    lazy var recentPickTitleView: TitleView = {
-        let tv = TitleView(text: "최신 픽", isAction: true, actionText: "모두 보기", actionMode: "ALL_RECENT_PICK")
-        tv.delegate = self
-        return tv
+    lazy var recentPickStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = 1
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
-    
-    lazy var recentPickContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    lazy var hotPlaceTitleView: TitleView = {
-        let tv = TitleView(text: "인기 플레이스", isAction: true, actionText: "모두 보기", actionMode: "ALL_HOT_PLACE")
-        tv.delegate = self
-        return tv
-    }()
-    
-    lazy var hotPlaceContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    
-    // MARK: Init
-    init(mainVC: MainViewController) {
-        super.init(nibName: nil, bundle: nil)
-        self.mainVC = mainVC
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     
     // MARK: ViewDidLoad
@@ -78,48 +53,15 @@ class HomeViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        
         configureView()
         
-        // 초기세팅 빈 Pick으로 (UI 흔들림 방지)
-        for i in 0...4 {
-            var pgv = PhotoGroupView()
-            if i == 1 { pgv = PhotoGroupView(direction: "L") }
-            else if i == 3 { pgv = PhotoGroupView(direction: "R") }
-            pgv.delegate = self
-            
-            recentPickContainerView.addSubview(pgv)
-            pgv.leadingAnchor.constraint(equalTo: recentPickContainerView.leadingAnchor).isActive = true
-            pgv.trailingAnchor.constraint(equalTo: recentPickContainerView.trailingAnchor).isActive = true
-            if i == 0 {
-                pgv.topAnchor.constraint(equalTo: recentPickContainerView.topAnchor).isActive = true
-            } else {
-                pgv.topAnchor.constraint(equalTo: recentPickContainerView.subviews[recentPickContainerView.subviews.count - 2].bottomAnchor, constant: 1).isActive = true
-            }
-            if i == 4 {
-                pgv.bottomAnchor.constraint(equalTo: recentPickContainerView.bottomAnchor).isActive = true
-            }
-            
-            photoGroupViewList.append(pgv)
-        }
+        getPicksRequest.delegate = self
         
-        // 푸시 알림 허용 확인
-        app.checkPushNotificationAvailable(vc: self)
+        checkPushNotificationAvailable()
         
-        getRecentPicksRequest.delegate = self
-        getHotPlacesRequest.delegate = self
-        
-        getRecentPicks()
-        getHotPlaces()
-    }
-    
-    
-    // MARK: ViewWillAppear
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        mainVC?.title = "플레픽"
-        if mainVC?.navigationItem.leftBarButtonItem != nil { mainVC?.navigationItem.leftBarButtonItem = nil }
-        if mainVC?.navigationItem.rightBarButtonItem != nil { mainVC?.navigationItem.rightBarButtonItem = nil }
+        getPicks()
     }
     
     
@@ -131,158 +73,85 @@ class HomeViewController: UIViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        scrollView.addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        scrollView.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         
-        contentView.addSubview(recentPickTitleView)
-        recentPickTitleView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        recentPickTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        recentPickTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        
-        contentView.addSubview(recentPickContainerView)
-        recentPickContainerView.topAnchor.constraint(equalTo: recentPickTitleView.bottomAnchor).isActive = true
-        recentPickContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        recentPickContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        
-        contentView.addSubview(hotPlaceTitleView)
-        hotPlaceTitleView.topAnchor.constraint(equalTo: recentPickContainerView.bottomAnchor).isActive = true
-        hotPlaceTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        hotPlaceTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        
-        contentView.addSubview(hotPlaceContainerView)
-        hotPlaceContainerView.topAnchor.constraint(equalTo: hotPlaceTitleView.bottomAnchor).isActive = true
-        hotPlaceContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        hotPlaceContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        hotPlaceContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        stackView.addArrangedSubview(recentPickStackView)
+        recentPickStackView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        recentPickStackView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
     }
     
-    func getRecentPicks() {
-        getRecentPicksRequest.fetch(vc: self, paramDict: [:])
+    func getPicks() {
+        isLoading = true
+        getPicksRequest.fetch(vc: self, paramDict: ["page": String(page), "limit": "30"])
     }
     
-    func getHotPlaces() {
-        getHotPlacesRequest.fetch(vc: self, paramDict: [:])
-    }
-    
-    // MARK: Function - @OBJC
-    @objc func refreshed() {
-        getRecentPicks()
-        getHotPlaces()
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        
+        if offsetY > contentHeight - scrollView.frame.height {
+            if !isLoading && !isEnded {
+                page += 1
+                getPicks()
+            }
+        }
     }
 }
 
-
-// MARK: Extension - TitleView
-extension HomeViewController: TitleViewProtocol {
-    func action(actionMode: String) {
-        print(actionMode)
-    }
-}
-
-// MARK: Extension - PhotoGroupView
+// MARK: PhotoGroupView
 extension HomeViewController: PhotoGroupViewProtocol {
-    func openPick(pick: Pick) {
-        print("openPick", pick.id)
+    func detailPick(pick: Pick) {
+        let pickVC = PickViewController()
+        pickVC.navigationItem.title = "최신 픽"
+        pickVC.id = pick.id
+        navigationController?.pushViewController(pickVC, animated: true)
     }
 }
 
-// MARK: Extension - PlaceLargeView
-extension HomeViewController: PlaceLargeViewProtocol {
-    func openPlace(place: Place) {
-        let placeVC = PlaceViewController(place: place)
-        navigationController?.pushViewController(placeVC, animated: true)
-    }
-    
-    func openPlaceAllComments(place: Place) {
-        let commentVC = CommentViewController(mode: "PLACE", id: place.id)
-        navigationController?.pushViewController(commentVC, animated: true)
-    }
-    
-    func openPlaceAllPicks(place: Place) {
-        print("openAllPicks", place.id)
-    }
-    
-    func openPick(piId: Int) {
-        print("openPick", piId)
-    }
-    
-    func openUser(uId: Int) {
-//        let authUId = app.getUId()
-//
-//        if authUId == uId {
-//            let accountVC = mainVC?.accountVC
-//            mainVC?.present(UINavigationController(rootViewController: accountVC!), animated: true, completion: nil)
-//        } else {
-            present(UINavigationController(rootViewController: AccountViewController(uId: uId)), animated: true, completion: nil)
-//        }
-    }
-}
-
-// MARK: Extension - GetRecentPicks
-extension HomeViewController: GetRecentPicksRequestProtocol {
-    func response(pickList: [Pick]?, getRecentPicks status: String) {
-        print("[HTTP RES]", getRecentPicksRequest.apiUrl, status)
+// MARK: HTTP - GetPicks
+extension HomeViewController: GetPicksRequestProtocol {
+    func response(pickList: [Pick]?, getPicks status: String) {
+        print("[HTTP RES]", getPicksRequest.apiUrl, status)
+        
         if status == "OK" {
-            if let pickList = pickList {
+            guard let pickList = pickList else { return }
+            
+            if pickList.count > 0 {
+                isEnded = false
+                
                 var _pickList: [Pick] = []
                 for (i, pick) in pickList.enumerated() {
                     _pickList.append(pick)
-                    if (i + 1) % 3 == 0 {
-                        photoGroupViewList[i / 3].pickList = _pickList
+                    if ((i + 1) % 3 == 0) {
+                        let pgv = PhotoGroupView(direction: .random(in: 0...2))
+                        pgv.pickList = _pickList
+                        pgv.delegate = self
+                        
+                        recentPickStackView.addArrangedSubview(pgv)
+                        pgv.leadingAnchor.constraint(equalTo: recentPickStackView.leadingAnchor).isActive = true
+                        pgv.trailingAnchor.constraint(equalTo: recentPickStackView.trailingAnchor).isActive = true
                         _pickList.removeAll()
+                        
+                    } else {
+                        if ((i + 1) == pickList.count && _pickList.count > 0) {
+                            // 마지막 direction은 무조건 0
+                            let pgv = PhotoGroupView()
+                            pgv.pickList = _pickList
+                            pgv.delegate = self
+                            
+                            recentPickStackView.addArrangedSubview(pgv)
+                            pgv.leadingAnchor.constraint(equalTo: recentPickStackView.leadingAnchor).isActive = true
+                            pgv.trailingAnchor.constraint(equalTo: recentPickStackView.trailingAnchor).isActive = true
+                        }
                     }
                 }
-            }
+            } else { isEnded = true }
         }
-        
-        getCnt += 1
-        if getCnt == 2 {
-            getCnt = 0
-            scrollView.refreshControl?.endRefreshing()
-        }
-    }
-}
-
-// MARK: Extension - GetHotPlaces
-extension HomeViewController: GetHotPlacesRequestProtocol {
-    func response(placeList: [Place]?, getHotPlaces status: String) {
-        print("[HTTP RES]", getHotPlacesRequest.apiUrl, status)
-        if status == "OK" {
-            if let placeList = placeList {
-                hotPlaceContainerView.removeAllChildView()
-                
-                if placeList.count > 0 {
-                    for (i, place) in placeList.enumerated() {
-                        let plv = PlaceLargeView()
-                        plv.place = place
-                        plv.delegate = self
-                        
-                        hotPlaceContainerView.addSubview(plv)
-                        plv.leadingAnchor.constraint(equalTo: hotPlaceContainerView.leadingAnchor).isActive = true
-                        plv.trailingAnchor.constraint(equalTo: hotPlaceContainerView.trailingAnchor).isActive = true
-                        if i == 0 {
-                            plv.topAnchor.constraint(equalTo: hotPlaceContainerView.topAnchor).isActive = true
-                        } else {
-                            plv.topAnchor.constraint(equalTo: hotPlaceContainerView.subviews[hotPlaceContainerView.subviews.count - 2].bottomAnchor, constant: SPACE_XXL).isActive = true
-                        }
-                        if i == placeList.count - 1 {
-                            plv.bottomAnchor.constraint(equalTo: hotPlaceContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
-                        }
-                        
-//                        placeLargeViewList.append(plv)
-                    }
-                }
-            }
-        }
-        
-        getCnt += 1
-        if getCnt == 2 {
-            getCnt = 0
-            scrollView.refreshControl?.endRefreshing()
-        }
+        isLoading = false
     }
 }

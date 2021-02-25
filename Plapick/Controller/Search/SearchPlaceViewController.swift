@@ -9,7 +9,7 @@ import UIKit
 
 
 protocol SearchPlaceViewControllerProtocol {
-    func closeSearchPlaceVC(place: Place?)
+    func selectPlace(place: Place)
 }
 
 
@@ -22,12 +22,17 @@ class SearchPlaceViewController: UIViewController {
     var selectedPlace: Place?
     let getPlacesRequest = GetPlacesRequest()
     let likePlaceRequest = LikePlaceRequest()
-    var isOpenedChildVC: Bool = false
     var paramDict: [String: String] = [:]
     var latitude: String?
     var longitude: String?
     var plocCode: String?
     var clocCode: String?
+    var user: User? {
+        didSet {
+            guard let user = self.user else { return }
+            paramDict["uId"] = String(user.id)
+        }
+    }
     var mode: String? {
         didSet {
             paramDict["mode"] = mode
@@ -37,24 +42,20 @@ class SearchPlaceViewController: UIViewController {
                 
                 let searchController = UISearchController(searchResultsController: nil)
                 searchController.automaticallyShowsCancelButton = false
-                // 커서 올리면 네비게이션 숨는거 안되게 (취소 눌러야 다시 생김)
                 searchController.hidesNavigationBarDuringPresentation = false
-                // 이거 안하면 커서 올라간 상태에서 화면 누르면 검색어 사라짐
                 searchController.obscuresBackgroundDuringPresentation = false
-        //        searchController.searchBar.setValue("취소", forKey: "cancelButtonText")
                 searchController.searchBar.placeholder = "검색어를 입력해주세요."
                 searchController.searchBar.delegate = self
-
                 navigationItem.searchController = searchController
                 navigationItem.hidesSearchBarWhenScrolling = false // 스크롤 해도 검색창 안사라지게
                 
                 // MARK: For DEV_DEBUG
-                currentKeyword = "석모도"
-                paramDict["keyword"] = "석모도"
-                navigationItem.searchController?.searchBar.text = "석모도"
+                currentKeyword = "가평"
+                paramDict["keyword"] = "가평"
+                navigationItem.searchController?.searchBar.text = "가평"
                 getPlaces()
                 
-            } else if mode == "MY_LIKE_PLACE" {
+            } else if mode == "LIKE_PLACE" {
                 navigationItem.title = "좋아요한 플레이스"
                 getPlaces()
             
@@ -85,25 +86,30 @@ class SearchPlaceViewController: UIViewController {
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.delegate = self
+        sv.alwaysBounceVertical = true
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
-    lazy var contentView: UIView = {
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_XL
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
+    
+    lazy var noPlaceContainerView: UIView = {
         let view = UIView()
+        view.isHidden = true
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
-    lazy var placeContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
     lazy var noPlaceLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        label.text = "검색 결과가 없습니다."
+        label.text = "플레이스가 없습니다."
+        label.font = .systemFont(ofSize: 14)
         label.textColor = .systemGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -118,49 +124,12 @@ class SearchPlaceViewController: UIViewController {
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
-        isModalInPresentation = true
-        
-        if let vcCnt = navigationController?.viewControllers.count {
-            prevVC = navigationController?.viewControllers[vcCnt - 2]
-        }
-        
         configureView()
         
-        setThemeColor()
-        
         getPlacesRequest.delegate = self
-    }
-    
-    
-    // 이거때매 AccountVC > PostingVC 날라감... 원인모름, 그다지 필요없는 기능이기때문에 폐기
-//    // MARK: ViewDidAppear
-//    override func viewDidAppear(_ animated: Bool) {
-////        super.viewDidAppear(animated) // 이거 하면 becomeFirstResponder 안먹음
-////        DispatchQueue.main.async {
-////            self.navigationItem.searchController?.searchBar.becomeFirstResponder()
-////        }
-//    }
-    
-    
-    // MARK: ViewDidDisapear
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if !isOpenedChildVC {
-            delegate?.closeSearchPlaceVC(place: selectedPlace)
-        }
-    }
-    
-    
-    // MARK: Function
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        setThemeColor()
-    }
-    func setThemeColor() {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            view.backgroundColor = .black
-        } else {
-            view.backgroundColor = .white
-        }
+        
+        guard let vcCnt = navigationController?.viewControllers.count else { return }
+        prevVC = navigationController?.viewControllers[vcCnt - 2]
     }
     
     func configureView() {
@@ -170,22 +139,21 @@ class SearchPlaceViewController: UIViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        scrollView.addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        scrollView.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -SPACE_XL).isActive = true
         
-        contentView.addSubview(placeContainerView)
-        placeContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        placeContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        placeContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        placeContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        stackView.addArrangedSubview(noPlaceContainerView)
+        noPlaceContainerView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        noPlaceContainerView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
         
-        contentView.addSubview(noPlaceLabel)
-        noPlaceLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: SCREEN_WIDTH / 2).isActive = true
-        noPlaceLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        noPlaceContainerView.addSubview(noPlaceLabel)
+        noPlaceLabel.topAnchor.constraint(equalTo: noPlaceContainerView.topAnchor, constant: SPACE_XL + SPACE_XS).isActive = true
+        noPlaceLabel.centerXAnchor.constraint(equalTo: noPlaceContainerView.centerXAnchor).isActive = true
+        noPlaceLabel.bottomAnchor.constraint(equalTo: noPlaceContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
     }
     
     func getPlaces() {
@@ -194,22 +162,17 @@ class SearchPlaceViewController: UIViewController {
 }
 
 
-// MARK: Extension - SearchBar
+// MARK: SearchBar
 extension SearchPlaceViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // 2자 이상 (영어는 4자)
-        if keyword.utf8.count < 4 {
-            return
-        }
+        if keyword.count < 2 { return }
         
         // 한글 Char 거르기
         let wordList = Array(keyword)
         for word in wordList {
-            if KOR_CHAR_LIST.contains(word) {
-                return
-            }
+            if KOR_CHAR_LIST.contains(word) { return }
         }
         
         // 이미 검색한 키워드 (리스트에 뿌려놓음)
@@ -221,88 +184,85 @@ extension SearchPlaceViewController: UISearchBarDelegate {
     }
 }
 
-// MARK: Extension - GetPlace
+// MARK: HTTP - GetPlaces
 extension SearchPlaceViewController: GetPlacesRequestProtocol {
     func response(placeList: [Place]?, getPlaces status: String) {
+        print("[HTTP RES]", getPlacesRequest.apiUrl, status)
+        
         if status == "OK" {
-            if let placeList = placeList {
-                placeContainerView.removeAllChildView()
+            guard let placeList = placeList else { return }
                 
-                if placeList.count > 0 {
-                    noPlaceLabel.isHidden = true
-                    for (i, place) in placeList.enumerated() {
-                        let pmv = PlaceMediumView()
-                        pmv.index = i
-                        pmv.place = place
-                        pmv.delegate = self
-                        
-                        placeContainerView.addSubview(pmv)
-                        pmv.centerXAnchor.constraint(equalTo: placeContainerView.centerXAnchor).isActive = true
-                        pmv.widthAnchor.constraint(equalTo: placeContainerView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-                        if i == 0 {
-                            pmv.topAnchor.constraint(equalTo: placeContainerView.topAnchor, constant: SPACE_XXL).isActive = true
-                        } else {
-                            pmv.topAnchor.constraint(equalTo: placeContainerView.subviews[placeContainerView.subviews.count - 2].bottomAnchor, constant: SPACE_XXL).isActive = true
-                        }
-                        if i == placeList.count - 1 {
-                            pmv.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor, constant: -SPACE_XXL).isActive = true
-                        }
-                    }
-                    
-                } else {
-                    noPlaceLabel.isHidden = false
-                }
+            for v in stackView.subviews {
+                if v == noPlaceContainerView { continue }
+                v.removeFromSuperview()
             }
-        }
-    }
-}
-
-// MARK: Extension - ScrollView
-extension SearchPlaceViewController: UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if let _ = navigationItem.searchController?.searchBar.isFirstResponder {
-            navigationItem.searchController?.searchBar.resignFirstResponder()
-        }
-    }
-}
-
-// MARK: Extension - PlaceMediumView
-extension SearchPlaceViewController: PlaceMediumViewProtocol {
-    func openPlace(place: Place) {
-        if let _ = navigationItem.searchController?.searchBar.isFirstResponder {
-            navigationItem.searchController?.searchBar.resignFirstResponder()
-        }
-
-        if prevVC is PostingViewController {
-            let alert = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertController.Style.actionSheet)
-            alert.addAction(UIAlertAction(title: "닫기", style: UIAlertAction.Style.cancel))
-            alert.addAction(UIAlertAction(title: "선택", style: UIAlertAction.Style.default, handler: { (_) in
-                self.selectedPlace = place
-                self.navigationController?.popViewController(animated: true)
-            }))
-            alert.addAction(UIAlertAction(title: "자세히 보기", style: UIAlertAction.Style.default, handler: { (_) in
-                self.isOpenedChildVC = true
-                let placeVC = PlaceViewController(place: place)
-                placeVC.delegate = self
-                self.navigationController?.pushViewController(placeVC, animated: true)
-            }))
-            present(alert, animated: true)
             
-        } else {
-            isOpenedChildVC = true
-            let placeVC = PlaceViewController(place: place)
-            placeVC.delegate = self
-            self.navigationController?.pushViewController(placeVC, animated: true)
+            guard let prevVC = self.prevVC else { return }
+            let isSelectButtonHidden = !(prevVC is PostingViewController)
+        
+            if placeList.count > 0 {
+                noPlaceContainerView.isHidden = true
+                
+                for (i, place) in placeList.enumerated() {
+                    let pv = PlaceView()
+                    pv.place = place
+                    pv.selectButton.isHidden = isSelectButtonHidden
+                    pv.delegate = self
+                    
+                    stackView.addArrangedSubview(pv)
+                    pv.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+                    pv.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+                    
+                    if i > 0 {
+                        let lv = LineView()
+                        pv.addSubview(lv)
+                        lv.topAnchor.constraint(equalTo: pv.topAnchor).isActive = true
+                        lv.leadingAnchor.constraint(equalTo: pv.leadingAnchor).isActive = true
+                        lv.trailingAnchor.constraint(equalTo: pv.trailingAnchor).isActive = true
+                    }
+                }
+                
+            } else { noPlaceContainerView.isHidden = false }
         }
     }
 }
 
-// MARK: Extension - PlaceVC
+// MARK: PlaceView
+extension SearchPlaceViewController: PlaceViewProtocol {
+    func detailPlace(place: Place) {
+        dismissKeyboard()
+        let placeVC = PlaceViewController()
+        placeVC.place = place
+        placeVC.delegate = self
+        navigationController?.pushViewController(placeVC, animated: true)
+    }
+    
+    func selectPlace(place: Place) {
+        dismissKeyboard()
+        delegate?.selectPlace(place: place)
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func detailPick(place: Place, piId: Int) {
+        dismissKeyboard()
+        
+        let pickVC = PickViewController()
+        pickVC.navigationItem.title = place.name
+//        pickVC.placeContainerView.isHidden = true
+//        pickVC.placeView.isHidden = true
+//        pickVC.placeTopLine.isHidden = true
+        pickVC.order = "POPULAR"
+        pickVC.pId = place.id
+        pickVC.id = piId
+        navigationController?.pushViewController(pickVC, animated: true)
+    }
+}
+
+// MARK: PlaceVC
 extension SearchPlaceViewController: PlaceViewControllerProtocol {
-    func closePlaceVC() {
-        isOpenedChildVC = false
-    }
-    func reloadPlace() {
-        getPlaces()
-    }
+    func likePlace() { getPlaces() }
+    func addPlace() { getPlaces() }
+    func addComment() { getPlaces() }
+    func removeComment() { getPlaces() }
+    func addPick() { getPlaces() }
 }

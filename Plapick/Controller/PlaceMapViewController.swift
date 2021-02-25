@@ -10,24 +10,24 @@ import NMapsMap
 import CoreLocation
 
 
-protocol PlaceMapViewControllerProtocol {
-    func closePlaceMapVC()
-}
-
-
 class PlaceMapViewController: UIViewController {
     
     // MARK: Property
     let app = App()
-    var delegate: PlaceMapViewControllerProtocol?
-    var latitude: String?
-    var longitude: String?
+    var place: Place? {
+        didSet {
+            guard let place = self.place else { return }
+            
+            navigationItem.title = place.name
+        }
+    }
     let locationManager = CLLocationManager()
     
     
     // MARK: View
     lazy var mapView: NMFMapView = {
         let nmv = NMFMapView()
+        nmv.alpha = 0
         nmv.allowsRotating = false
         nmv.allowsTilting = false
         nmv.logoInteractionEnabled = false
@@ -76,72 +76,43 @@ class PlaceMapViewController: UIViewController {
     }()
     
     
-    // MARK: Init
-    init(latitude: String, longitude: String) {
-        super.init(nibName: nil, bundle: nil)
-        
-        self.latitude = latitude
-        self.longitude = longitude
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    
     // MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        isModalInPresentation = true
+        view.backgroundColor = .systemBackground
         
         configureView()
         
         setThemeColor()
-        
-        guard let latitude = self.latitude else { return }
-        guard let longitude = self.longitude else { return }
-        guard let lat = Double(latitude) else { return }
-        guard let lng = Double(longitude) else { return }
-        
-        let marker = NMFMarker()
-        marker.position = NMGLatLng(lat: lat, lng: lng)
-        marker.mapView = mapView
-        marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
-            let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng))
-            cameraUpdate.animation = .fly
-            cameraUpdate.animationDuration = 1
-            self.mapView.moveCamera(cameraUpdate)
-            return true
-        }
-        
-        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng))
-        DispatchQueue.main.async {
-            self.mapView.moveCamera(cameraUpdate)
-        }
     }
     
     
-    // MARK: ViewDidDisapear
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        delegate?.closePlaceMapVC()
+    // MARK: ViewDidAppear
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        guard let place = self.place else { return }
+        
+        guard let latitude = Double(place.latitude) else { return }
+        guard let longitude = Double(place.longitude) else { return }
+
+        let marker = NMFMarker()
+        marker.position = NMGLatLng(lat: latitude, lng: longitude)
+        marker.mapView = mapView
+    
+        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: latitude, lng: longitude), zoomTo: 15)
+        mapView.moveCamera(cameraUpdate, completion: { (_) in
+            UIView.animate(withDuration: 0.2, animations: {
+                self.mapView.alpha = 1
+            })
+        })
     }
     
     
     // MARK: Function
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        setThemeColor()
-    }
-    func setThemeColor() {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            view.backgroundColor = .black
-            buttonContainerView.backgroundColor = .black
-        } else {
-            view.backgroundColor = .white
-            buttonContainerView.backgroundColor = .white
-        }
-    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
+    func setThemeColor() { buttonContainerView.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white }
     
     func configureView() {
         view.addSubview(mapView)
@@ -188,12 +159,12 @@ class PlaceMapViewController: UIViewController {
     
     // MARK: Function - @OBJC
     @objc func markerTapped() {
-        guard let latitude = self.latitude else { return }
-        guard let longitude = self.longitude else { return }
-        guard let lat = Double(latitude) else { return }
-        guard let lng = Double(longitude) else { return }
+        guard let place = self.place else { return }
         
-        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng))
+        guard let latitude = Double(place.latitude) else { return }
+        guard let longitude = Double(place.longitude) else { return }
+        
+        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: latitude, lng: longitude))
         cameraUpdate.animation = .fly
         cameraUpdate.animationDuration = 1
         mapView.moveCamera(cameraUpdate)

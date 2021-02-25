@@ -84,7 +84,6 @@ class GetKakaoPlacesRequest: HttpRequest {
                 self.delegate?.response(kakaoPlaceList: nil, getKakaoPlaces: "ERR_STATUS_DECODE")
                 return
             }
-            print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }

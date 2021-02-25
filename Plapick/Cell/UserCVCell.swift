@@ -16,9 +16,10 @@ class UserCVCell: UICollectionViewCell {
         didSet {
             guard let user = self.user else { return }
             
-            photoView.setProfileImage(uId: user.id, profileImage: user.profileImage)
-            
             label.text = user.nickName
+            
+            guard let profileImage = user.profileImage else { return }
+            imageView.setProfileImage(uId: user.id, profileImage: profileImage)
         }
     }
     
@@ -26,22 +27,25 @@ class UserCVCell: UICollectionViewCell {
     // MARK: View
     lazy var containerView: UIView = {
         let view = UIView()
-//        view.backgroundColor = .systemGray6
         view.layer.cornerRadius = SPACE_XS
         view.layer.borderWidth = LINE_WIDTH
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    lazy var photoView: PhotoView = {
-        let pv = PhotoView()
-        pv.layer.cornerRadius = 20
-        return pv
+    lazy var imageView: UIImageView = {
+        let iv = UIImageView()
+        iv.backgroundColor = .systemGray6
+        iv.clipsToBounds = true
+        iv.layer.cornerRadius = 20
+        iv.contentMode = .scaleAspectFill
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
     lazy var label: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = .systemFont(ofSize: 12)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -75,16 +79,15 @@ class UserCVCell: UICollectionViewCell {
         containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -SPACE_XXS).isActive = true
         containerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
-        containerView.addSubview(photoView)
-        photoView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_XXS).isActive = true
-        photoView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
-        photoView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        photoView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        containerView.addSubview(imageView)
+        imageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_XS).isActive = true
+        imageView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         containerView.addSubview(label)
-        label.topAnchor.constraint(equalTo: photoView.bottomAnchor).isActive = true
         label.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: SPACE_XXS).isActive = true
         label.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -SPACE_XXS).isActive = true
-        label.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        label.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -SPACE_XS).isActive = true
     }
 }

@@ -83,7 +83,6 @@ class AddPlaceRequest: HttpRequest {
                 self.delegate?.response(place: nil, addPlace: "ERR_STATUS_DECODE")
                 return
             }
-            print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
@@ -94,9 +93,27 @@ class AddPlaceRequest: HttpRequest {
             // MARK: Response
             do {
                 let response = try JSONDecoder().decode(PlaceRequestResult.self, from: data)
+                
                 let resPlace = response.result
                 
-                let place = Place(id: resPlace.p_id, kId: resPlace.p_k_id, name: resPlace.p_name, categoryName: resPlace.p_category_name, categoryGroupName: resPlace.p_category_group_name, categoryGroupCode: resPlace.p_category_group_code, address: resPlace.p_address, roadAddress: resPlace.p_road_address, latitude: resPlace.p_latitude, longitude: resPlace.p_longitude, phone: resPlace.p_phone, plocCode: resPlace.p_ploc_code, clocCode: resPlace.p_cloc_code)
+                var pickImageList: [String] = []
+                
+                let picks = resPlace.picks
+                
+                if !picks.isEmpty {
+                    let splittedPicks = picks.split(separator: "|")
+                    for splittedPick in splittedPicks {
+                        let splitted = splittedPick.split(separator: ":")
+                        let piId = splitted[0]
+                        let uId = splitted[1]
+                        let image = "\(IMAGE_URL)/users/\(uId)/\(piId).jpg"
+                        pickImageList.append(image)
+                        
+                        if pickImageList.count == 10 { break } // 10개까지
+                    }
+                }
+                
+                let place = Place(id: resPlace.p_id, kId: resPlace.p_k_id, name: resPlace.p_name, categoryName: resPlace.p_category_name, categoryGroupName: resPlace.p_category_group_name, categoryGroupCode: resPlace.p_category_group_code, address: resPlace.p_address, roadAddress: resPlace.p_road_address, latitude: resPlace.p_latitude, longitude: resPlace.p_longitude, phone: resPlace.p_phone, plocCode: resPlace.p_ploc_code, clocCode: resPlace.p_cloc_code, pickImageList: pickImageList, isLike: resPlace.isLike, likeCnt: resPlace.likeCnt, commentCnt: resPlace.commentCnt, pickCnt: resPlace.pickCnt)
                 
                 self.delegate?.response(place: place, addPlace: "OK")
                 

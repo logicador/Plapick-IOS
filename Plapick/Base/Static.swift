@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 
-public let PLAPICK_URL = "http://121.138.167.244:3001" // "http://logicador.asuscomm.com:3001" // "http://plapick.com"
+public let PLAPICK_URL = "http://121.138.167.244:3001" // http://plapick.com http://121.138.167.244:3001
 public let IMAGE_URL = PLAPICK_URL + "/images"
 public let API_URL = PLAPICK_URL + "/api"
 public let KAKAO_NATIVE_APP_KEY = "746689b818804d4d3509d851a17a37c0"
@@ -21,7 +21,7 @@ public let DEFAULT_LONGITUDE: String = "126.986836"
 public let HTTP_TIMEOUT: TimeInterval = 10
 
 public let COMPRESS_IMAGE_QUALITY: CGFloat = 0.2
-public let LINE_WIDTH: CGFloat = 0.4
+public let LINE_WIDTH: CGFloat = 0.5
 public let LINE_COLOR: UIColor = UIColor.separator
 
 public let SPACE_XXXXXXL: CGFloat = 120
@@ -59,6 +59,8 @@ public let CONTENTS_RATIO_XXXXXXS: CGFloat = 0.66
 
 public let SCREEN_WIDTH: CGFloat = UIScreen.main.bounds.size.width
 public let SCREEN_HEIGHT: CGFloat = UIScreen.main.bounds.size.height
+
+public let BOTTOM_SPACING: CGFloat = SCREEN_WIDTH * 0.1
 
 public let MOST_PICKS_MAX_COUNT: Int = 10
 

@@ -10,29 +10,34 @@ import SDWebImage
 
 
 protocol CommentViewProtocol {
-    func openUser(uId: Int)
-    func removeComment(comment: Comment)
+    func detailUser(user: User)
+    func removeComment(id: Int)
 }
 
 
 class CommentView: UIView {
     
     // MARK: Property
-    let app = App()
     var delegate: CommentViewProtocol?
-    var comment: Comment? {
+    var id: Int?
+    var date: String? {
+        didSet {
+            guard let date = self.date else { return }
+            dateLabel.text = String(date.split(separator: " ")[0])
+        }
+    }
+    var comment: String? {
         didSet {
             guard let comment = self.comment else { return }
+            commentLabel.text = comment
+        }
+    }
+    var user: User? {
+        didSet {
+            guard let user = self.user else { return }
             
-            photoView.setProfileImage(uId: comment.uId, profileImage: comment.profileImage)
-            
-            nickNameLabel.text = comment.nickName
-            dateLabel.text = String(comment.createdDate.split(separator: " ")[0])
-            commentLabel.text = comment.comment
-            
-            if comment.uId == app.getUId() {
-                
-            }
+            nickNameLabel.text = user.nickName
+            profileImageView.setProfileImage(uId: user.id, profileImage: user.profileImage ?? "")
         }
     }
     
@@ -40,37 +45,41 @@ class CommentView: UIView {
     // MARK: View
     lazy var containerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemGray6
-        view.layer.cornerRadius = SPACE_XS
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    lazy var photoView: PhotoView = {
-        let pv = PhotoView()
-        pv.layer.cornerRadius = 20
-        pv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(photoTapped)))
-        return pv
+    lazy var profileImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.layer.cornerRadius = 20
+        iv.backgroundColor = .systemBackground
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(userTapped)))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
-    
     lazy var nickNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 14)
+        label.font = .boldSystemFont(ofSize: 14)
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(userTapped)))
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
     lazy var dateLabel: UILabel = {
         let label = UILabel()
+        label.font = .systemFont(ofSize: 12)
         label.textColor = .systemGray
-        label.font = UIFont.systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
     lazy var removeButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "xmark"), for: .normal)
+        button.setTitle("삭제", for: .normal)
+        button.tintColor = .systemRed
+        button.titleLabel?.font = .systemFont(ofSize: 14)
         button.addTarget(self, action: #selector(removeTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -78,8 +87,8 @@ class CommentView: UIView {
     
     lazy var commentLabel: UILabel = {
         let label = UILabel()
+        label.font = .systemFont(ofSize: 12)
         label.numberOfLines = 0
-        label.font = UIFont.systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -88,6 +97,9 @@ class CommentView: UIView {
     // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        backgroundColor = .systemGray6
+        layer.cornerRadius = SPACE_XS
         
         configureView()
         
@@ -102,44 +114,43 @@ class CommentView: UIView {
     // MARK: Function
     func configureView() {
         addSubview(containerView)
-        containerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        containerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        containerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        containerView.topAnchor.constraint(equalTo: topAnchor, constant: SPACE_XS).isActive = true
+        containerView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        containerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: CONTENTS_RATIO_L).isActive = true
+        containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -SPACE_XS).isActive = true
         
-        containerView.addSubview(photoView)
-        photoView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_S).isActive = true
-        photoView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: SPACE_S).isActive = true
-        photoView.widthAnchor.constraint(equalToConstant: 40).isActive = true
-        photoView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        containerView.addSubview(profileImageView)
+        profileImageView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        profileImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
         
         containerView.addSubview(nickNameLabel)
-        nickNameLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_S).isActive = true
-        nickNameLabel.leadingAnchor.constraint(equalTo: photoView.trailingAnchor, constant: SPACE_S).isActive = true
+        nickNameLabel.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        nickNameLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
         
         containerView.addSubview(dateLabel)
         dateLabel.centerYAnchor.constraint(equalTo: nickNameLabel.centerYAnchor).isActive = true
         dateLabel.leadingAnchor.constraint(equalTo: nickNameLabel.trailingAnchor, constant: SPACE_XS).isActive = true
         
         containerView.addSubview(removeButton)
-        removeButton.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_S).isActive = true
-        removeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -SPACE_S).isActive = true
+        removeButton.centerYAnchor.constraint(equalTo: nickNameLabel.centerYAnchor).isActive = true
+        removeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
         
         containerView.addSubview(commentLabel)
-        commentLabel.topAnchor.constraint(equalTo: nickNameLabel.bottomAnchor, constant: SPACE_XS).isActive = true
-        commentLabel.leadingAnchor.constraint(equalTo: photoView.trailingAnchor, constant: SPACE_S).isActive = true
-        commentLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -SPACE_S).isActive = true
-        commentLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -SPACE_S).isActive = true
+        commentLabel.topAnchor.constraint(equalTo: profileImageView.bottomAnchor ,constant: -12).isActive = true
+        commentLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
+        commentLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
-    @objc func photoTapped() {
-        guard let comment = self.comment else { return }
-        delegate?.openUser(uId: comment.uId)
+    @objc func userTapped() {
+        guard let user = self.user else { return }
+        delegate?.detailUser(user: user)
     }
     
     @objc func removeTapped() {
-        guard let comment = self.comment else { return }
-        delegate?.removeComment(comment: comment)
+        guard let id = self.id else { return }
+        delegate?.removeComment(id: id)
     }
 }

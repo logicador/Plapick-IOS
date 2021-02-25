@@ -22,12 +22,14 @@ class PlaceMediumView: UIView {
     let ICON_WIDTH: CGFloat = 30
     var app = App()
     var index: Int?
+    var pickImageList: [String] = []
     var mostPickList: [MostPick] = []
     var place: Place? {
         didSet {
             guard let place = self.place else { return }
+            pickImageList = place.pickImageList
             
-            let categoryName = app.getCategoryString(categoryName: place.categoryName)
+            let categoryName = app.getCategoryName(categoryName: place.categoryName)
             categoryNameLabel.text = categoryName
 
             nameLabel.text = place.name
@@ -38,11 +40,11 @@ class PlaceMediumView: UIView {
             commentCntLabel.text = String(place.commentCnt)
             pickCntLabel.text = String(place.pickCnt)
             
-            mostPickList = place.mostPickList
+//            mostPickList = place.mostPickList
             collectionView.reloadData()
             
             var nextBottomAnchor: NSLayoutYAxisAnchor = headerBottomLine.bottomAnchor
-            if mostPickList.count > 0 {
+            if pickImageList.count > 0 {
                 containerView.addSubview(collectionView)
                 collectionView.topAnchor.constraint(equalTo: nextBottomAnchor).isActive = true
                 collectionView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
@@ -290,10 +292,10 @@ class PlaceMediumView: UIView {
 }
 
 
-// MARK: Extension - CollectionView
+// MARK: CollectionView
 extension PlaceMediumView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return mostPickList.count
+        return pickImageList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

@@ -10,36 +10,59 @@ import SDWebImage
 
 
 protocol AccountViewControllerProtocol {
-    func closeAccountVC()
-    func reloadUser()
+//    func follow(user: User)
+    func follow()
 }
 
 
 class AccountViewController: UIViewController {
     
     // MARK: Property
+    let app = App()
     var delegate: AccountViewControllerProtocol?
-    var app = App()
-    var authUId: Int?
-    var uId: Int?
     let getPicksRequest = GetPicksRequest()
-    let getUserReuqest = GetUserRequest()
-    let profileImageWidth = SCREEN_WIDTH * (1 / 4)
-    var isOpenedChildVC: Bool = false
-    var photoGroupViewList: [PhotoGroupView] = []
     let followRequest = FollowRequest()
+    let getUserRequest = GetUserRequest()
+    var user: User? {
+        didSet {
+            guard let user = self.user else { return }
+            
+            profileImageView.setProfileImage(uId: user.id, profileImage: user.profileImage ?? "")
+            nickNameLabel.text = user.nickName
+            pickCntLabel.text = "\(String(user.pickCnt))개"
+            followerCntLabel.text = String(user.followerCnt)
+            followingCntLabel.text = String(user.followingCnt)
+            likePickCntLabel.text = String(user.likePickCnt)
+            likePlaceCntLabel.text = String(user.likePlaceCnt)
+        }
+    }
+    var isFollow = "N" {
+        didSet {
+            navigationItem.rightBarButtonItem = (isFollow == "Y") ? UIBarButtonItem(title: "팔로우 취소", style: .plain, target: self, action: #selector(followTapped)) : UIBarButtonItem(title: "팔로우", style: .plain, target: self, action: #selector(followTapped))
+            navigationItem.rightBarButtonItem?.tintColor = (isFollow == "Y") ? .systemRed : .systemBlue
+        }
+    }
+    var isEnded = false
+    var isLoading = false
+    var page = 1
     
     
     // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
+        sv.delegate = self
+        sv.alwaysBounceVertical = true
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
-    lazy var contentView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_L
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     
     // MARK: View - Profile
@@ -48,234 +71,195 @@ class AccountViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
-    lazy var profileImageContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var profileImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.backgroundColor = .systemGray6
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageTapped)))
+        iv.layer.cornerRadius = SCREEN_WIDTH * (1 / 8)
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
-    lazy var profileImagePhotoView: PhotoView = {
-        let pv = PhotoView()
-        pv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(profileImageTapped)))
-        pv.layer.cornerRadius = profileImageWidth / 2
-        return pv
-    }()
-    
     lazy var profileLabelContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    lazy var nickNameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 20)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     lazy var pickCntTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "게시한 픽"
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = .systemFont(ofSize: 12)
         label.textColor = .systemGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     lazy var pickCntLabel: UILabel = {
         let label = UILabel()
-        label.text = "0"
-        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.font = .boldSystemFont(ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var profileBottomLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
+    
+    // MARK: View - Cnt
+    lazy var cntContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var cntCenterLine: LineView = {
+        let lv = LineView(orientation: .vertical)
+        return lv
+    }()
+    
+    // MARK: View - Cnt - Like
+    lazy var likeCntTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "좋아요"
+        label.font = .systemFont(ofSize: 12)
+        label.textColor = .systemGray
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var likePlaceCntContainerView: UIView = {
+        let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(likePlaceCntTapped)))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var likePlaceCntLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var likePlaceCntTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "플레이스"
+        label.font = .systemFont(ofSize: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var likePickCntContainerView: UIView = {
+        let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(likePickCntTapped)))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var likePickCntLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var likePickCntTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "픽"
+        label.font = .systemFont(ofSize: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    // MARK: View - Cnt - Follow
+    lazy var followingCntContainerView: UIView = {
+        let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(followingCntTapped)))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var followingCntLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 18)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var followingCntTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "팔로잉"
+        label.font = .systemFont(ofSize: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    lazy var followerCntContainerView: UIView = {
+        let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(followerCntTapped)))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var followerCntLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     lazy var followerCntTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "팔로워"
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .systemGray
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    lazy var followerCntLabel: UILabel = {
-        let label = UILabel()
-        label.text = "0"
-        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.font = .systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    lazy var profileLine: LineView = {
-        let lv = LineView()
-        return lv
-    }()
-    
-    // MARK: View - Follow
-    lazy var followContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    lazy var followImageView: UIImageView = {
-        let img = UIImage(systemName: "person.2.fill")
-        let iv = UIImageView(image: img)
-        iv.contentMode = .scaleAspectFit
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
-    }()
-    lazy var followTitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "팔로우"
-        label.font = UIFont.boldSystemFont(ofSize: 22)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    lazy var followerButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.backgroundColor = .tertiarySystemGroupedBackground
-        button.setTitle("팔로워", for: UIControl.State.normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.cornerRadius = SPACE_S
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XXS, left: SPACE_S, bottom: SPACE_XXS, right: SPACE_S)
-        button.addTarget(self, action: #selector(followerTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    lazy var followingButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.backgroundColor = .tertiarySystemGroupedBackground
-        button.setTitle("팔로잉", for: UIControl.State.normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.cornerRadius = SPACE_S
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XXS, left: SPACE_S, bottom: SPACE_XXS, right: SPACE_S)
-        button.addTarget(self, action: #selector(followingTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    // MARK: View - Like
-    lazy var likeContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    lazy var likeImageView: UIImageView = {
-        let img = UIImage(systemName: "heart.fill")
-        let iv = UIImageView(image: img)
-        iv.contentMode = .scaleAspectFit
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
-    }()
-    lazy var likeTitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "좋아요"
-        label.font = UIFont.boldSystemFont(ofSize: 22)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    lazy var likePickButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.backgroundColor = .tertiarySystemGroupedBackground
-        button.setTitle("픽", for: UIControl.State.normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.cornerRadius = SPACE_S
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XXS, left: SPACE_S, bottom: SPACE_XXS, right: SPACE_S)
-        button.addTarget(self, action: #selector(likePickTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    lazy var likePlaceButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.backgroundColor = .tertiarySystemGroupedBackground
-        button.setTitle("플레이스", for: UIControl.State.normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.cornerRadius = SPACE_S
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XXS, left: SPACE_S, bottom: SPACE_XXS, right: SPACE_S)
-        button.addTarget(self, action: #selector(likePlaceTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    lazy var followLikeLine: LineView = {
-        let lv = LineView()
-        return lv
-    }()
-    
-    // MARK: View - Other
-    lazy var pickTitleView: TitleView = {
-        let tv = TitleView(text: "게시한 픽")
-        return tv
-    }()
-    lazy var followButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.backgroundColor = .tertiarySystemGroupedBackground
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.layer.cornerRadius = SPACE_S
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XXS, left: SPACE_S, bottom: SPACE_XXS, right: SPACE_S)
-        button.addTarget(self, action: #selector(followTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    lazy var pickContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    // MARK: View - Pick
+    lazy var pickStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = 1
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     lazy var noPickContainerView: UIView = {
         let view = UIView()
         view.isHidden = true
-        view.layer.cornerRadius = 20
-        view.backgroundColor = .systemGray6
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    lazy var noPickTopLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
     lazy var noPickLabel: UILabel = {
         let label = UILabel()
-        label.text = "등록된 픽이 없습니다."
+        label.text = "게시된 픽이 없습니다."
+        label.font = .systemFont(ofSize: 14)
         label.textColor = .systemGray
-        label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    lazy var addPickbutton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("새로운 픽", for: UIControl.State.normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.addTarget(self, action: #selector(addPickTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    // MARK: Init
-    init(uId: Int) {
-        super.init(nibName: nil, bundle: nil)
-        self.uId = uId
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     
     // MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .systemBackground
+        
+        navigationItem.title = "사용자"
+        
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: UIBarButtonItem.Style.plain, target: self, action: #selector(closeTapped))
-        
-        authUId = app.getUId()
         
         configureView()
         
-        setThemeColor()
-        
         getPicksRequest.delegate = self
-        getUserReuqest.delegate = self
         followRequest.delegate = self
+        getUserRequest.delegate = self
         
-        guard let uId = self.uId else { return }
-        guard let authUId = self.authUId else { return }
-        
-        if authUId == uId {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "설정", style: UIBarButtonItem.Style.plain, target: self, action: #selector(settingTapped))
-        } else {
-            getUser()
-            getPicks()
-        }
+        getPicks()
     }
     
     
@@ -283,40 +267,13 @@ class AccountViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        guard let uId = self.uId else { return }
-        guard let authUId = self.authUId else { return }
-        
-        // 내 프로필일 경우에만 새로고침
-        if authUId == uId {
-            getUser()
-            getPicks()
-        }
-    }
-    
-    
-    // MARK: ViewDidDisappear
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if !isOpenedChildVC {
-            delegate?.closeAccountVC()
-        }
+        getUser()
+//        guard let user = self.user else { return }
+//        getUserRequest.fetch(vc: self, paramDict: ["uId": String(user.id)])
     }
     
     
     // MARK: Function
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
-    func setThemeColor() {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            view.backgroundColor = .black
-            followImageView.tintColor = .white
-            likeImageView.tintColor = .white
-        } else {
-            view.backgroundColor = .white
-            followImageView.tintColor = .black
-            likeImageView.tintColor = .black
-        }
-    }
-    
     func configureView() {
         view.addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -324,395 +281,308 @@ class AccountViewController: UIViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        scrollView.addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
+        scrollView.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: SPACE_L).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
         
         // MARK: ConfigureView - Profile
-        contentView.addSubview(profileContainerView)
-        profileContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        profileContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        profileContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        
-        profileContainerView.addSubview(profileImageContainerView)
-        profileImageContainerView.topAnchor.constraint(equalTo: profileContainerView.topAnchor).isActive = true
-        profileImageContainerView.leadingAnchor.constraint(equalTo: profileContainerView.leadingAnchor).isActive = true
-        profileImageContainerView.widthAnchor.constraint(equalTo: profileContainerView.widthAnchor, multiplier: 0.5).isActive = true
-        profileImageContainerView.bottomAnchor.constraint(equalTo: profileContainerView.bottomAnchor).isActive = true
+        stackView.addArrangedSubview(profileContainerView)
+        profileContainerView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        profileContainerView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
+
+        profileContainerView.addSubview(profileImageView)
+        profileImageView.topAnchor.constraint(equalTo: profileContainerView.topAnchor).isActive = true
+        profileImageView.leadingAnchor.constraint(equalTo: profileContainerView.leadingAnchor).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: SCREEN_WIDTH * (1 / 4)).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: SCREEN_WIDTH * (1 / 4)).isActive = true
         
         profileContainerView.addSubview(profileLabelContainerView)
+        profileLabelContainerView.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: SPACE_L).isActive = true
+        profileLabelContainerView.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor).isActive = true
         profileLabelContainerView.trailingAnchor.constraint(equalTo: profileContainerView.trailingAnchor).isActive = true
-        profileLabelContainerView.widthAnchor.constraint(equalTo: profileContainerView.widthAnchor, multiplier: 0.5).isActive = true
-        profileLabelContainerView.centerYAnchor.constraint(equalTo: profileContainerView.centerYAnchor).isActive = true
         
-        profileImageContainerView.addSubview(profileImagePhotoView)
-        profileImagePhotoView.topAnchor.constraint(equalTo: profileImageContainerView.topAnchor, constant: SPACE_XL).isActive = true
-        profileImagePhotoView.trailingAnchor.constraint(equalTo: profileImageContainerView.trailingAnchor).isActive = true
-        profileImagePhotoView.widthAnchor.constraint(equalToConstant: profileImageWidth).isActive = true
-        profileImagePhotoView.heightAnchor.constraint(equalToConstant: profileImageWidth).isActive = true
-        profileImagePhotoView.bottomAnchor.constraint(equalTo: profileImageContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
+        profileLabelContainerView.addSubview(nickNameLabel)
+        nickNameLabel.topAnchor.constraint(equalTo: profileLabelContainerView.topAnchor).isActive = true
+        nickNameLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor).isActive = true
         
         profileLabelContainerView.addSubview(pickCntTitleLabel)
-        pickCntTitleLabel.topAnchor.constraint(equalTo: profileLabelContainerView.topAnchor).isActive = true
-        pickCntTitleLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor, constant: SPACE).isActive = true
+        pickCntTitleLabel.topAnchor.constraint(equalTo: nickNameLabel.bottomAnchor, constant: SPACE_XS).isActive = true
+        pickCntTitleLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor).isActive = true
         
         profileLabelContainerView.addSubview(pickCntLabel)
-        pickCntLabel.topAnchor.constraint(equalTo: pickCntTitleLabel.bottomAnchor).isActive = true
-        pickCntLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor, constant: SPACE).isActive = true
+        pickCntLabel.topAnchor.constraint(equalTo: pickCntTitleLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        pickCntLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor).isActive = true
+        pickCntLabel.bottomAnchor.constraint(equalTo: profileLabelContainerView.bottomAnchor).isActive = true
         
-        profileLabelContainerView.addSubview(followerCntTitleLabel)
-        followerCntTitleLabel.topAnchor.constraint(equalTo: pickCntLabel.bottomAnchor, constant: SPACE_XS).isActive = true
-        followerCntTitleLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor, constant: SPACE).isActive = true
+        profileContainerView.addSubview(profileBottomLine)
+        profileBottomLine.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: SPACE_L).isActive = true
+        profileBottomLine.leadingAnchor.constraint(equalTo: profileContainerView.leadingAnchor).isActive = true
+        profileBottomLine.trailingAnchor.constraint(equalTo: profileContainerView.trailingAnchor).isActive = true
+        profileBottomLine.bottomAnchor.constraint(equalTo: profileContainerView.bottomAnchor).isActive = true
         
-        profileLabelContainerView.addSubview(followerCntLabel)
-        followerCntLabel.topAnchor.constraint(equalTo: followerCntTitleLabel.bottomAnchor).isActive = true
-        followerCntLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor, constant: SPACE).isActive = true
-        followerCntLabel.bottomAnchor.constraint(equalTo: profileLabelContainerView.bottomAnchor).isActive = true
+        // MARK: ConfigureView - Cnt
+        stackView.addArrangedSubview(cntContainerView)
+        cntContainerView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        cntContainerView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
         
-        contentView.addSubview(profileLine)
-        profileLine.topAnchor.constraint(equalTo: profileContainerView.bottomAnchor).isActive = true
-        profileLine.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        profileLine.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        cntContainerView.addSubview(cntCenterLine)
+        cntCenterLine.centerXAnchor.constraint(equalTo: cntContainerView.centerXAnchor).isActive = true
+        cntCenterLine.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
+        cntCenterLine.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
         
-        guard let uId = self.uId else { return }
-        guard let authUId = self.authUId else { return }
+        // MARK: ConfigureView - Cnt - Like
+        cntContainerView.addSubview(likeCntTitleLabel)
+        likeCntTitleLabel.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
+        likeCntTitleLabel.trailingAnchor.constraint(equalTo: cntContainerView.trailingAnchor).isActive = true
+        likeCntTitleLabel.widthAnchor.constraint(equalTo: cntContainerView.widthAnchor, multiplier: 0.5).isActive = true
         
-        var nextBottomAnchor: NSLayoutYAxisAnchor = profileLine.bottomAnchor
-        if authUId == uId {
-            
-            // MARK: ConfigureView - Follow
-            contentView.addSubview(followContainerView)
-            followContainerView.topAnchor.constraint(equalTo: profileLine.bottomAnchor, constant: SPACE_XL).isActive = true
-            followContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-            followContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            
-            followContainerView.addSubview(followImageView)
-            followImageView.leadingAnchor.constraint(equalTo: followContainerView.leadingAnchor).isActive = true
-            followImageView.centerYAnchor.constraint(equalTo: followContainerView.centerYAnchor).isActive = true
-            followImageView.widthAnchor.constraint(equalToConstant: 22).isActive = true
-            followImageView.heightAnchor.constraint(equalToConstant: 22).isActive = true
-            
-            followContainerView.addSubview(followTitleLabel)
-            followTitleLabel.topAnchor.constraint(equalTo: followContainerView.topAnchor).isActive = true
-            followTitleLabel.leadingAnchor.constraint(equalTo: followImageView.trailingAnchor, constant: SPACE_XS).isActive = true
-            followTitleLabel.bottomAnchor.constraint(equalTo: followContainerView.bottomAnchor).isActive = true
-            
-            followContainerView.addSubview(followingButton)
-            followingButton.centerYAnchor.constraint(equalTo: followContainerView.centerYAnchor).isActive = true
-            followingButton.trailingAnchor.constraint(equalTo: followContainerView.trailingAnchor).isActive = true
-            
-            followContainerView.addSubview(followerButton)
-            followerButton.centerYAnchor.constraint(equalTo: followContainerView.centerYAnchor).isActive = true
-            followerButton.trailingAnchor.constraint(equalTo: followingButton.leadingAnchor, constant: -SPACE_XS).isActive = true
-            
-            // MARK: ConfigureView - Like
-            contentView.addSubview(likeContainerView)
-            likeContainerView.topAnchor.constraint(equalTo: followContainerView.bottomAnchor, constant: SPACE_XL).isActive = true
-            likeContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-            likeContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            
-            likeContainerView.addSubview(likeImageView)
-            likeImageView.leadingAnchor.constraint(equalTo: likeContainerView.leadingAnchor).isActive = true
-            likeImageView.centerYAnchor.constraint(equalTo: likeContainerView.centerYAnchor).isActive = true
-            likeImageView.widthAnchor.constraint(equalToConstant: 22).isActive = true
-            likeImageView.heightAnchor.constraint(equalToConstant: 22).isActive = true
-            
-            likeContainerView.addSubview(likeTitleLabel)
-            likeTitleLabel.topAnchor.constraint(equalTo: likeContainerView.topAnchor).isActive = true
-            likeTitleLabel.leadingAnchor.constraint(equalTo: likeImageView.trailingAnchor, constant: SPACE_XS).isActive = true
-            likeTitleLabel.bottomAnchor.constraint(equalTo: likeContainerView.bottomAnchor).isActive = true
-            
-            likeContainerView.addSubview(likePlaceButton)
-            likePlaceButton.centerYAnchor.constraint(equalTo: likeContainerView.centerYAnchor).isActive = true
-            likePlaceButton.trailingAnchor.constraint(equalTo: likeContainerView.trailingAnchor).isActive = true
-            
-            followContainerView.addSubview(likePickButton)
-            likePickButton.centerYAnchor.constraint(equalTo: likeContainerView.centerYAnchor).isActive = true
-            likePickButton.trailingAnchor.constraint(equalTo: likePlaceButton.leadingAnchor, constant: -SPACE_XS).isActive = true
-            
-            contentView.addSubview(followLikeLine)
-            followLikeLine.topAnchor.constraint(equalTo: likeContainerView.bottomAnchor, constant: SPACE_XL).isActive = true
-            followLikeLine.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-            followLikeLine.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-            
-            nextBottomAnchor = followLikeLine.bottomAnchor
-        }
+        cntContainerView.addSubview(likePlaceCntContainerView)
+        likePlaceCntContainerView.topAnchor.constraint(equalTo: likeCntTitleLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        likePlaceCntContainerView.trailingAnchor.constraint(equalTo: cntContainerView.trailingAnchor).isActive = true
+        likePlaceCntContainerView.widthAnchor.constraint(equalTo: cntContainerView.widthAnchor, multiplier: 1 / 4).isActive = true
+        likePlaceCntContainerView.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
         
-        // MARK: ConfigureView - Other
-        contentView.addSubview(pickTitleView)
-        pickTitleView.topAnchor.constraint(equalTo: nextBottomAnchor).isActive = true
-        pickTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        pickTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        likePlaceCntContainerView.addSubview(likePlaceCntLabel)
+        likePlaceCntLabel.topAnchor.constraint(equalTo: likePlaceCntContainerView.topAnchor).isActive = true
+        likePlaceCntLabel.centerXAnchor.constraint(equalTo: likePlaceCntContainerView.centerXAnchor).isActive = true
+
+        likePlaceCntContainerView.addSubview(likePlaceCntTitleLabel)
+        likePlaceCntTitleLabel.topAnchor.constraint(equalTo: likePlaceCntLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        likePlaceCntTitleLabel.centerXAnchor.constraint(equalTo: likePlaceCntContainerView.centerXAnchor).isActive = true
+        likePlaceCntTitleLabel.bottomAnchor.constraint(equalTo: likePlaceCntContainerView.bottomAnchor).isActive = true
         
-        if authUId == uId {
-            pickTitleView.addSubview(addPickbutton)
-            addPickbutton.trailingAnchor.constraint(equalTo: pickTitleView.containerView.trailingAnchor).isActive = true
-            addPickbutton.centerYAnchor.constraint(equalTo: pickTitleView.label.centerYAnchor).isActive = true
-            
-        } else {
-            pickTitleView.addSubview(followButton)
-            followButton.trailingAnchor.constraint(equalTo: pickTitleView.containerView.trailingAnchor).isActive = true
-            followButton.centerYAnchor.constraint(equalTo: pickTitleView.label.centerYAnchor).isActive = true
-        }
+        cntContainerView.addSubview(likePickCntContainerView)
+        likePickCntContainerView.centerYAnchor.constraint(equalTo: likePlaceCntContainerView.centerYAnchor).isActive = true
+        likePickCntContainerView.trailingAnchor.constraint(equalTo: likePlaceCntContainerView.leadingAnchor).isActive = true
+        likePickCntContainerView.widthAnchor.constraint(equalTo: cntContainerView.widthAnchor, multiplier: 1 / 4).isActive = true
         
-        contentView.addSubview(pickContainerView)
-        pickContainerView.topAnchor.constraint(equalTo: pickTitleView.bottomAnchor).isActive = true
-        pickContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        pickContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        pickContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        likePickCntContainerView.addSubview(likePickCntLabel)
+        likePickCntLabel.topAnchor.constraint(equalTo: likePickCntContainerView.topAnchor).isActive = true
+        likePickCntLabel.centerXAnchor.constraint(equalTo: likePickCntContainerView.centerXAnchor).isActive = true
+
+        likePickCntContainerView.addSubview(likePickCntTitleLabel)
+        likePickCntTitleLabel.topAnchor.constraint(equalTo: likePickCntLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        likePickCntTitleLabel.centerXAnchor.constraint(equalTo: likePickCntContainerView.centerXAnchor).isActive = true
+        likePickCntTitleLabel.bottomAnchor.constraint(equalTo: likePickCntContainerView.bottomAnchor).isActive = true
         
-        contentView.addSubview(noPickContainerView)
-        noPickContainerView.topAnchor.constraint(equalTo: pickTitleView.bottomAnchor).isActive = true
-        noPickContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        noPickContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        noPickContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        // MARK: ConfigureView - Cnt - Follow
+        cntContainerView.addSubview(followingCntContainerView)
+        followingCntContainerView.centerYAnchor.constraint(equalTo: likePlaceCntContainerView.centerYAnchor).isActive = true
+        followingCntContainerView.trailingAnchor.constraint(equalTo: likePickCntContainerView.leadingAnchor).isActive = true
+        followingCntContainerView.widthAnchor.constraint(equalTo: cntContainerView.widthAnchor, multiplier: 1 / 4).isActive = true
+        
+        followingCntContainerView.addSubview(followingCntLabel)
+        followingCntLabel.topAnchor.constraint(equalTo: followingCntContainerView.topAnchor).isActive = true
+        followingCntLabel.centerXAnchor.constraint(equalTo: followingCntContainerView.centerXAnchor).isActive = true
+
+        followingCntContainerView.addSubview(followingCntTitleLabel)
+        followingCntTitleLabel.topAnchor.constraint(equalTo: followingCntLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        followingCntTitleLabel.centerXAnchor.constraint(equalTo: followingCntContainerView.centerXAnchor).isActive = true
+        followingCntTitleLabel.bottomAnchor.constraint(equalTo: followingCntContainerView.bottomAnchor).isActive = true
+        
+        cntContainerView.addSubview(followerCntContainerView)
+        followerCntContainerView.centerYAnchor.constraint(equalTo: likePlaceCntContainerView.centerYAnchor).isActive = true
+        followerCntContainerView.trailingAnchor.constraint(equalTo: followingCntContainerView.leadingAnchor).isActive = true
+        followerCntContainerView.widthAnchor.constraint(equalTo: cntContainerView.widthAnchor, multiplier: 1 / 4).isActive = true
+        
+        followerCntContainerView.addSubview(followerCntLabel)
+        followerCntLabel.topAnchor.constraint(equalTo: followerCntContainerView.topAnchor).isActive = true
+        followerCntLabel.centerXAnchor.constraint(equalTo: followerCntContainerView.centerXAnchor).isActive = true
+
+        followerCntContainerView.addSubview(followerCntTitleLabel)
+        followerCntTitleLabel.topAnchor.constraint(equalTo: followerCntLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        followerCntTitleLabel.centerXAnchor.constraint(equalTo: followerCntContainerView.centerXAnchor).isActive = true
+        followerCntTitleLabel.bottomAnchor.constraint(equalTo: followerCntContainerView.bottomAnchor).isActive = true
+        
+        // MARK: ConfigureView - Pick
+        stackView.addArrangedSubview(pickStackView)
+        pickStackView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        pickStackView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        pickStackView.addArrangedSubview(noPickContainerView)
+        noPickContainerView.centerXAnchor.constraint(equalTo: pickStackView.centerXAnchor).isActive = true
+        noPickContainerView.widthAnchor.constraint(equalTo: pickStackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
+        
+        noPickContainerView.addSubview(noPickTopLine)
+        noPickTopLine.topAnchor.constraint(equalTo: noPickContainerView.topAnchor).isActive = true
+        noPickTopLine.leadingAnchor.constraint(equalTo: noPickContainerView.leadingAnchor).isActive = true
+        noPickTopLine.trailingAnchor.constraint(equalTo: noPickContainerView.trailingAnchor).isActive = true
         
         noPickContainerView.addSubview(noPickLabel)
-        noPickLabel.topAnchor.constraint(equalTo: noPickContainerView.topAnchor, constant: NO_DATA_SPACE).isActive = true
+        noPickLabel.topAnchor.constraint(equalTo: noPickTopLine.bottomAnchor, constant: SPACE_XL).isActive = true
         noPickLabel.centerXAnchor.constraint(equalTo: noPickContainerView.centerXAnchor).isActive = true
-        noPickLabel.bottomAnchor.constraint(equalTo: noPickContainerView.bottomAnchor, constant: -NO_DATA_SPACE).isActive = true
-    }
-    
-    func getUser() {
-        guard let uId = self.uId else { return }
-        getUserReuqest.fetch(vc: self, paramDict: ["uId": String(uId)])
+        noPickLabel.bottomAnchor.constraint(equalTo: noPickContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
     }
     
     func getPicks() {
-        guard let uId = self.uId else { return }
-        getPicksRequest.fetch(vc: self, paramDict: ["uId": String(uId)])
+        guard let user = self.user else { return }
+        isLoading = true
+        getPicksRequest.fetch(vc: self, paramDict: ["uId": String(user.id), "page": String(page), "limit": "30"])
+    }
+    
+    func getUser() {
+        guard let user = self.user else { return }
+        getUserRequest.fetch(vc: self, paramDict: ["uId": String(user.id)])
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        
+        if offsetY > contentHeight - scrollView.frame.height {
+            if !isLoading && !isEnded {
+                page += 1
+                getPicks()
+            }
+        }
     }
     
     // MARK: Function - @OBJC
-    @objc func settingTapped() {
-        isOpenedChildVC = true
-        let settingVC = SettingViewController()
-//        settingVC.authAccountVC = self
-        settingVC.delegate = self
-        navigationController?.pushViewController(settingVC, animated: true)
-    }
-    
-    @objc func closeTapped() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func followerTapped() {
-        isOpenedChildVC = true
-        let searchUserTVC = SearchUserTableViewController()
-        searchUserTVC.mode = "FOLLOWER"
-        searchUserTVC.delegate = self
-        navigationController?.pushViewController(searchUserTVC, animated: true)
-    }
-    
-    @objc func followingTapped() {
-        isOpenedChildVC = true
-        let searchUserTVC = SearchUserTableViewController()
-        searchUserTVC.mode = "FOLLOWING"
-        searchUserTVC.delegate = self
-        navigationController?.pushViewController(searchUserTVC, animated: true)
-    }
-    
-    @objc func likePickTapped() {
+    @objc func likePlaceCntTapped() {
+        guard let user = self.user else { return }
         
-    }
-    
-    @objc func likePlaceTapped() {
-        isOpenedChildVC = true
         let searchPlaceVC = SearchPlaceViewController()
-        searchPlaceVC.mode = "MY_LIKE_PLACE"
-        searchPlaceVC.delegate = self
+        searchPlaceVC.user = user
+        searchPlaceVC.mode = "LIKE_PLACE"
         navigationController?.pushViewController(searchPlaceVC, animated: true)
     }
     
-    @objc func followTapped(sender: UIButton) {
-        guard let uId = self.uId else { return }
+    @objc func likePickCntTapped() {
         
-        var cnt = 0
-        if let followerCntText = followerCntLabel.text {
-            if let followerCnt = Int(followerCntText) {
-                cnt = followerCnt
-            }
-        }
-        
-        if sender.tag == 1 {
-            cnt += 1
-            followButton.setTitle("팔로우 취소", for: UIControl.State.normal)
-            followButton.tag = 2
-            
-        } else {
-            cnt -= 1
-            followButton.setTitle("팔로우", for: UIControl.State.normal)
-            followButton.tag = 1
-        }
-        
-        followerCntLabel.text = String(cnt)
-        
-        followRequest.fetch(vc: self, paramDict: ["uId": String(uId)])
     }
     
-    @objc func addPickTapped() {
-        isOpenedChildVC = true
-        let postingVC = PostingViewController()
-//        postingVC.authAccountVC = self
-        postingVC.delegate = self
-        navigationController?.pushViewController(postingVC, animated: true)
+    @objc func followerCntTapped() {
+        guard let user = self.user else { return }
+        
+        let searchUserVC = SearchUserViewController()
+        searchUserVC.user = user
+        searchUserVC.mode = "FOLLOWER"
+        navigationController?.pushViewController(searchUserVC, animated: true)
+    }
+    
+    @objc func followingCntTapped() {
+        guard let user = self.user else { return }
+        
+        let searchUserVC = SearchUserViewController()
+        searchUserVC.user = user
+        searchUserVC.mode = "FOLLOWING"
+        navigationController?.pushViewController(searchUserVC, animated: true)
+    }
+    
+    @objc func followTapped() {
+        guard let user = self.user else { return }
+        let followText = (isFollow == "Y") ? "팔로우 취소" : "팔로우"
+
+        let alert = UIAlertController(title: nil, message: "해당 사용자를\n\"\(followText)\"\n하시겠습니까?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "아니오", style: .cancel))
+        alert.addAction(UIAlertAction(title: followText, style: (isFollow == "Y") ? .destructive : .default, handler: { (_) in
+            self.followRequest.fetch(vc: self, paramDict: ["uId": String(user.id)])
+        }))
+        present(alert, animated: true, completion: nil)
     }
     
     @objc func profileImageTapped() {
-        isOpenedChildVC = true
+        guard let user = self.user else { return }
         let photoVC = PhotoViewController()
-        photoVC.image = profileImagePhotoView.image
-        if let nickName = navigationItem.title {
-            photoVC.navigationItem.title = "\(nickName)님의 사진"
-        }
-        photoVC.delegate = self
+        photoVC.image = profileImageView.image
+        photoVC.navigationItem.title = "\(user.nickName)님의 사진"
         navigationController?.pushViewController(photoVC, animated: true)
     }
 }
 
+// MARK: PhotoGroupView
+extension AccountViewController: PhotoGroupViewProtocol {
+    func detailPick(pick: Pick) {
+        guard let user = self.user else { return }
+        
+        let pickVC = PickViewController()
+        pickVC.navigationItem.title = "\(user.nickName)님의 픽"
+        pickVC.userContainerView.isHidden = true
+//        pickVC.placeTopLine.isHidden = true
+        pickVC.uId = user.id
+        pickVC.id = pick.id
+        navigationController?.pushViewController(pickVC, animated: true)
+    }
+}
 
-// MARK: Extension - GetPicks
+// MARK: HTTP - GetPicks
 extension AccountViewController: GetPicksRequestProtocol {
     func response(pickList: [Pick]?, getPicks status: String) {
+        print("[HTTP RES]", getPicksRequest.apiUrl, status)
+        
         if status == "OK" {
-            if let pickList = pickList {
-                pickContainerView.removeAllChildView()
+            guard let pickList = pickList else { return }
+            
+            if pickList.count > 0 {
+                isEnded = false
+                noPickContainerView.isHidden = true
                 
-                if pickList.count > 0 {
-                    noPickContainerView.isHidden = true
-                    var _pickList: [Pick] = []
-                    for (i, pick) in pickList.enumerated() {
-                        let index = i + 1
-                        _pickList.append(pick)
+                var _pickList: [Pick] = []
+                for (i, pick) in pickList.enumerated() {
+                    _pickList.append(pick)
+                    if ((i + 1) % 3 == 0 || ((i + 1) == pickList.count && _pickList.count > 0)) {
+                        let pgv = PhotoGroupView() // 은영이 의견 수렴
+//                        let pgv = PhotoGroupView(direction: ((i + 1) == pickList.count && _pickList.count > 0) ? 0 : .random(in: 0...2))
+                        pgv.pickList = _pickList
+                        pgv.delegate = self
                         
-                        if _pickList.count == 3 { // 3개가 쌓였을때
-                            let pgv = PhotoGroupView()
-                            pgv.pickList = _pickList
-                            pgv.delegate = self
-    
-                            pickContainerView.addSubview(pgv)
-                            pgv.leadingAnchor.constraint(equalTo: pickContainerView.leadingAnchor).isActive = true
-                            pgv.trailingAnchor.constraint(equalTo: pickContainerView.trailingAnchor).isActive = true
-                            
-                            if index / 3 == 1 { // 첫번째 pgv
-                                pgv.topAnchor.constraint(equalTo: pickContainerView.topAnchor).isActive = true
-                            } else { // 그 이후 pgv
-                                pgv.topAnchor.constraint(equalTo: pickContainerView.subviews[pickContainerView.subviews.count - 2].bottomAnchor, constant: 1).isActive = true
-                            }
-                            
-                            _pickList = []
-                        }
-                        
-                        if index == pickList.count { // 마지막 픽
-                            if _pickList.count > 0 { // 쌓아둔 픽이 있다면
-                                let pgv = PhotoGroupView()
-                                pgv.pickList = _pickList
-                                pgv.delegate = self
-                                pickContainerView.addSubview(pgv)
-                                pgv.leadingAnchor.constraint(equalTo: pickContainerView.leadingAnchor).isActive = true
-                                pgv.trailingAnchor.constraint(equalTo: pickContainerView.trailingAnchor).isActive = true
-                                
-                                if pickContainerView.subviews.count == 1 { // 첫번째 pgv
-                                    pgv.topAnchor.constraint(equalTo: pickContainerView.topAnchor, constant: 1).isActive = true
-                                } else {
-                                    pgv.topAnchor.constraint(equalTo: pickContainerView.subviews[pickContainerView.subviews.count - 2].bottomAnchor, constant: 1).isActive = true
-                                }
-                                
-                                pgv.bottomAnchor.constraint(equalTo: pickContainerView.bottomAnchor).isActive = true
-                                
-                            } else { // 없다면 마지막 pgv bottom cons 잡아주기
-                                pickContainerView.subviews[pickContainerView.subviews.count - 1].bottomAnchor.constraint(equalTo: pickContainerView.bottomAnchor).isActive = true
-                            }
-                        }
+                        pickStackView.addArrangedSubview(pgv)
+                        pgv.leadingAnchor.constraint(equalTo: pickStackView.leadingAnchor).isActive = true
+                        pgv.trailingAnchor.constraint(equalTo: pickStackView.trailingAnchor).isActive = true
+                        _pickList.removeAll()
                     }
-                    
-                } else {
-                    noPickContainerView.isHidden = false
                 }
+                
+            } else {
+                isEnded = true
+                if pickStackView.subviews.count == 1 { noPickContainerView.isHidden = false }
             }
         }
+        isLoading = false
     }
 }
 
-// MARK: Extension - Setting
-extension AccountViewController: SettingViewControllerProtocol {
-    func closeSettingVC() {
-        isOpenedChildVC = false
-    }
-}
-
-// MARK: Extension - GetUser
-extension AccountViewController: GetUserRequestProtocol {
-    func response(user: User?, getUser status: String) {
-        if status == "OK" {
-            if let user = user {
-                navigationItem.title = user.nickName
-                
-                profileImagePhotoView.setProfileImage(uId: user.id, profileImage: user.profileImage)
-                
-                followerCntLabel.text = String(user.followerCnt)
-                pickCntLabel.text = String(user.pickCnt)
-                
-                let isFollow = user.isFollow ?? "N"
-                if isFollow == "Y" {
-                    followButton.setTitle("팔로우 취소", for: UIControl.State.normal)
-                    followButton.tag = 2
-                } else {
-                    followButton.setTitle("팔로우", for: UIControl.State.normal)
-                    followButton.tag = 1
-                }
-                
-                if user.id != app.getUId() {
-                    app.addRecentUser(user: user)
-                }
-            }
-        }
-    }
-}
-
-// MARK: Extension - PhotoGroupView
-extension AccountViewController: PhotoGroupViewProtocol {
-    func openPick(pick: Pick) {
-        print("openPick", pick.id)
-    }
-}
-
-// MARK: Extension - PostingVCProtocol
-extension AccountViewController: PostingViewControllerProtocol {
-    func closePostingVC(isUploaded: Bool) {
-        isOpenedChildVC = false
-    }
-}
-
-// MARK: Extension - SearchUserTVCProtocol {
-extension AccountViewController: SearchUserTableViewControllerProtocol {
-    func closeSearchUserTVC() {
-        isOpenedChildVC = false
-    }
-}
-
-// MARK: Extension - FollowRequest
+// MARK: HTTP - Follow
 extension AccountViewController: FollowRequestProtocol {
     func response(follow status: String) {
+        print("[HTTP RES]", followRequest.apiUrl, status)
+
         if status == "OK" {
-            delegate?.reloadUser()
+            isFollow = (isFollow == "Y") ? "N" : "Y"
+            user?.isFollow = isFollow
+
+//            guard let user = self.user else { return }
+//            delegate?.follow(user: user)
+            delegate?.follow()
+            getUser()
+//            getUserRequest.fetch(vc: self, paramDict: ["uId": String(user.id)])
         }
     }
 }
 
-// MARK: Extension - SearchPlaceVC
-extension AccountViewController: SearchPlaceViewControllerProtocol {
-    func closeSearchPlaceVC(place: Place?) {
-        isOpenedChildVC = false
-    }
-}
-
-// MARK: Extension - PhotoVC
-extension AccountViewController: PhotoViewControllerProtocol {
-    func closePhotoViewVC() {
-        isOpenedChildVC = false
+// MARK: HTTP - GetUser
+extension AccountViewController: GetUserRequestProtocol {
+    func response(user: User?, getUser status: String) {
+        print("[HTTP RES]", getUserRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let user = user else { return }
+            
+            profileImageView.setProfileImage(uId: user.id, profileImage: user.profileImage ?? "")
+            nickNameLabel.text = user.nickName
+            pickCntLabel.text = "\(String(user.pickCnt))개"
+            followerCntLabel.text = String(user.followerCnt)
+            followingCntLabel.text = String(user.followingCnt)
+            likePickCntLabel.text = String(user.likePickCnt)
+            likePlaceCntLabel.text = String(user.likePlaceCnt)
+            
+            if user.id != app.getUId() {
+                isFollow = user.isFollow
+                app.addRecentUser(user: user)
+            }
+        }
     }
 }

@@ -62,7 +62,6 @@ class UploadImageRequest: HttpRequest {
                         self.delegate?.response(imageName: nil, uploadImage: "ERR_STATUS_DECODE")
                         return
                     }
-                    print("[HTTP RES]", self.apiUrl, status)
                     
                     if status != "OK" {
                         if isShowAlert { vc.requestErrorAlert(title: status) }

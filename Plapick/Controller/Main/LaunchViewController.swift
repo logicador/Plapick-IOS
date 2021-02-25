@@ -23,7 +23,6 @@ class LaunchViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
     lazy var logoImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "logo.png")
@@ -31,11 +30,10 @@ class LaunchViewController: UIViewController {
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
-    
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "PLAPICK"
-        label.font = UIFont.boldSystemFont(ofSize: 40)
+        label.font = .boldSystemFont(ofSize: 40)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -56,19 +54,20 @@ class LaunchViewController: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
             if self.app.isLogined() {
                 let user = self.app.getUser()
-                guard let type = user.type else {
-                    self.changeRootViewController(rootViewController: LoginViewController())
-                    return
-                }
+                
                 guard let socialId = user.socialId else {
                     self.changeRootViewController(rootViewController: LoginViewController())
                     return
                 }
                 
+                guard let type = user.type else {
+                    self.changeRootViewController(rootViewController: LoginViewController())
+                    return
+                }
+                
                 self.loginRequest.fetch(vc: self, paramDict: ["type": type, "socialId": socialId])
-            } else {
-                self.changeRootViewController(rootViewController: LoginViewController())
-            }
+                
+            } else { self.changeRootViewController(rootViewController: LoginViewController()) }
         }
     }
     
@@ -94,61 +93,63 @@ class LaunchViewController: UIViewController {
 }
 
 
-// MARK: Extension - Login
+// MARK: HTTP - Login
 extension LaunchViewController: LoginRequestProtocol {
     func response(user: User?, login status: String) {
+        print("[HTTP RES]", loginRequest.apiUrl, status)
+        
         if status == "OK" {
-            if let user = user {
-                app.login(user: user)
-                
-                getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
-            }
+            guard let user = user else { return }
+            app.login(user: user)
+            getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
         }
     }
 }
 
-// MARK: Extension - GetVersion
+// MARK: HTTP - GetVersion
 extension LaunchViewController: GetVersionRequestProtocol {
     func response(versionCode: Int?, versionName: String?, getVersion status: String) {
+        print("[HTTP RES]", getVersionRequest.apiUrl, status)
+        
         if status == "OK" {
             guard let versionCode = versionCode else { return }
             guard let versionName = versionName else { return }
-            
             app.setNewVersionCode(newVersionCode: versionCode)
             app.setNewVersionName(newVersionName: versionName)
             
             guard let infoDictionary = Bundle.main.infoDictionary else { return }
-            let code = infoDictionary["CFBundleVersion"] as? String
-            let name = infoDictionary["CFBundleShortVersionString"] as? String
-            if let versionCode = code {
-                if let curVersionCode = Int(versionCode) {
-                    app.setCurVersionCode(curVersionCode: curVersionCode)
-                }
-            }
-            if let curVersionName = name {
-                app.setCurVersionName(curVersionName: curVersionName)
-            }
+            guard let code = infoDictionary["CFBundleVersion"] as? String else { return }
+            guard let curVersionName = infoDictionary["CFBundleShortVersionString"] as? String else { return }
+            guard let curVersionCode = Int(code) else { return }
+            app.setCurVersionCode(curVersionCode: curVersionCode)
+            app.setCurVersionName(curVersionName: curVersionName)
             
             let pndId = app.getPndId()
-            if pndId.isEmpty {
-                changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
-            } else {
-                getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": pndId])
-            }
+            if pndId.isEmpty { changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController())) }
+            else { getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": pndId]) }
         }
     }
 }
 
-// MARK: Extension - GetPushNotificationDevice
+// MARK: HTTP - GetPushNotificationDevice
 extension LaunchViewController: GetPushNotificationDeviceRequestProtocol {
     func response(isAllowedFollow: String?, isAllowedMyPickComment: String?, isAllowedRecommendedPlace: String?, isAllowedAd: String?, isAllowedEventNotice: String?, getPushNotificationDevice status: String) {
+        print("[HTTP RES]", getPushNotificationDeviceRequest.apiUrl, status)
         
-        app.setPushNotification(key: "FOLLOW", value: isAllowedFollow ?? "Y")
-        app.setPushNotification(key: "MY_PICK_COMMENT", value: isAllowedMyPickComment ?? "Y")
-        app.setPushNotification(key: "RECOMMENDED_PLACE", value: isAllowedRecommendedPlace ?? "Y")
-        app.setPushNotification(key: "AD", value: isAllowedAd ?? "Y")
-        app.setPushNotification(key: "EVENT_NOTICE", value: isAllowedEventNotice ?? "Y")
-        
-        changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+        if status == "OK" {
+            guard let isAllowedFollow = isAllowedFollow else { return }
+            guard let isAllowedMyPickComment = isAllowedMyPickComment else { return }
+            guard let isAllowedRecommendedPlace = isAllowedRecommendedPlace else { return }
+            guard let isAllowedAd = isAllowedAd else { return }
+            guard let isAllowedEventNotice = isAllowedEventNotice else { return }
+            
+            app.setPushNotification(key: "FOLLOW", value: isAllowedFollow)
+            app.setPushNotification(key: "MY_PICK_COMMENT", value: isAllowedMyPickComment)
+            app.setPushNotification(key: "RECOMMENDED_PLACE", value: isAllowedRecommendedPlace)
+            app.setPushNotification(key: "AD", value: isAllowedAd)
+            app.setPushNotification(key: "EVENT_NOTICE", value: isAllowedEventNotice)
+            
+            changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+        }
     }
 }

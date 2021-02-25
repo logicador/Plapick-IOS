@@ -16,7 +16,6 @@ class SearchPlaceMapViewController: UIViewController {
     let app = App()
     let locationManager = CLLocationManager()
     var currentKeyword: String = ""
-    var tableViewBottomCons: NSLayoutConstraint?
     var kakaoPlaceList: [KakaoPlace] = []
     let getKakaoPlacesRequest = GetKakaoPlacesRequest()
     
@@ -66,7 +65,7 @@ class SearchPlaceMapViewController: UIViewController {
         button.layer.shadowOffset = CGSize(width: 0.0, height: 2.0) // 그림자 방향?
         button.layer.shadowRadius = SPACE_XS
         button.setTitle("이 위치에서 찾기", for: .normal)
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 16)
         button.contentEdgeInsets = UIEdgeInsets(top: (SPACE_S + 2), left: 0, bottom: (SPACE_S + 2), right: 0)
         button.addTarget(self, action: #selector(searchTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -77,15 +76,16 @@ class SearchPlaceMapViewController: UIViewController {
         let tv = UITableView()
         tv.register(KakaoPlaceTVCell.self, forCellReuseIdentifier: "KakaoPlaceTVCell")
         tv.separatorInset.left = SPACE
-        tv.tableFooterView = UIView(frame: CGRect.zero) // 빈 셀 안보이게
+        tv.tableFooterView = UIView(frame: .zero) // 빈 셀 안보이게
         tv.isHidden = true
+        tv.alpha = 0
         tv.dataSource = self
         tv.delegate = self
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
     }()
     
-    
+
     // MARK: ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,15 +96,12 @@ class SearchPlaceMapViewController: UIViewController {
         
         navigationItem.title = "지도에서 찾기"
         
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
         let searchController = UISearchController(searchResultsController: nil)
+        searchController.hidesNavigationBarDuringPresentation = false
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.setValue("취소", forKey: "cancelButtonText")
         searchController.searchBar.placeholder = "검색어를 입력해주세요."
         searchController.searchBar.delegate = self
-
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false // 스크롤 해도 검색창 안사라지게
         
@@ -159,8 +156,7 @@ class SearchPlaceMapViewController: UIViewController {
         tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        tableViewBottomCons = tableView.bottomAnchor.constraint(equalTo: mapView.topAnchor)
-        tableViewBottomCons?.isActive = true
+        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
@@ -207,36 +203,6 @@ class SearchPlaceMapViewController: UIViewController {
         searchPlaceVC.mode = "COORD"
         navigationController?.pushViewController(searchPlaceVC, animated: true)
     }
-    
-    @objc func keyboardWillShow(notification: NSNotification) {
-        // MARK: For DEV_DEBUG
-        currentKeyword = "가평"
-        navigationItem.searchController?.searchBar.text = "가평"
-        getKakaoPlacesRequest.fetch(vc: self, paramDict: ["keyword": "가평"])
-        
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            tableView.isHidden = false
-            tableViewBottomCons?.isActive = false
-            tableViewBottomCons = tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -keyboardSize.height)
-            tableViewBottomCons?.isActive = true
-            UIView.animate(withDuration: 0.2, animations: {
-                self.view.layoutIfNeeded()
-            })
-        }
-    }
-    
-    @objc func keyboardWillHide(notification: NSNotification) {
-        tableViewBottomCons?.isActive = false
-        tableViewBottomCons = tableView.bottomAnchor.constraint(equalTo: mapView.topAnchor)
-        tableViewBottomCons?.isActive = true
-        UIView.animate(withDuration: 0.2, animations: {
-            self.view.layoutIfNeeded()
-        }, completion: { (_) in
-            self.kakaoPlaceList.removeAll()
-            self.tableView.reloadData()
-            self.tableView.isHidden = true
-        })
-    }
 }
 
 
@@ -245,17 +211,12 @@ extension SearchPlaceMapViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         let keyword = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        // 2자 이상 (영어는 4자)
-        if keyword.utf8.count < 4 {
-            return
-        }
+        if keyword.count < 2 { return }
         
         // 한글 Char 거르기
         let wordList = Array(keyword)
         for word in wordList {
-            if KOR_CHAR_LIST.contains(word) {
-                return
-            }
+            if KOR_CHAR_LIST.contains(word) { return }
         }
         
         // 이미 검색한 키워드 (리스트에 뿌려놓음)
@@ -264,24 +225,41 @@ extension SearchPlaceMapViewController: UISearchBarDelegate {
         currentKeyword = keyword
         getKakaoPlacesRequest.fetch(vc: self, paramDict: ["keyword": keyword])
     }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        tableView.isHidden = false
+        UIView.animate(withDuration: 0.2, animations: {
+            self.tableView.alpha = 1
+        })
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        UIView.animate(withDuration: 0.2, animations: {
+            self.tableView.alpha = 0
+        }, completion: { (_) in
+            self.tableView.isHidden = true
+            self.kakaoPlaceList.removeAll()
+            self.tableView.reloadData()
+            self.currentKeyword = ""
+        })
+    }
 }
 
 // MARK: TableView
 extension SearchPlaceMapViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if kakaoPlaceList.count > 0 {
-            tableView.backgroundView = nil
-        } else {
+        if kakaoPlaceList.count > 0 { tableView.backgroundView = nil }
+        else {
             let bgView = UIView()
             
             let label = UILabel()
             label.text = "검색 결과가 없습니다."
-            label.font = UIFont.systemFont(ofSize: 16)
+            label.font = .systemFont(ofSize: 14)
             label.textColor = .systemGray
             label.translatesAutoresizingMaskIntoConstraints = false
             
             bgView.addSubview(label)
-            label.topAnchor.constraint(equalTo: bgView.topAnchor, constant: SCREEN_WIDTH / 2).isActive = true
+            label.topAnchor.constraint(equalTo: bgView.topAnchor, constant: SPACE_XXL).isActive = true
             label.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
             
             tableView.backgroundView = bgView
@@ -305,7 +283,12 @@ extension SearchPlaceMapViewController: UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigationItem.searchController?.isActive = false
+        dismissKeyboard()
+        UIView.animate(withDuration: 0.2, animations: {
+            self.tableView.alpha = 0
+        }, completion: { (_) in
+            self.tableView.isHidden = true
+        })
         
         let kakaoPlace = kakaoPlaceList[indexPath.row]
         guard let lat = Double(kakaoPlace.latitude) else { return }
@@ -321,6 +304,8 @@ extension SearchPlaceMapViewController: UITableViewDelegate, UITableViewDataSour
 // MARK: HTTP - GetKakaoPlaces
 extension SearchPlaceMapViewController: GetKakaoPlacesRequestProtocol {
     func response(kakaoPlaceList: [KakaoPlace]?, getKakaoPlaces status: String) {
+        print("[HTTP RES]", getKakaoPlacesRequest.apiUrl, status)
+        
         if status == "OK" {
             guard let kakaoPlaceList = kakaoPlaceList else { return }
             self.kakaoPlaceList = kakaoPlaceList

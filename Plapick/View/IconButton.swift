@@ -11,19 +11,17 @@ import UIKit
 class IconButton: UIButton {
     
     // MARK: Property
-    let iconWidth: CGFloat = 25
     var text: String? {
         didSet {
             guard let text = self.text else { return }
-            setTitle(text, for: UIControl.State.normal)
-            titleLabel?.font = UIFont.systemFont(ofSize: 18)
+            setTitle(text, for: .normal)
+            titleLabel?.font = .systemFont(ofSize: 16)
         }
     }
     var icon: String? {
         didSet {
             guard let icon = self.icon else { return }
             iconImageView.image = UIImage(systemName: icon)
-//            setImage(UIImage(systemName: icon), for: UIControl.State.normal)
         }
     }
     
@@ -43,16 +41,14 @@ class IconButton: UIButton {
         
         backgroundColor = .systemGray6
         layer.cornerRadius = SPACE_XS
-        contentEdgeInsets = UIEdgeInsets(top: SPACE, left: SPACE + iconWidth + SPACE_S, bottom: SPACE, right: 0)
+        contentEdgeInsets = UIEdgeInsets(top: SPACE_S, left: SPACE_S + 22 + SPACE_S, bottom: SPACE_S, right: 0)
         contentHorizontalAlignment = .left
         
         addSubview(iconImageView)
-        iconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: SPACE).isActive = true
+        iconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: SPACE_S).isActive = true
         iconImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        iconImageView.widthAnchor.constraint(equalToConstant: iconWidth).isActive = true
-        iconImageView.heightAnchor.constraint(equalToConstant: iconWidth).isActive = true
-        
-//        setThemeColor()
+        iconImageView.widthAnchor.constraint(equalToConstant: 22).isActive = true
+        iconImageView.heightAnchor.constraint(equalToConstant: 22).isActive = true
         
         translatesAutoresizingMaskIntoConstraints = false
     }
@@ -60,15 +56,4 @@ class IconButton: UIButton {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
-//    // MARK: Function
-//    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
-//    func setThemeColor() {
-//        if self.traitCollection.userInterfaceStyle == .dark {
-//            tintColor = .white
-//        } else {
-//            tintColor = .black
-//        }
-//    }
 }

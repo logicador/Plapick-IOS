@@ -12,48 +12,60 @@ import CoreLocation
 class SearchViewController: UIViewController {
     
     // MARK: Property
-    let placeSlideWidth: CGFloat = (SCREEN_WIDTH / 2) + (SPACE_XXS * 2)
-    let userSlideHeight: CGFloat = 72
-    var app = App()
-    var mainVC: MainViewController?
+    let app = App()
     let locationManager = CLLocationManager()
+    let placeSlideWidth: CGFloat = (SCREEN_WIDTH / 3) - (2 / 3) + (SPACE_XXS * 2)
+    let userSlideHeight: CGFloat = 40 + 12 + (SPACE_XS * 3)
     var recentPlaceList: [Place] = []
     var recentUserList: [User] = []
     
     
-    // MARK: VIew
+    // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
+        sv.alwaysBounceVertical = true
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
-    lazy var contentView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_XL
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     
     // MARK: View - Place
-    lazy var searchPlaceTitleView: TitleView = {
-        let tv = TitleView(text: "플레이스", style: .large)
-        return tv
+    lazy var searchPlaceTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "플레이스"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
-    lazy var searchPlaceContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var searchPlaceStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_S
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     lazy var searchPlaceKeywordIconButton: IconButton = {
-        let ib = IconButton(type: UIButton.ButtonType.system)
+        let ib = IconButton(type: .system)
         ib.text = "키워드로 검색"
         ib.icon = "keyboard"
-        ib.addTarget(self, action: #selector(searchPlaceKeywordTapped), for: UIControl.Event.touchUpInside)
+        ib.addTarget(self, action: #selector(searchPlaceKeywordTapped), for: .touchUpInside)
         return ib
     }()
     
+    // MARK: View - Place - Warning
     lazy var warningContainerView: UIView = {
         let view = UIView()
-        view.layer.borderWidth = 1
+        view.layer.borderWidth = LINE_WIDTH
         view.layer.borderColor = UIColor.mainColor.cgColor
         view.layer.cornerRadius = SPACE_XS
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -69,57 +81,66 @@ class SearchViewController: UIViewController {
     }()
     lazy var warningLabel: UILabel = {
         let label = UILabel()
-
-        let attrString = NSMutableAttributedString()
-            .thin("[", fontSize: 14)
-            .bold("내 위치 주변 탐색", fontSize: 14)
-            .thin(" / ", fontSize: 14)
-            .bold("지역으로 찾기", fontSize: 14)
-            .thin(" / ", fontSize: 14)
-            .bold("지도에서 찾기", fontSize: 14)
-            .thin("] 기능은 픽이 ", fontSize: 14)
-            .bold("1개 이상", fontSize: 14)
-            .thin(" 게시된 플레이스만 찾을 수 있습니다.", fontSize: 14)
-
-        label.attributedText = attrString
+        label.font = .systemFont(ofSize: 12)
+        label.text = "'내위치주변탐색' '지역으로찾기' '지도에서찾기' 기능은 '플레픽' 데이터베이스에 등록된 플레이스들만 찾을 수 있습니다.\n\n더 많은 검색 결과를 원하신다면 '키워드로 검색' 기능을 이용해주세요!"
+//        let mabs = NSMutableAttributedString()
+//            .bold("[내 위치 주변 탐색 / 지역으로 찾기 / 지도에서 찾기] ", fontSize: 12)
+//            .normal("기능은 픽이", fontSize: 12)
+//            .bold(" 1개 이상 ", fontSize: 12)
+//            .normal("게시된 플레이스만 찾을 수 있습니다.", fontSize: 12)
+//        label.attributedText = mabs
         label.numberOfLines = 0
-        label.setLineSpacing(lineSpacing: SPACE_XXS)
+//        label.setLineSpacing(lineSpacing: SPACE_XXS)
         label.textColor = .mainColor
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     lazy var searchPlaceGPSIconButton: IconButton = {
-        let ib = IconButton(type: UIButton.ButtonType.system)
+        let ib = IconButton(type: .system)
         ib.text = "내 위치 주변 탐색"
         ib.icon = "scope"
-        ib.addTarget(self, action: #selector(gpsTapped), for: UIControl.Event.touchUpInside)
+        ib.addTarget(self, action: #selector(searchPlaceGpsTapped), for: .touchUpInside)
         return ib
     }()
     lazy var searchPlaceLocationIconButton: IconButton = {
-        let ib = IconButton(type: UIButton.ButtonType.system)
+        let ib = IconButton(type: .system)
         ib.text = "지역으로 찾기"
         ib.icon = "location"
-        ib.addTarget(self, action: #selector(locationTapped), for: UIControl.Event.touchUpInside)
+        ib.addTarget(self, action: #selector(searchPlaceLocationTapped), for: .touchUpInside)
         return ib
     }()
     lazy var searchPlaceMapIconButton: IconButton = {
-        let ib = IconButton(type: UIButton.ButtonType.system)
+        let ib = IconButton(type: .system)
         ib.text = "지도에서 찾기"
         ib.icon = "map"
-        ib.addTarget(self, action: #selector(mapTapped), for: UIControl.Event.touchUpInside)
+        ib.addTarget(self, action: #selector(searchPlaceMapTapped), for: .touchUpInside)
         return ib
     }()
     
-    lazy var recentPlaceTitleView: TitleView = {
-        let tv = TitleView(text: "최근 본 플레이스", style: .ultraSmall, isAction: true, actionText: "모두 삭제", actionMode: "REMOVE_RECENT_PLACES")
-        tv.delegate = self
-        return tv
+    // MARK: View - Place - Recent
+    lazy var recentPlaceTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "최근 본 플레이스"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.isUserInteractionEnabled = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var removeAllRecentPlaceButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("모두 삭제", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.tintColor = .systemRed
+        button.addTarget(self, action: #selector(removeAllRecentPlaceTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     lazy var recentPlaceCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        let cv = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.alwaysBounceHorizontal = true
         cv.backgroundColor = .systemBackground
         cv.register(PlaceCVCell.self, forCellWithReuseIdentifier: "PlaceCVCell")
         cv.showsHorizontalScrollIndicator = false
@@ -130,27 +151,44 @@ class SearchViewController: UIViewController {
     }()
     
     // MARK: View - User
-    lazy var searchUserTitleView: TitleView = {
-        let tv = TitleView(text: "다른사람", style: .large)
-        return tv
+    lazy var searchUserTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "다른사람"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     lazy var searchUserNickNameIconButton: IconButton = {
-        let ib = IconButton(type: UIButton.ButtonType.system)
+        let ib = IconButton(type: .system)
         ib.text = "닉네임으로 검색"
         ib.icon = "person.2"
-        ib.addTarget(self, action: #selector(searchUserNickNameTapped), for: UIControl.Event.touchUpInside)
+        ib.addTarget(self, action: #selector(searchUserNickNameTapped), for: .touchUpInside)
         return ib
     }()
     
-    lazy var recentUserTitleView: TitleView = {
-        let tv = TitleView(text: "최근 본 다른사람", style: .ultraSmall, isAction: true, actionText: "모두 삭제", actionMode: "REMOVE_RECENT_USERS")
-        tv.delegate = self
-        return tv
+    // MARK: View - User - Recent
+    lazy var recentUserTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "최근 본 다른사람"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.isUserInteractionEnabled = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var removeAllRecentUserButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("모두 삭제", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.tintColor = .systemRed
+        button.addTarget(self, action: #selector(removeAllRecentUserTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     lazy var recentUserCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         let cv = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        cv.alwaysBounceHorizontal = true
         cv.backgroundColor = .systemBackground
         cv.showsHorizontalScrollIndicator = false
         cv.register(UserCVCell.self, forCellWithReuseIdentifier: "UserCVCell")
@@ -159,17 +197,6 @@ class SearchViewController: UIViewController {
         cv.translatesAutoresizingMaskIntoConstraints = false
         return cv
     }()
-    
-    
-    // MARK: Init
-    init(mainVC: MainViewController) {
-        super.init(nibName: nil, bundle: nil)
-        self.mainVC = mainVC
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     
     // MARK: ViewDidLoad
@@ -188,14 +215,9 @@ class SearchViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        mainVC?.title = "검색"
-        if mainVC?.navigationItem.leftBarButtonItem != nil { mainVC?.navigationItem.leftBarButtonItem = nil }
-        if mainVC?.navigationItem.rightBarButtonItem != nil { mainVC?.navigationItem.rightBarButtonItem = nil }
-        
         recentPlaceList = app.getRecentPlaceList().reversed()
-        recentPlaceCollectionView.reloadData()
-        
         recentUserList = app.getRecentUserList().reversed()
+        recentPlaceCollectionView.reloadData()
         recentUserCollectionView.reloadData()
     }
     
@@ -208,97 +230,91 @@ class SearchViewController: UIViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        scrollView.addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        scrollView.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: SPACE_XL).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -SPACE_XL).isActive = true
         
         // MARK: ConfigureView - Place
-        contentView.addSubview(searchPlaceTitleView)
-        searchPlaceTitleView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        searchPlaceTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        searchPlaceTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.addArrangedSubview(searchPlaceTitleLabel)
+        searchPlaceTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        searchPlaceTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(searchPlaceContainerView)
-        searchPlaceContainerView.topAnchor.constraint(equalTo: searchPlaceTitleView.bottomAnchor).isActive = true
-        searchPlaceContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        searchPlaceContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        stackView.addArrangedSubview(searchPlaceStackView)
+        searchPlaceStackView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        searchPlaceStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
-        searchPlaceContainerView.addSubview(searchPlaceKeywordIconButton)
-        searchPlaceKeywordIconButton.topAnchor.constraint(equalTo: searchPlaceContainerView.topAnchor).isActive = true
-        searchPlaceKeywordIconButton.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
-        searchPlaceKeywordIconButton.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
+        searchPlaceStackView.addArrangedSubview(searchPlaceKeywordIconButton)
+        searchPlaceKeywordIconButton.leadingAnchor.constraint(equalTo: searchPlaceStackView.leadingAnchor).isActive = true
+        searchPlaceKeywordIconButton.trailingAnchor.constraint(equalTo: searchPlaceStackView.trailingAnchor).isActive = true
         
-        searchPlaceContainerView.addSubview(warningContainerView)
-        warningContainerView.topAnchor.constraint(equalTo: searchPlaceKeywordIconButton.bottomAnchor, constant: SPACE_L).isActive = true
-        warningContainerView.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
-        warningContainerView.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
-
+        // MARK: ConfigureView - Place - Warning
+        searchPlaceStackView.addArrangedSubview(warningContainerView)
+        warningContainerView.leadingAnchor.constraint(equalTo: searchPlaceStackView.leadingAnchor).isActive = true
+        warningContainerView.trailingAnchor.constraint(equalTo: searchPlaceStackView.trailingAnchor).isActive = true
+        
         warningContainerView.addSubview(warningImageView)
-        warningImageView.leadingAnchor.constraint(equalTo: warningContainerView.leadingAnchor, constant: SPACE).isActive = true
-        warningImageView.widthAnchor.constraint(equalToConstant: 25).isActive = true
-        warningImageView.heightAnchor.constraint(equalToConstant: 25).isActive = true
+        warningImageView.centerYAnchor.constraint(equalTo: warningContainerView.centerYAnchor).isActive = true
+        warningImageView.leadingAnchor.constraint(equalTo: warningContainerView.leadingAnchor, constant: SPACE_S).isActive = true
+        warningImageView.widthAnchor.constraint(equalToConstant: 22).isActive = true
+        warningImageView.heightAnchor.constraint(equalToConstant: 22).isActive = true
 
         warningContainerView.addSubview(warningLabel)
         warningLabel.topAnchor.constraint(equalTo: warningContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        warningLabel.leadingAnchor.constraint(equalTo: warningImageView.trailingAnchor, constant: SPACE_S).isActive = true
+        warningLabel.leadingAnchor.constraint(equalTo: warningContainerView.leadingAnchor, constant: SPACE_S + 22 + SPACE_S).isActive = true
         warningLabel.trailingAnchor.constraint(equalTo: warningContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
         warningLabel.bottomAnchor.constraint(equalTo: warningContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
-
-        warningImageView.centerYAnchor.constraint(equalTo: warningLabel.centerYAnchor).isActive = true
         
-        searchPlaceContainerView.addSubview(searchPlaceGPSIconButton)
-        searchPlaceGPSIconButton.topAnchor.constraint(equalTo: warningContainerView.bottomAnchor, constant: SPACE_S).isActive = true
-//        searchPlaceGPSIconButton.topAnchor.constraint(equalTo: searchPlaceKeywordIconButton.bottomAnchor, constant: SPACE_S).isActive = true
-        searchPlaceGPSIconButton.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
-        searchPlaceGPSIconButton.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
+        searchPlaceStackView.addArrangedSubview(searchPlaceGPSIconButton)
+        searchPlaceGPSIconButton.leadingAnchor.constraint(equalTo: searchPlaceStackView.leadingAnchor).isActive = true
+        searchPlaceGPSIconButton.trailingAnchor.constraint(equalTo: searchPlaceStackView.trailingAnchor).isActive = true
         
-        searchPlaceContainerView.addSubview(searchPlaceLocationIconButton)
-        searchPlaceLocationIconButton.topAnchor.constraint(equalTo: searchPlaceGPSIconButton.bottomAnchor, constant: SPACE_S).isActive = true
-        searchPlaceLocationIconButton.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
-        searchPlaceLocationIconButton.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
+        searchPlaceStackView.addArrangedSubview(searchPlaceLocationIconButton)
+        searchPlaceLocationIconButton.leadingAnchor.constraint(equalTo: searchPlaceStackView.leadingAnchor).isActive = true
+        searchPlaceLocationIconButton.trailingAnchor.constraint(equalTo: searchPlaceStackView.trailingAnchor).isActive = true
         
-        searchPlaceContainerView.addSubview(searchPlaceMapIconButton)
-        searchPlaceMapIconButton.topAnchor.constraint(equalTo: searchPlaceLocationIconButton.bottomAnchor, constant: SPACE_S).isActive = true
-        searchPlaceMapIconButton.leadingAnchor.constraint(equalTo: searchPlaceContainerView.leadingAnchor).isActive = true
-        searchPlaceMapIconButton.trailingAnchor.constraint(equalTo: searchPlaceContainerView.trailingAnchor).isActive = true
-        searchPlaceMapIconButton.bottomAnchor.constraint(equalTo: searchPlaceContainerView.bottomAnchor).isActive = true
+        searchPlaceStackView.addArrangedSubview(searchPlaceMapIconButton)
+        searchPlaceMapIconButton.leadingAnchor.constraint(equalTo: searchPlaceStackView.leadingAnchor).isActive = true
+        searchPlaceMapIconButton.trailingAnchor.constraint(equalTo: searchPlaceStackView.trailingAnchor).isActive = true
         
-        contentView.addSubview(recentPlaceTitleView)
-        recentPlaceTitleView.topAnchor.constraint(equalTo: searchPlaceContainerView.bottomAnchor).isActive = true
-        recentPlaceTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        recentPlaceTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        // MARK: View - Place - Recent
+        stackView.addArrangedSubview(recentPlaceTitleLabel)
+        recentPlaceTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        recentPlaceTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(recentPlaceCollectionView)
-        recentPlaceCollectionView.topAnchor.constraint(equalTo: recentPlaceTitleView.bottomAnchor).isActive = true
-        recentPlaceCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        recentPlaceCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        recentPlaceTitleLabel.addSubview(removeAllRecentPlaceButton)
+        removeAllRecentPlaceButton.centerYAnchor.constraint(equalTo: recentPlaceTitleLabel.centerYAnchor).isActive = true
+        removeAllRecentPlaceButton.trailingAnchor.constraint(equalTo: recentPlaceTitleLabel.trailingAnchor).isActive = true
+        
+        stackView.addArrangedSubview(recentPlaceCollectionView)
+        recentPlaceCollectionView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
         recentPlaceCollectionView.heightAnchor.constraint(equalToConstant: placeSlideWidth).isActive = true
+        recentPlaceCollectionView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
         
         // MARK: ConfigureView - User
-        contentView.addSubview(searchUserTitleView)
-        searchUserTitleView.topAnchor.constraint(equalTo: recentPlaceCollectionView.bottomAnchor).isActive = true
-        searchUserTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        searchUserTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.addArrangedSubview(searchUserTitleLabel)
+        searchUserTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        searchUserTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(searchUserNickNameIconButton)
-        searchUserNickNameIconButton.topAnchor.constraint(equalTo: searchUserTitleView.bottomAnchor).isActive = true
-        searchUserNickNameIconButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        searchUserNickNameIconButton.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        stackView.addArrangedSubview(searchUserNickNameIconButton)
+        searchUserNickNameIconButton.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        searchUserNickNameIconButton.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
-        contentView.addSubview(recentUserTitleView)
-        recentUserTitleView.topAnchor.constraint(equalTo: searchUserNickNameIconButton.bottomAnchor).isActive = true
-        recentUserTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        recentUserTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        // MARK: ConfigureView - User - Recent
+        stackView.addArrangedSubview(recentUserTitleLabel)
+        recentUserTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        recentUserTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(recentUserCollectionView)
-        recentUserCollectionView.topAnchor.constraint(equalTo: recentUserTitleView.bottomAnchor).isActive = true
-        recentUserCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        recentUserCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        recentUserTitleLabel.addSubview(removeAllRecentUserButton)
+        removeAllRecentUserButton.centerYAnchor.constraint(equalTo: recentUserTitleLabel.centerYAnchor).isActive = true
+        removeAllRecentUserButton.trailingAnchor.constraint(equalTo: recentUserTitleLabel.trailingAnchor).isActive = true
+        
+        stackView.addArrangedSubview(recentUserCollectionView)
+        recentUserCollectionView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
         recentUserCollectionView.heightAnchor.constraint(equalToConstant: userSlideHeight).isActive = true
-        recentUserCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -SPACE_XL).isActive = true
+        recentUserCollectionView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
@@ -308,13 +324,7 @@ class SearchViewController: UIViewController {
         navigationController?.pushViewController(searchPlaceVC, animated: true)
     }
     
-    @objc func searchUserNickNameTapped() {
-        let searchUserTVC = SearchUserTableViewController()
-        searchUserTVC.mode = "KEYWORD"
-        navigationController?.pushViewController(searchUserTVC, animated: true)
-    }
-    
-    @objc func gpsTapped() {
+    @objc func searchPlaceGpsTapped() {
         let status = CLLocationManager.authorizationStatus()
         
         if status == .notDetermined {
@@ -328,8 +338,8 @@ class SearchViewController: UIViewController {
             locationManager.startUpdatingLocation()
             
             guard let location = locationManager.location else {
-                let alert = UIAlertController(title: "위치정보", message: "사용자의 위치 정보를 가져올 수 없습니다. 다시 시도해주세요.", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "닫기", style: UIAlertAction.Style.cancel))
+                let alert = UIAlertController(title: "위치정보", message: "사용자의 위치 정보를 가져올 수 없습니다. 다시 시도해주세요.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
                 present(alert, animated: true, completion: nil)
                 return
             }
@@ -347,72 +357,90 @@ class SearchViewController: UIViewController {
         }
     }
     
-    @objc func locationTapped() {
-        let locationVC = LocationViewController()
-        navigationController?.pushViewController(locationVC, animated: true)
+    @objc func searchPlaceLocationTapped() {
+        let searchPlacelocationVC = SearchPlaceLocationViewController()
+        navigationController?.pushViewController(searchPlacelocationVC, animated: true)
     }
     
-    @objc func mapTapped() {
+    @objc func searchPlaceMapTapped() {
         let searchPlaceMapVC = SearchPlaceMapViewController()
         navigationController?.pushViewController(searchPlaceMapVC, animated: true)
     }
-}
-
-
-// MARK: TitleView
-extension SearchViewController: TitleViewProtocol {
-    func action(actionMode: String) {
-        if actionMode == "REMOVE_RECENT_PLACES" {
-            app.removeAllRecentPlaceList()
-            recentPlaceList.removeAll()
-            recentPlaceCollectionView.reloadData()
-            
-        } else if actionMode == "REMOVE_RECENT_USERS" {
-            app.removeAllRecentUserList()
-            recentUserList.removeAll()
-            recentUserCollectionView.reloadData()
-        }
+    
+    @objc func removeAllRecentPlaceTapped() {
+        app.removeAllRecentPlaceList()
+        recentPlaceList.removeAll()
+        recentPlaceCollectionView.reloadData()
+    }
+    
+    @objc func searchUserNickNameTapped() {
+        let searchUserVC = SearchUserViewController()
+        searchUserVC.mode = "KEYWORD"
+        navigationController?.pushViewController(searchUserVC, animated: true)
+    }
+    
+    @objc func removeAllRecentUserTapped() {
+        app.removeAllRecentUserList()
+        recentUserList.removeAll()
+        recentUserCollectionView.reloadData()
     }
 }
 
 // MARK: CollectionView
 extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
         if collectionView == recentPlaceCollectionView {
-            if recentPlaceList.count > 0 {
-                collectionView.backgroundView = nil
-            } else {
+            if recentPlaceList.count > 0 { collectionView.backgroundView = nil }
+            else {
                 let bgView = UIView()
+                
+                let view = UIView()
+                view.layer.cornerRadius = SPACE_XS
+                view.backgroundColor = .systemGray6
+                view.translatesAutoresizingMaskIntoConstraints = false
+                bgView.addSubview(view)
+                view.topAnchor.constraint(equalTo: bgView.topAnchor).isActive = true
+                view.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
+                view.widthAnchor.constraint(equalTo: bgView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+                view.bottomAnchor.constraint(equalTo: bgView.bottomAnchor).isActive = true
                 
                 let label = UILabel()
                 label.text = "최근 본 플레이스가 없습니다."
-                label.font = UIFont.systemFont(ofSize: 14)
+                label.font = .systemFont(ofSize: 14)
                 label.textColor = .systemGray
                 label.translatesAutoresizingMaskIntoConstraints = false
-                
-                bgView.addSubview(label)
-                label.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
-                label.centerYAnchor.constraint(equalTo: bgView.centerYAnchor).isActive = true
+                view.addSubview(label)
+                label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+                label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
                 
                 collectionView.backgroundView = bgView
             }
             return recentPlaceList.count
             
         } else {
-            if recentUserList.count > 0 {
-                collectionView.backgroundView = nil
-            } else {
+            if recentUserList.count > 0 { collectionView.backgroundView = nil }
+            else {
                 let bgView = UIView()
+                
+                let view = UIView()
+                view.layer.cornerRadius = SPACE_XS
+                view.backgroundColor = .systemGray6
+                view.translatesAutoresizingMaskIntoConstraints = false
+                bgView.addSubview(view)
+                view.topAnchor.constraint(equalTo: bgView.topAnchor).isActive = true
+                view.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
+                view.widthAnchor.constraint(equalTo: bgView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+                view.bottomAnchor.constraint(equalTo: bgView.bottomAnchor).isActive = true
                 
                 let label = UILabel()
                 label.text = "최근 본 다른사람이 없습니다."
-                label.font = UIFont.systemFont(ofSize: 14)
+                label.font = .systemFont(ofSize: 14)
                 label.textColor = .systemGray
                 label.translatesAutoresizingMaskIntoConstraints = false
-                
-                bgView.addSubview(label)
-                label.centerXAnchor.constraint(equalTo: bgView.centerXAnchor).isActive = true
-                label.centerYAnchor.constraint(equalTo: bgView.centerYAnchor).isActive = true
+                view.addSubview(label)
+                label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+                label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
                 
                 collectionView.backgroundView = bgView
             }
@@ -421,6 +449,7 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
         if collectionView == recentPlaceCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PlaceCVCell", for: indexPath) as! PlaceCVCell
             cell.place = recentPlaceList[indexPath.row]
@@ -441,20 +470,21 @@ extension SearchViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == recentPlaceCollectionView {
-            return CGSize(width: placeSlideWidth, height: placeSlideWidth)
-        } else {
-            return CGSize(width: view.frame.width * 0.3, height: userSlideHeight)
-        }
+        if collectionView == recentPlaceCollectionView { return CGSize(width: placeSlideWidth, height: placeSlideWidth) }
+        else { return CGSize(width: view.frame.width * 0.3, height: userSlideHeight) }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
         if collectionView == recentPlaceCollectionView {
-            let placeVC = PlaceViewController(place: recentPlaceList[indexPath.row])
+            let placeVC = PlaceViewController()
+            placeVC.place = recentPlaceList[indexPath.row]
             navigationController?.pushViewController(placeVC, animated: true)
+            
         } else {
-            let accountVC = AccountViewController(uId: recentUserList[indexPath.row].id)
-            present(UINavigationController(rootViewController: accountVC), animated: true, completion: nil)
+            let accountVC = AccountViewController()
+            accountVC.user = recentUserList[indexPath.row]
+            navigationController?.pushViewController(accountVC, animated: true)
         }
     }
 }

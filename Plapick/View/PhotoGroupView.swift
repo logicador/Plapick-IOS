@@ -11,36 +11,83 @@ import SDWebImage
 
 // MARK: Protocol
 protocol PhotoGroupViewProtocol {
-    func openPick(pick: Pick)
+    func detailPick(pick: Pick)
 }
 
 
 class PhotoGroupView: UIView {
     
-    // MARK: Properties
+    // MARK: Property
     var app = App()
     var delegate: PhotoGroupViewProtocol?
-    let photoSize = (UIScreen.main.bounds.size.width / 3) - (2 / 3)
-    var photoViewList: [PhotoView] = [PhotoView(), PhotoView(), PhotoView()]
+    let imageSize = (SCREEN_WIDTH / 3) - (2 / 3)
+//    var photoViewList: [PhotoView] = [PhotoView(), PhotoView(), PhotoView()]
     var pickList: [Pick] = [] {
         didSet {
-            for (i, pick) in self.pickList.enumerated() {
-                if let url = URL(string: app.getPickUrl(id: pick.id, uId: pick.uId)) {
-                    photoViewList[i].sd_setImage(with: url, completed: nil)
-                }
+            if pickList.count > 0 {
+                guard let url = URL(string: "\(IMAGE_URL)/users/\(pickList[0].uId)/\(pickList[0].id).jpg") else { return }
+                iv1.sd_setImage(with: url, completed: nil)
             }
+            
+            if pickList.count > 1 {
+                guard let url = URL(string: "\(IMAGE_URL)/users/\(pickList[1].uId)/\(pickList[1].id).jpg") else { return }
+                iv2.sd_setImage(with: url, completed: nil)
+            }
+            
+            if pickList.count > 2 {
+                guard let url = URL(string: "\(IMAGE_URL)/users/\(pickList[2].uId)/\(pickList[2].id).jpg") else { return }
+                iv3.sd_setImage(with: url, completed: nil)
+            }
+            
+//            for (i, pick) in self.pickList.enumerated() {
+//                if let url = URL(string: "\(IMAGE_URL)/users/\(pick.uId)/\(pick.id).jpg") {
+//                    photoViewList[i].sd_setImage(with: url, completed: nil)
+//                }
+//            }
         }
     }
     
     
+    // MARK: View
+    lazy var iv1: UIImageView = {
+        let iv = UIImageView()
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(iv1Tapped)))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    lazy var iv2: UIImageView = {
+        let iv = UIImageView()
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(iv2Tapped)))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    lazy var iv3: UIImageView = {
+        let iv = UIImageView()
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(iv3Tapped)))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    
+    
     // MARK: Init
-    init(direction: String = "N") {
+    init(direction: Int = 0) {
         super.init(frame: CGRect.zero)
         
-        let emptyPick = Pick(id: 0, uId: 0, pId: 0, message: "", createdDate: "", updatedDate: "")
-        self.pickList = [emptyPick, emptyPick, emptyPick]
+//        let emptyPick = Pick(id: 0, uId: 0, pId: 0, message: "", createdDate: "", updatedDate: "")
+//        self.pickList = [emptyPick, emptyPick, emptyPick]
         
         configureView(direction: direction)
+        
+        translatesAutoresizingMaskIntoConstraints = false
     }
     
     required init?(coder: NSCoder) {
@@ -49,93 +96,88 @@ class PhotoGroupView: UIView {
     
     
     // MARK: Function
-    func configureView(direction: String) {
-        for photoView in photoViewList {
-            addSubview(photoView)
-        }
+    func configureView(direction: Int) {
+        addSubview(iv1)
+        addSubview(iv2)
+        addSubview(iv3)
+//        for photoView in photoViewList {
+//            addSubview(photoView)
+//        }
         
-        if direction == "L" {
+        if direction == 1 {
             configureL()
-        } else if direction == "R" {
+        } else if direction == 2 {
             configureR()
         } else {
             configureN()
         }
-        
-        photoViewList[0].addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(photoView1Tapped)))
-        photoViewList[1].addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(photoView2Tapped)))
-        photoViewList[2].addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(photoView3Tapped)))
-        
-        translatesAutoresizingMaskIntoConstraints = false
     }
     
     func configureN() {
-        photoViewList[0].topAnchor.constraint(equalTo: topAnchor).isActive = true
-        photoViewList[0].bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        photoViewList[0].widthAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[0].heightAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[0].leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv1.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        iv1.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv1.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv1.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv1.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
-        photoViewList[1].topAnchor.constraint(equalTo: topAnchor).isActive = true
-        photoViewList[1].bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        photoViewList[1].widthAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[1].heightAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[1].centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        iv2.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        iv2.centerYAnchor.constraint(equalTo: iv1.centerYAnchor).isActive = true
+        iv2.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv2.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
         
-        photoViewList[2].topAnchor.constraint(equalTo: topAnchor).isActive = true
-        photoViewList[2].bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        photoViewList[2].widthAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[2].heightAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[2].trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        iv3.centerYAnchor.constraint(equalTo: iv1.centerYAnchor).isActive = true
+        iv3.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        iv3.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv3.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
     }
     
     func configureL() {
-        photoViewList[0].topAnchor.constraint(equalTo: topAnchor).isActive = true
-        photoViewList[0].bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        photoViewList[0].widthAnchor.constraint(equalToConstant: (photoSize * 2) + 1).isActive = true
-        photoViewList[0].heightAnchor.constraint(equalToConstant: (photoSize * 2) + 1).isActive = true
-        photoViewList[0].leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv1.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        iv1.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv1.widthAnchor.constraint(equalToConstant: (imageSize * 2) + 1).isActive = true
+        iv1.heightAnchor.constraint(equalToConstant: (imageSize * 2) + 1).isActive = true
+        iv1.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
-        photoViewList[1].topAnchor.constraint(equalTo: topAnchor).isActive = true
-        photoViewList[1].widthAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[1].heightAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[1].trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-
-        photoViewList[2].topAnchor.constraint(equalTo: photoViewList[1].bottomAnchor, constant: 1).isActive = true
-        photoViewList[2].widthAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[2].heightAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[2].trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        iv2.topAnchor.constraint(equalTo: iv1.topAnchor).isActive = true
+        iv2.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        iv2.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv2.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+        
+        iv3.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        iv3.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv3.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv3.bottomAnchor.constraint(equalTo: iv1.bottomAnchor).isActive = true
     }
     
     func configureR() {
-        photoViewList[0].topAnchor.constraint(equalTo: topAnchor).isActive = true
-        photoViewList[0].widthAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[0].heightAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[0].leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv3.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        iv3.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        iv3.widthAnchor.constraint(equalToConstant: (imageSize * 2) + 1).isActive = true
+        iv3.heightAnchor.constraint(equalToConstant: (imageSize * 2) + 1).isActive = true
+        iv3.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
-        photoViewList[1].topAnchor.constraint(equalTo: photoViewList[0].bottomAnchor, constant: 1).isActive = true
-        photoViewList[1].widthAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[1].heightAnchor.constraint(equalToConstant: photoSize).isActive = true
-        photoViewList[1].leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv1.topAnchor.constraint(equalTo: iv3.topAnchor).isActive = true
+        iv1.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv1.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv1.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
         
-        photoViewList[2].topAnchor.constraint(equalTo: topAnchor).isActive = true
-        photoViewList[2].bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        photoViewList[2].widthAnchor.constraint(equalToConstant: (photoSize * 2) + 1).isActive = true
-        photoViewList[2].heightAnchor.constraint(equalToConstant: (photoSize * 2) + 1).isActive = true
-        photoViewList[2].trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        iv2.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        iv2.widthAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv2.heightAnchor.constraint(equalToConstant: imageSize).isActive = true
+        iv2.bottomAnchor.constraint(equalTo: iv3.bottomAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
-    @objc func photoView1Tapped() {
+    @objc func iv1Tapped() {
         if pickList.count < 1 { return }
-        delegate?.openPick(pick: pickList[0])
+        delegate?.detailPick(pick: pickList[0])
     }
-    @objc func photoView2Tapped() {
+    @objc func iv2Tapped() {
         if pickList.count < 2 { return }
-        delegate?.openPick(pick: pickList[1])
+        delegate?.detailPick(pick: pickList[1])
     }
-    @objc func photoView3Tapped() {
+    @objc func iv3Tapped() {
         if pickList.count < 3 { return }
-        delegate?.openPick(pick: pickList[2])
+        delegate?.detailPick(pick: pickList[2])
     }
 }

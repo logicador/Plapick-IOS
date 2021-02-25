@@ -16,7 +16,7 @@ class MostPickSmallCVCell: UICollectionViewCell {
         didSet {
             guard let mostPick = self.mostPick else { return }
             
-            if let url = URL(string: app.getPickUrl(id: mostPick.id, uId: mostPick.uId)) {
+            if let url = URL(string: "\(IMAGE_URL)/users/\(mostPick.uId)/\(mostPick.id).jpg") {
                 photoView.sd_setImage(with: url, completed: nil)
             }
         }

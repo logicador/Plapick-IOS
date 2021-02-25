@@ -10,15 +10,15 @@
 		253117AEAEF1DA27906323F1 /* Pods_Plapick.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E39571607D70074FC00EBC1F /* Pods_Plapick.framework */; };
 		5701EFD125BFD22600AA4E0F /* LikePlaceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5701EFD025BFD22600AA4E0F /* LikePlaceRequest.swift */; };
 		5701EFD525BFE84F00AA4E0F /* AddPlaceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5701EFD425BFE84F00AA4E0F /* AddPlaceRequest.swift */; };
-		5708BFA025C009F700C3271E /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5708BF9F25C009F700C3271E /* TestViewController.swift */; };
 		570B3AE025BF333C0028424D /* SearchPlaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570B3ADF25BF333C0028424D /* SearchPlaceViewController.swift */; };
 		570B3AE525BF34F60028424D /* PlaceMediumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 570B3AE425BF34F60028424D /* PlaceMediumView.swift */; };
+		5710A7D825CD99E7000C5D8D /* QnaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5710A7D725CD99E7000C5D8D /* QnaViewController.swift */; };
+		5710A7DC25CDA170000C5D8D /* QnaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5710A7DB25CDA170000C5D8D /* QnaView.swift */; };
+		5710A7DF25CDA1D6000C5D8D /* Qna.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5710A7DE25CDA1D6000C5D8D /* Qna.swift */; };
 		57266D3225C6BE82004C8187 /* MostPickLargeCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57266D3125C6BE82004C8187 /* MostPickLargeCVCell.swift */; };
 		57266D3625C6C3D3004C8187 /* MostPickSmallCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57266D3525C6C3D3004C8187 /* MostPickSmallCVCell.swift */; };
 		57266D4025C70FB8004C8187 /* GetPlaceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57266D3F25C70FB8004C8187 /* GetPlaceRequest.swift */; };
 		572D31E125A579AD00A93FD9 /* Pick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572D31E025A579AD00A93FD9 /* Pick.swift */; };
-		572D31E725A5AAFF00A93FD9 /* ParentLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572D31E625A5AAFF00A93FD9 /* ParentLocationView.swift */; };
-		572D31EA25A5AB0900A93FD9 /* ChildLocationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 572D31E925A5AB0900A93FD9 /* ChildLocationView.swift */; };
 		5738649225BD29F10025AF1A /* HttpResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5738649125BD29F10025AF1A /* HttpResponse.swift */; };
 		5738649925BD325E0025AF1A /* HttpRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5738649825BD325E0025AF1A /* HttpRequest.swift */; };
 		5738649E25BD4E320025AF1A /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5738649D25BD4E320025AF1A /* MainViewController.swift */; };
@@ -29,7 +29,7 @@
 		573E42EB25CAB69300D6231A /* ParentLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E42EA25CAB69300D6231A /* ParentLocation.swift */; };
 		573E42EE25CAB6DA00D6231A /* ChildLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E42ED25CAB6DA00D6231A /* ChildLocation.swift */; };
 		573E42FF25CAF67A00D6231A /* RemoveCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 573E42FE25CAF67A00D6231A /* RemoveCommentRequest.swift */; };
-		5757008625A5DA6B006D5931 /* SearchPlaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5757008525A5DA6B006D5931 /* SearchPlaceView.swift */; };
+		574ADFB625CBB397001EAC7B /* NoDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574ADFB525CBB397001EAC7B /* NoDataView.swift */; };
 		5759EBC625BEA1DF007497F6 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5759EBC525BEA1DF007497F6 /* SearchViewController.swift */; };
 		5759EBD725BEE7F4007497F6 /* GetPlacesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5759EBD625BEE7F4007497F6 /* GetPlacesRequest.swift */; };
 		57755BB325B3F91400CF0849 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57755BB225B3F91400CF0849 /* UserNotifications.framework */; };
@@ -37,6 +37,9 @@
 		57755BBD25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */; };
 		57755BCF25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BCE25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift */; };
 		57755BD525B47F4B00CF0849 /* PickViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57755BD425B47F4B00CF0849 /* PickViewController.swift */; };
+		5778BBB625E0DCEE00377A52 /* WriteQnaViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5778BBB525E0DCEE00377A52 /* WriteQnaViewController.swift */; };
+		5778BBBA25E0F1F500377A52 /* AddQnaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5778BBB925E0F1F500377A52 /* AddQnaRequest.swift */; };
+		5778BBBD25E0F3EA00377A52 /* GetQnasRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5778BBBC25E0F3EA00377A52 /* GetQnasRequest.swift */; };
 		577A87CD25C9228900ABC145 /* AddCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577A87CC25C9228900ABC145 /* AddCommentRequest.swift */; };
 		577A87D125C9634300ABC145 /* SearchPlaceMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577A87D025C9634300ABC145 /* SearchPlaceMapViewController.swift */; };
 		5780FD8F25C13DE0002F89F2 /* PlaceSmallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5780FD8E25C13DE0002F89F2 /* PlaceSmallView.swift */; };
@@ -62,29 +65,26 @@
 		57B0E8E225CA85B500F123E7 /* GetKakaoPlacesRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8E125CA85B500F123E7 /* GetKakaoPlacesRequest.swift */; };
 		57B0E8E525CA870E00F123E7 /* KakaoPlace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8E425CA870E00F123E7 /* KakaoPlace.swift */; };
 		57B0E8EA25CA899D00F123E7 /* KakaoPlaceTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8E925CA899D00F123E7 /* KakaoPlaceTVCell.swift */; };
-		57B0E8EE25CAA49D00F123E7 /* LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8ED25CAA49D00F123E7 /* LocationViewController.swift */; };
+		57B0E8EE25CAA49D00F123E7 /* SearchPlaceLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B0E8ED25CAA49D00F123E7 /* SearchPlaceLocationViewController.swift */; };
+		57BA5F0925E2407900C8A628 /* PlaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BA5F0825E2407900C8A628 /* PlaceView.swift */; };
+		57BA5F0D25E2588200C8A628 /* PickImageCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BA5F0C25E2588200C8A628 /* PickImageCVCell.swift */; };
+		57BA5F1325E2CBBB00C8A628 /* RemoveQnaRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BA5F1225E2CBBB00C8A628 /* RemoveQnaRequest.swift */; };
 		57C040D925998CCA00856F61 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040D825998CCA00856F61 /* AppDelegate.swift */; };
 		57C040DB25998CCA00856F61 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040DA25998CCA00856F61 /* SceneDelegate.swift */; };
 		57C040E225998CCB00856F61 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 57C040E125998CCB00856F61 /* Assets.xcassets */; };
 		57C040F92599963800856F61 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040F82599963800856F61 /* Extension.swift */; };
 		57C040FC259996AD00856F61 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040FB259996AD00856F61 /* HomeViewController.swift */; };
 		57C040FF259996B600856F61 /* PostingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C040FE259996B600856F61 /* PostingViewController.swift */; };
-		57C04102259996CE00856F61 /* _LocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04101259996CE00856F61 /* _LocationViewController.swift */; };
 		57C04105259996DF00856F61 /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04104259996DF00856F61 /* AccountViewController.swift */; };
 		57C0410B2599C16800856F61 /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C0410A2599C16800856F61 /* TitleView.swift */; };
 		57C041142599CD7600856F61 /* PhotoGroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C041132599CD7600856F61 /* PhotoGroupView.swift */; };
 		57C041172599CE1000856F61 /* PhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C041162599CE1000856F61 /* PhotoView.swift */; };
 		57C0411E2599E8A200856F61 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C0411D2599E8A200856F61 /* Place.swift */; };
 		57C041262599FA1C00856F61 /* PlaceLargeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C041252599FA1C00856F61 /* PlaceLargeView.swift */; };
-		57C04129259A09EF00856F61 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04128259A09EF00856F61 /* TabBarView.swift */; };
-		57C0412D259A0B6F00856F61 /* TabBarCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C0412C259A0B6F00856F61 /* TabBarCVCell.swift */; };
-		57C04131259A12BA00856F61 /* LocationTabViewCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04130259A12BA00856F61 /* LocationTabViewCVCell.swift */; };
-		57C04135259A13E900856F61 /* LocationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04134259A13E900856F61 /* LocationListViewController.swift */; };
-		57C04138259A13F300856F61 /* LocationMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C04137259A13F300856F61 /* LocationMapViewController.swift */; };
 		57D68C8E25B579DF00DE8242 /* ImageScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D68C8D25B579DF00DE8242 /* ImageScrollView.swift */; };
 		57D9552725C3D69100CD2C6F /* PlaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D9552625C3D69100CD2C6F /* PlaceViewController.swift */; };
 		57D9552A25C3DBCD00CD2C6F /* GetUsersRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D9552925C3DBCD00CD2C6F /* GetUsersRequest.swift */; };
-		57D9552D25C3DF3200CD2C6F /* SearchUserTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D9552C25C3DF3200CD2C6F /* SearchUserTableViewController.swift */; };
+		57D9552D25C3DF3200CD2C6F /* SearchUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D9552C25C3DF3200CD2C6F /* SearchUserViewController.swift */; };
 		57D9554125C3E25200CD2C6F /* UserTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D9554025C3E25200CD2C6F /* UserTVCell.swift */; };
 		57D9554425C3F16800CD2C6F /* IconButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D9554325C3F16800CD2C6F /* IconButton.swift */; };
 		57D9554825C401B600CD2C6F /* PlaceCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D9554725C401B600CD2C6F /* PlaceCVCell.swift */; };
@@ -94,7 +94,12 @@
 		57DCD7BE25C27D080040AC01 /* EditUserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DCD7BD25C27D080040AC01 /* EditUserViewController.swift */; };
 		57DCD7D025C2834D0040AC01 /* EditUserRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DCD7CF25C2834D0040AC01 /* EditUserRequest.swift */; };
 		57DCD7D325C289630040AC01 /* CheckUserNickNameRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57DCD7D225C289630040AC01 /* CheckUserNickNameRequest.swift */; };
-		57E56BFD25B09629002C2059 /* TermsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E56BFC25B09629002C2059 /* TermsViewController.swift */; };
+		57E32EF225E62B76009AA4C2 /* PickCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E32EF125E62B76009AA4C2 /* PickCVCell.swift */; };
+		57E9719325E4DAE900D86FC5 /* GetPlaceCommentsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E9719225E4DAE900D86FC5 /* GetPlaceCommentsRequest.swift */; };
+		57E9719625E4DE1500D86FC5 /* PlaceComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E9719525E4DE1500D86FC5 /* PlaceComment.swift */; };
+		57E971A725E4F6F400D86FC5 /* PlaceCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E971A625E4F6F400D86FC5 /* PlaceCommentViewController.swift */; };
+		57E971AA25E50CEA00D86FC5 /* AddPlaceCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E971A925E50CEA00D86FC5 /* AddPlaceCommentRequest.swift */; };
+		57E971AD25E5148D00D86FC5 /* RemovePlaceCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57E971AC25E5148D00D86FC5 /* RemovePlaceCommentRequest.swift */; };
 		57EFB3AD25AC01220001CF59 /* LoginRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57EFB3AC25AC01220001CF59 /* LoginRequest.swift */; };
 		57EFB3CA25AC22E70001CF59 /* kakao_login_medium_wide.png in Resources */ = {isa = PBXBuildFile; fileRef = 57EFB3C925AC22E70001CF59 /* kakao_login_medium_wide.png */; };
 		57EFB3CD25AC26D40001CF59 /* kakao_login_large_wide.png in Resources */ = {isa = PBXBuildFile; fileRef = 57EFB3CC25AC26D40001CF59 /* kakao_login_large_wide.png */; };
@@ -105,15 +110,15 @@
 /* Begin PBXFileReference section */
 		5701EFD025BFD22600AA4E0F /* LikePlaceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikePlaceRequest.swift; sourceTree = "<group>"; };
 		5701EFD425BFE84F00AA4E0F /* AddPlaceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlaceRequest.swift; sourceTree = "<group>"; };
-		5708BF9F25C009F700C3271E /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		570B3ADF25BF333C0028424D /* SearchPlaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceViewController.swift; sourceTree = "<group>"; };
 		570B3AE425BF34F60028424D /* PlaceMediumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceMediumView.swift; sourceTree = "<group>"; };
+		5710A7D725CD99E7000C5D8D /* QnaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnaViewController.swift; sourceTree = "<group>"; };
+		5710A7DB25CDA170000C5D8D /* QnaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnaView.swift; sourceTree = "<group>"; };
+		5710A7DE25CDA1D6000C5D8D /* Qna.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Qna.swift; sourceTree = "<group>"; };
 		57266D3125C6BE82004C8187 /* MostPickLargeCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPickLargeCVCell.swift; sourceTree = "<group>"; };
 		57266D3525C6C3D3004C8187 /* MostPickSmallCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MostPickSmallCVCell.swift; sourceTree = "<group>"; };
 		57266D3F25C70FB8004C8187 /* GetPlaceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPlaceRequest.swift; sourceTree = "<group>"; };
 		572D31E025A579AD00A93FD9 /* Pick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pick.swift; sourceTree = "<group>"; };
-		572D31E625A5AAFF00A93FD9 /* ParentLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentLocationView.swift; sourceTree = "<group>"; };
-		572D31E925A5AB0900A93FD9 /* ChildLocationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildLocationView.swift; sourceTree = "<group>"; };
 		5738649125BD29F10025AF1A /* HttpResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpResponse.swift; sourceTree = "<group>"; };
 		5738649825BD325E0025AF1A /* HttpRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HttpRequest.swift; sourceTree = "<group>"; };
 		5738649D25BD4E320025AF1A /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -124,7 +129,7 @@
 		573E42EA25CAB69300D6231A /* ParentLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentLocation.swift; sourceTree = "<group>"; };
 		573E42ED25CAB6DA00D6231A /* ChildLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildLocation.swift; sourceTree = "<group>"; };
 		573E42FE25CAF67A00D6231A /* RemoveCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveCommentRequest.swift; sourceTree = "<group>"; };
-		5757008525A5DA6B006D5931 /* SearchPlaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceView.swift; sourceTree = "<group>"; };
+		574ADFB525CBB397001EAC7B /* NoDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoDataView.swift; sourceTree = "<group>"; };
 		5759EBC525BEA1DF007497F6 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		5759EBD625BEE7F4007497F6 /* GetPlacesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPlacesRequest.swift; sourceTree = "<group>"; };
 		57755BB225B3F91400CF0849 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
@@ -132,6 +137,9 @@
 		57755BBC25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPushNotificationDeviceRequest.swift; sourceTree = "<group>"; };
 		57755BCE25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPushNotificationDeviceRequest.swift; sourceTree = "<group>"; };
 		57755BD425B47F4B00CF0849 /* PickViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickViewController.swift; sourceTree = "<group>"; };
+		5778BBB525E0DCEE00377A52 /* WriteQnaViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteQnaViewController.swift; sourceTree = "<group>"; };
+		5778BBB925E0F1F500377A52 /* AddQnaRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddQnaRequest.swift; sourceTree = "<group>"; };
+		5778BBBC25E0F3EA00377A52 /* GetQnasRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetQnasRequest.swift; sourceTree = "<group>"; };
 		577A87CC25C9228900ABC145 /* AddCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCommentRequest.swift; sourceTree = "<group>"; };
 		577A87D025C9634300ABC145 /* SearchPlaceMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceMapViewController.swift; sourceTree = "<group>"; };
 		5780FD8E25C13DE0002F89F2 /* PlaceSmallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSmallView.swift; sourceTree = "<group>"; };
@@ -157,7 +165,10 @@
 		57B0E8E125CA85B500F123E7 /* GetKakaoPlacesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetKakaoPlacesRequest.swift; sourceTree = "<group>"; };
 		57B0E8E425CA870E00F123E7 /* KakaoPlace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoPlace.swift; sourceTree = "<group>"; };
 		57B0E8E925CA899D00F123E7 /* KakaoPlaceTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoPlaceTVCell.swift; sourceTree = "<group>"; };
-		57B0E8ED25CAA49D00F123E7 /* LocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
+		57B0E8ED25CAA49D00F123E7 /* SearchPlaceLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPlaceLocationViewController.swift; sourceTree = "<group>"; };
+		57BA5F0825E2407900C8A628 /* PlaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceView.swift; sourceTree = "<group>"; };
+		57BA5F0C25E2588200C8A628 /* PickImageCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickImageCVCell.swift; sourceTree = "<group>"; };
+		57BA5F1225E2CBBB00C8A628 /* RemoveQnaRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveQnaRequest.swift; sourceTree = "<group>"; };
 		57C040D525998CCA00856F61 /* Plapick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Plapick.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		57C040D825998CCA00856F61 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		57C040DA25998CCA00856F61 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -166,22 +177,16 @@
 		57C040F82599963800856F61 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		57C040FB259996AD00856F61 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		57C040FE259996B600856F61 /* PostingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostingViewController.swift; sourceTree = "<group>"; };
-		57C04101259996CE00856F61 /* _LocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _LocationViewController.swift; sourceTree = "<group>"; };
 		57C04104259996DF00856F61 /* AccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
 		57C0410A2599C16800856F61 /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
 		57C041132599CD7600856F61 /* PhotoGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGroupView.swift; sourceTree = "<group>"; };
 		57C041162599CE1000856F61 /* PhotoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoView.swift; sourceTree = "<group>"; };
 		57C0411D2599E8A200856F61 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
 		57C041252599FA1C00856F61 /* PlaceLargeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceLargeView.swift; sourceTree = "<group>"; };
-		57C04128259A09EF00856F61 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
-		57C0412C259A0B6F00856F61 /* TabBarCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarCVCell.swift; sourceTree = "<group>"; };
-		57C04130259A12BA00856F61 /* LocationTabViewCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTabViewCVCell.swift; sourceTree = "<group>"; };
-		57C04134259A13E900856F61 /* LocationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationListViewController.swift; sourceTree = "<group>"; };
-		57C04137259A13F300856F61 /* LocationMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMapViewController.swift; sourceTree = "<group>"; };
 		57D68C8D25B579DF00DE8242 /* ImageScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageScrollView.swift; sourceTree = "<group>"; };
 		57D9552625C3D69100CD2C6F /* PlaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceViewController.swift; sourceTree = "<group>"; };
 		57D9552925C3DBCD00CD2C6F /* GetUsersRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetUsersRequest.swift; sourceTree = "<group>"; };
-		57D9552C25C3DF3200CD2C6F /* SearchUserTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUserTableViewController.swift; sourceTree = "<group>"; };
+		57D9552C25C3DF3200CD2C6F /* SearchUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUserViewController.swift; sourceTree = "<group>"; };
 		57D9554025C3E25200CD2C6F /* UserTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTVCell.swift; sourceTree = "<group>"; };
 		57D9554325C3F16800CD2C6F /* IconButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconButton.swift; sourceTree = "<group>"; };
 		57D9554725C401B600CD2C6F /* PlaceCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceCVCell.swift; sourceTree = "<group>"; };
@@ -191,7 +196,12 @@
 		57DCD7BD25C27D080040AC01 /* EditUserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditUserViewController.swift; sourceTree = "<group>"; };
 		57DCD7CF25C2834D0040AC01 /* EditUserRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditUserRequest.swift; sourceTree = "<group>"; };
 		57DCD7D225C289630040AC01 /* CheckUserNickNameRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckUserNickNameRequest.swift; sourceTree = "<group>"; };
-		57E56BFC25B09629002C2059 /* TermsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermsViewController.swift; sourceTree = "<group>"; };
+		57E32EF125E62B76009AA4C2 /* PickCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickCVCell.swift; sourceTree = "<group>"; };
+		57E9719225E4DAE900D86FC5 /* GetPlaceCommentsRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPlaceCommentsRequest.swift; sourceTree = "<group>"; };
+		57E9719525E4DE1500D86FC5 /* PlaceComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceComment.swift; sourceTree = "<group>"; };
+		57E971A625E4F6F400D86FC5 /* PlaceCommentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceCommentViewController.swift; sourceTree = "<group>"; };
+		57E971A925E50CEA00D86FC5 /* AddPlaceCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPlaceCommentRequest.swift; sourceTree = "<group>"; };
+		57E971AC25E5148D00D86FC5 /* RemovePlaceCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemovePlaceCommentRequest.swift; sourceTree = "<group>"; };
 		57EFB3AA25ABF7570001CF59 /* Plapick.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Plapick.entitlements; sourceTree = "<group>"; };
 		57EFB3AC25AC01220001CF59 /* LoginRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRequest.swift; sourceTree = "<group>"; };
 		57EFB3C925AC22E70001CF59 /* kakao_login_medium_wide.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = kakao_login_medium_wide.png; sourceTree = "<group>"; };
@@ -230,8 +240,8 @@
 			children = (
 				57DCD7E325C2B4440040AC01 /* Post */,
 				57DCD7E225C2B4400040AC01 /* Get */,
-				5738649125BD29F10025AF1A /* HttpResponse.swift */,
 				5738649825BD325E0025AF1A /* HttpRequest.swift */,
+				5738649125BD29F10025AF1A /* HttpResponse.swift */,
 			);
 			path = HttpConnection;
 			sourceTree = "<group>";
@@ -305,12 +315,10 @@
 				57D9552625C3D69100CD2C6F /* PlaceViewController.swift */,
 				57A9966725C7E64C0016CDA5 /* PlaceMapViewController.swift */,
 				57A9967A25C86F3A0016CDA5 /* CommentViewController.swift */,
-				57B0E8ED25CAA49D00F123E7 /* LocationViewController.swift */,
+				5710A7D725CD99E7000C5D8D /* QnaViewController.swift */,
+				5778BBB525E0DCEE00377A52 /* WriteQnaViewController.swift */,
 				57755BD425B47F4B00CF0849 /* PickViewController.swift */,
-				57C04134259A13E900856F61 /* LocationListViewController.swift */,
-				57C04137259A13F300856F61 /* LocationMapViewController.swift */,
-				57E56BFC25B09629002C2059 /* TermsViewController.swift */,
-				5708BF9F25C009F700C3271E /* TestViewController.swift */,
+				57E971A625E4F6F400D86FC5 /* PlaceCommentViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -325,7 +333,6 @@
 				57C040FE259996B600856F61 /* PostingViewController.swift */,
 				57A97D5425AD9A6E00E8F982 /* NoticeViewController.swift */,
 				57C04104259996DF00856F61 /* AccountViewController.swift */,
-				57C04101259996CE00856F61 /* _LocationViewController.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -337,17 +344,16 @@
 				57C0410A2599C16800856F61 /* TitleView.swift */,
 				57C041162599CE1000856F61 /* PhotoView.swift */,
 				57C041132599CD7600856F61 /* PhotoGroupView.swift */,
+				57BA5F0825E2407900C8A628 /* PlaceView.swift */,
 				5780FD8E25C13DE0002F89F2 /* PlaceSmallView.swift */,
 				570B3AE425BF34F60028424D /* PlaceMediumView.swift */,
 				57C041252599FA1C00856F61 /* PlaceLargeView.swift */,
 				5780FD9B25C1845B002F89F2 /* PushView.swift */,
 				57D9554325C3F16800CD2C6F /* IconButton.swift */,
 				57A9967325C8468D0016CDA5 /* CommentView.swift */,
-				57C04128259A09EF00856F61 /* TabBarView.swift */,
-				572D31E625A5AAFF00A93FD9 /* ParentLocationView.swift */,
-				572D31E925A5AB0900A93FD9 /* ChildLocationView.swift */,
-				5757008525A5DA6B006D5931 /* SearchPlaceView.swift */,
 				57D68C8D25B579DF00DE8242 /* ImageScrollView.swift */,
+				574ADFB525CBB397001EAC7B /* NoDataView.swift */,
+				5710A7DB25CDA170000C5D8D /* QnaView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -363,6 +369,8 @@
 				57A9966E25C815F70016CDA5 /* Comment.swift */,
 				573E42EA25CAB69300D6231A /* ParentLocation.swift */,
 				573E42ED25CAB6DA00D6231A /* ChildLocation.swift */,
+				5710A7DE25CDA1D6000C5D8D /* Qna.swift */,
+				57E9719525E4DE1500D86FC5 /* PlaceComment.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -376,8 +384,8 @@
 				57B0E8E925CA899D00F123E7 /* KakaoPlaceTVCell.swift */,
 				57266D3525C6C3D3004C8187 /* MostPickSmallCVCell.swift */,
 				57266D3125C6BE82004C8187 /* MostPickLargeCVCell.swift */,
-				57C0412C259A0B6F00856F61 /* TabBarCVCell.swift */,
-				57C04130259A12BA00856F61 /* LocationTabViewCVCell.swift */,
+				57E32EF125E62B76009AA4C2 /* PickCVCell.swift */,
+				57BA5F0C25E2588200C8A628 /* PickImageCVCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -386,8 +394,9 @@
 			isa = PBXGroup;
 			children = (
 				570B3ADF25BF333C0028424D /* SearchPlaceViewController.swift */,
+				57B0E8ED25CAA49D00F123E7 /* SearchPlaceLocationViewController.swift */,
 				577A87D025C9634300ABC145 /* SearchPlaceMapViewController.swift */,
-				57D9552C25C3DF3200CD2C6F /* SearchUserTableViewController.swift */,
+				57D9552C25C3DF3200CD2C6F /* SearchUserViewController.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -406,6 +415,8 @@
 				5780FDA325C1C305002F89F2 /* GetVersionRequest.swift */,
 				57755BCE25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift */,
 				57A9967725C860C90016CDA5 /* GetCommentsRequest.swift */,
+				5778BBBC25E0F3EA00377A52 /* GetQnasRequest.swift */,
+				57E9719225E4DAE900D86FC5 /* GetPlaceCommentsRequest.swift */,
 			);
 			path = Get;
 			sourceTree = "<group>";
@@ -426,6 +437,10 @@
 				5792854925AF48A10060F00C /* UploadImageRequest.swift */,
 				577A87CC25C9228900ABC145 /* AddCommentRequest.swift */,
 				573E42FE25CAF67A00D6231A /* RemoveCommentRequest.swift */,
+				5778BBB925E0F1F500377A52 /* AddQnaRequest.swift */,
+				57BA5F1225E2CBBB00C8A628 /* RemoveQnaRequest.swift */,
+				57E971A925E50CEA00D86FC5 /* AddPlaceCommentRequest.swift */,
+				57E971AC25E5148D00D86FC5 /* RemovePlaceCommentRequest.swift */,
 			);
 			path = Post;
 			sourceTree = "<group>";
@@ -564,26 +579,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				57C04102259996CE00856F61 /* _LocationViewController.swift in Sources */,
 				577A87CD25C9228900ABC145 /* AddCommentRequest.swift in Sources */,
 				5792F5BF25AB493C00015FE9 /* LaunchViewController.swift in Sources */,
 				573864CA25BDD4A60025AF1A /* MostPick.swift in Sources */,
+				5778BBBD25E0F3EA00377A52 /* GetQnasRequest.swift in Sources */,
+				57E971A725E4F6F400D86FC5 /* PlaceCommentViewController.swift in Sources */,
 				57D68C8E25B579DF00DE8242 /* ImageScrollView.swift in Sources */,
 				573E42FF25CAF67A00D6231A /* RemoveCommentRequest.swift in Sources */,
-				5757008625A5DA6B006D5931 /* SearchPlaceView.swift in Sources */,
 				573E42EB25CAB69300D6231A /* ParentLocation.swift in Sources */,
-				57C04131259A12BA00856F61 /* LocationTabViewCVCell.swift in Sources */,
 				570B3AE025BF333C0028424D /* SearchPlaceViewController.swift in Sources */,
 				57C040FC259996AD00856F61 /* HomeViewController.swift in Sources */,
 				57D9552725C3D69100CD2C6F /* PlaceViewController.swift in Sources */,
-				57C04129259A09EF00856F61 /* TabBarView.swift in Sources */,
 				57A9966F25C815F70016CDA5 /* Comment.swift in Sources */,
 				57FB7F8125AC6681007BE142 /* App.swift in Sources */,
 				57755BD525B47F4B00CF0849 /* PickViewController.swift in Sources */,
 				57B0E8E225CA85B500F123E7 /* GetKakaoPlacesRequest.swift in Sources */,
-				57C04138259A13F300856F61 /* LocationMapViewController.swift in Sources */,
 				57266D3225C6BE82004C8187 /* MostPickLargeCVCell.swift in Sources */,
-				57B0E8EE25CAA49D00F123E7 /* LocationViewController.swift in Sources */,
+				57B0E8EE25CAA49D00F123E7 /* SearchPlaceLocationViewController.swift in Sources */,
 				5780FDA025C1AFBE002F89F2 /* EditPushNotificationDeviceRequest.swift in Sources */,
 				57C04105259996DF00856F61 /* AccountViewController.swift in Sources */,
 				57D9554425C3F16800CD2C6F /* IconButton.swift in Sources */,
@@ -596,6 +608,7 @@
 				577A87D125C9634300ABC145 /* SearchPlaceMapViewController.swift in Sources */,
 				57A9967825C860C90016CDA5 /* GetCommentsRequest.swift in Sources */,
 				57D9555325C4445F00CD2C6F /* FollowRequest.swift in Sources */,
+				5778BBBA25E0F1F500377A52 /* AddQnaRequest.swift in Sources */,
 				57A9967B25C86F3A0016CDA5 /* CommentViewController.swift in Sources */,
 				57D9554C25C4098A00CD2C6F /* UserCVCell.swift in Sources */,
 				57C040D925998CCA00856F61 /* AppDelegate.swift in Sources */,
@@ -604,46 +617,53 @@
 				57DCD7D325C289630040AC01 /* CheckUserNickNameRequest.swift in Sources */,
 				5792F5C225AB494E00015FE9 /* LoginViewController.swift in Sources */,
 				5759EBD725BEE7F4007497F6 /* GetPlacesRequest.swift in Sources */,
+				5710A7D825CD99E7000C5D8D /* QnaViewController.swift in Sources */,
 				57D9554825C401B600CD2C6F /* PlaceCVCell.swift in Sources */,
+				57E9719625E4DE1500D86FC5 /* PlaceComment.swift in Sources */,
+				57E32EF225E62B76009AA4C2 /* PickCVCell.swift in Sources */,
 				57755BBD25B43E4D00CF0849 /* AddPushNotificationDeviceRequest.swift in Sources */,
 				573864CE25BDDEEE0025AF1A /* LineView.swift in Sources */,
 				57C0411E2599E8A200856F61 /* Place.swift in Sources */,
 				57D9554125C3E25200CD2C6F /* UserTVCell.swift in Sources */,
 				5780FD9825C181CC002F89F2 /* SettingViewController.swift in Sources */,
+				57E9719325E4DAE900D86FC5 /* GetPlaceCommentsRequest.swift in Sources */,
 				57266D3625C6C3D3004C8187 /* MostPickSmallCVCell.swift in Sources */,
-				5708BFA025C009F700C3271E /* TestViewController.swift in Sources */,
 				573864A625BD652B0025AF1A /* GetRecentPicksRequest.swift in Sources */,
 				57EFB3AD25AC01220001CF59 /* LoginRequest.swift in Sources */,
+				57BA5F1325E2CBBB00C8A628 /* RemoveQnaRequest.swift in Sources */,
 				57C040DB25998CCA00856F61 /* SceneDelegate.swift in Sources */,
 				57A5527625B682BC009EABA3 /* PhotoViewController.swift in Sources */,
 				57C0410B2599C16800856F61 /* TitleView.swift in Sources */,
 				5759EBC625BEA1DF007497F6 /* SearchViewController.swift in Sources */,
+				5778BBB625E0DCEE00377A52 /* WriteQnaViewController.swift in Sources */,
+				5710A7DF25CDA1D6000C5D8D /* Qna.swift in Sources */,
 				5701EFD525BFE84F00AA4E0F /* AddPlaceRequest.swift in Sources */,
 				57DCD7BA25C2710F0040AC01 /* GetUserRequest.swift in Sources */,
 				5780FD8F25C13DE0002F89F2 /* PlaceSmallView.swift in Sources */,
-				57C0412D259A0B6F00856F61 /* TabBarCVCell.swift in Sources */,
-				57D9552D25C3DF3200CD2C6F /* SearchUserTableViewController.swift in Sources */,
-				572D31EA25A5AB0900A93FD9 /* ChildLocationView.swift in Sources */,
-				57C04135259A13E900856F61 /* LocationListViewController.swift in Sources */,
+				57D9552D25C3DF3200CD2C6F /* SearchUserViewController.swift in Sources */,
+				57BA5F0925E2407900C8A628 /* PlaceView.swift in Sources */,
 				5780FD9C25C1845B002F89F2 /* PushView.swift in Sources */,
 				57755BCF25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift in Sources */,
+				57BA5F0D25E2588200C8A628 /* PickImageCVCell.swift in Sources */,
 				5780FDA425C1C305002F89F2 /* GetVersionRequest.swift in Sources */,
-				572D31E725A5AAFF00A93FD9 /* ParentLocationView.swift in Sources */,
+				57E971AA25E50CEA00D86FC5 /* AddPlaceCommentRequest.swift in Sources */,
 				57A9967425C8468D0016CDA5 /* CommentView.swift in Sources */,
 				57D9552A25C3DBCD00CD2C6F /* GetUsersRequest.swift in Sources */,
 				5738649E25BD4E320025AF1A /* MainViewController.swift in Sources */,
 				57A97D5525AD9A6E00E8F982 /* NoticeViewController.swift in Sources */,
 				57C041142599CD7600856F61 /* PhotoGroupView.swift in Sources */,
 				57B0E8EA25CA899D00F123E7 /* KakaoPlaceTVCell.swift in Sources */,
+				57E971AD25E5148D00D86FC5 /* RemovePlaceCommentRequest.swift in Sources */,
 				57B0E8E525CA870E00F123E7 /* KakaoPlace.swift in Sources */,
-				57E56BFD25B09629002C2059 /* TermsViewController.swift in Sources */,
 				57DCD7D025C2834D0040AC01 /* EditUserRequest.swift in Sources */,
 				57DCD7BE25C27D080040AC01 /* EditUserViewController.swift in Sources */,
+				5710A7DC25CDA170000C5D8D /* QnaView.swift in Sources */,
 				57A97D4F25AD6A4300E8F982 /* LogoutRequest.swift in Sources */,
 				5738649225BD29F10025AF1A /* HttpResponse.swift in Sources */,
 				573E42EE25CAB6DA00D6231A /* ChildLocation.swift in Sources */,
 				572D31E125A579AD00A93FD9 /* Pick.swift in Sources */,
 				57C041262599FA1C00856F61 /* PlaceLargeView.swift in Sources */,
+				574ADFB625CBB397001EAC7B /* NoDataView.swift in Sources */,
 				57C040F92599963800856F61 /* Extension.swift in Sources */,
 				57C040FF259996B600856F61 /* PostingViewController.swift in Sources */,
 				5792854A25AF48A10060F00C /* UploadImageRequest.swift in Sources */,
@@ -781,14 +801,14 @@
 				CODE_SIGN_ENTITLEMENTS = Plapick/Plapick.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1000;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 364WTC934M;
 				INFOPLIST_FILE = Plapick/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.logicador.Plapick;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Plapick Profile";
@@ -806,14 +826,14 @@
 				CODE_SIGN_ENTITLEMENTS = Plapick/Plapick.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1000;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 364WTC934M;
 				INFOPLIST_FILE = Plapick/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.logicador.Plapick;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Plapick Profile";

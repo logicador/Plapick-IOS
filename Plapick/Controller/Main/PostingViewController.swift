@@ -11,19 +11,14 @@ import Photos
 
 // MARK: Protocol
 protocol PostingViewControllerProtocol {
-    func closePostingVC(isUploaded: Bool)
+    func addPick()
 }
 
 
 class PostingViewController: UIViewController {
     
     // MARK: Property
-    var app = App()
     var delegate: PostingViewControllerProtocol?
-//    var searchKakaoPlaceVC = SearchKakaoPlaceViewController()
-    var isOpenedChildVC: Bool = false
-//    var authAccountVC: AccountViewController?
-    var selectedImage: UIImage?
     let addPlaceRequest = AddPlaceRequest()
     let uploadImageRequest = UploadImageRequest()
     let addPickRequest = AddPickRequest()
@@ -31,18 +26,33 @@ class PostingViewController: UIViewController {
     var selectedPlace: Place? {
         didSet {
             guard let place = selectedPlace else { return }
+            placeSmallView.place = place
+            placeSmallView.isHidden = false
+            noPlaceContainerView.isHidden = true
             
-            placeContainerView.removeAllChildView()
+            guard let _ = selectedImage else {
+                navigationItem.rightBarButtonItem = nil
+                return
+            }
+            let message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if message.count > 100 { navigationItem.rightBarButtonItem = nil }
+            else { navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시", style: .plain, target: self, action: #selector(postingTapped)) }
+        }
+    }
+    var selectedImage: UIImage? {
+        didSet {
+            guard let image = selectedImage else { return }
+            imageView.image = image
+            imageView.isHidden = false
+            noImageContainerView.isHidden = true
             
-            let pmv = PlaceMediumView()
-            pmv.place = place
-            pmv.delegate = self
-            
-            placeContainerView.addSubview(pmv)
-            pmv.topAnchor.constraint(equalTo: placeContainerView.topAnchor).isActive = true
-            pmv.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
-            pmv.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
-            pmv.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor).isActive = true
+            guard let _ = selectedPlace else {
+                navigationItem.rightBarButtonItem = nil
+                return
+            }
+            let message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if message.count > 100 { navigationItem.rightBarButtonItem = nil}
+            else { navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시", style: .plain, target: self, action: #selector(postingTapped)) }
         }
     }
     
@@ -51,86 +61,140 @@ class PostingViewController: UIViewController {
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.delegate = self
+        sv.alwaysBounceVertical = true
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
-    lazy var contentView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_XL
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     
     // MARK: View - Message
-    lazy var messageTitleView: TitleView = {
-        let tv = TitleView(text: "메시지")
-        return tv
+    lazy var messageTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "메시지"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
-    
     lazy var messageTextContainerView: UIView = {
         let view = UIView()
-        view.layer.borderWidth = 1
-        view.layer.cornerRadius = 10
+        view.layer.borderWidth = LINE_WIDTH
+        view.layer.cornerRadius = SPACE_XS
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    
     lazy var messageTextView: UITextView = {
         let tv = UITextView()
-        tv.font = UIFont.systemFont(ofSize: 16)
+        tv.font = .systemFont(ofSize: 15)
         tv.text = "이곳에 메시지를 입력합니다."
-        tv.textColor = .lightGray
+        tv.textColor = .systemGray
         tv.delegate = self
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
     }()
-    
-    // MARK: View - Image
-    lazy var imageTitleView: TitleView = {
-        let tv = TitleView(text: "사진", isAction: true, actionText: "앨범에서 선택", actionMode: "SELECT_IMAGE")
-        tv.delegate = self
-        return tv
-    }()
-    
-    lazy var photoView: PhotoView = {
-        let pv = PhotoView(contentMode: .scaleAspectFit)
-        return pv
-    }()
-    
-    lazy var noPhotoLabel: UILabel = {
+    lazy var messageCntLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 18)
-        label.text = "사진을 등록해주세요"
-        label.textColor = .systemGray
+        label.text = "0 / 100"
+        label.textColor = .systemBlue
+        label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    // MARK: View - Place
-    lazy var placeTitleView: TitleView = {
-        let tv = TitleView(text: "플레이스", isAction: true, actionText: "찾기", actionMode: "SEARCH_PLACE")
-        tv.delegate = self
-        return tv
+    lazy var messageClearImageView: UIImageView = {
+        let image = UIImage(systemName: "xmark.circle.fill")
+        let iv = UIImageView(image: image)
+        iv.contentMode = .scaleAspectFit
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(messageClearTapped)))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
-    lazy var placeContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    // MARK: View - Place
+    lazy var placeTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "플레이스"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.isUserInteractionEnabled = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var searchPlaceButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("찾기", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.addTarget(self, action: #selector(searchPlaceTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     lazy var noPlaceContainerView: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = 20
+        view.layer.cornerRadius = SPACE_XS
         view.backgroundColor = .systemGray6
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     lazy var noPlaceLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 18)
-        label.text = "플레이스를 등록해주세요"
+        label.text = "등록된 플레이스가 없습니다."
+        label.font = .systemFont(ofSize: 14)
         label.textColor = .systemGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    lazy var placeSmallView: PlaceSmallView = {
+        let psv = PlaceSmallView()
+        psv.isHidden = true
+        return psv
+    }()
+    
+    // MARK: View - Image
+    lazy var imageTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "사진"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.isUserInteractionEnabled = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var selectImageButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("앨범에서 선택", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.addTarget(self, action: #selector(selectImageTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    lazy var noImageContainerView: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = SPACE_XS
+        view.backgroundColor = .systemGray6
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var noImageLabel: UILabel = {
+        let label = UILabel()
+        label.text = "선택된 사진이 없습니다."
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .systemGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var imageView: UIImageView = {
+        let iv = UIImageView()
+        iv.layer.cornerRadius = SPACE_XS
+        iv.isHidden = true
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
     // MARK: View - Indicator
@@ -141,7 +205,7 @@ class PostingViewController: UIViewController {
         return aiv
     }()
     lazy var blurOverlayView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
+        let blurEffect = UIBlurEffect(style: .light)
         let vev = UIVisualEffectView(effect: blurEffect)
         vev.alpha = 0.3
         vev.translatesAutoresizingMaskIntoConstraints = false
@@ -159,30 +223,15 @@ class PostingViewController: UIViewController {
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
-        isModalInPresentation = true
-        
         configureView()
+        
+        hideKeyboardWhenTappedAround()
         
         setThemeColor()
         
-//        searchKakaoPlaceVC.delegate = self
-        
-        app.delegate = self
         addPlaceRequest.delegate = self
         uploadImageRequest.delegate = self
         addPickRequest.delegate = self
-    }
-    
-    
-    // MARK: ViewDidDisappear
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        // searchKakaoPlaceVC가 열리면서 viewDidDisappear가 호출되기때문에 Main에 closeVC를 주게됨
-        // 그걸 막기 위해 searchKakaoPlaceVC가 nil인지 확인 후 종료 시그널
-        if !isOpenedChildVC {
-            delegate?.closePostingVC(isUploaded: isUploaded)
-        }
     }
     
     
@@ -192,17 +241,7 @@ class PostingViewController: UIViewController {
     }
     func setThemeColor() {
         messageTextContainerView.layer.borderColor = UIColor.separator.cgColor
-        if messageTextView.textColor != UIColor.lightGray {
-            messageTextView.textColor = UIColor.systemBackground.inverted
-        }
-        
-        if self.traitCollection.userInterfaceStyle == .dark {
-            view.backgroundColor = .black
-            messageTextView.backgroundColor = .black
-        } else {
-            view.backgroundColor = .white
-            messageTextView.backgroundColor = .white
-        }
+        if messageTextView.textColor != .systemGray { messageTextView.textColor = (traitCollection.userInterfaceStyle == .dark) ? .white : .black }
     }
     
     func configureView() {
@@ -212,269 +251,249 @@ class PostingViewController: UIViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        scrollView.addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        scrollView.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: SPACE_XL).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -SPACE_XL).isActive = true
         
         // MARK: ConfigureView - Message
-        contentView.addSubview(messageTitleView)
-        messageTitleView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        messageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        messageTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.addArrangedSubview(messageTitleLabel)
+        messageTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        messageTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(messageTextContainerView)
-        messageTextContainerView.topAnchor.constraint(equalTo: messageTitleView.bottomAnchor).isActive = true
-        messageTextContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        messageTextContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        messageTextContainerView.heightAnchor.constraint(equalToConstant: SCREEN_WIDTH * 0.33).isActive = true
-        
+        stackView.addArrangedSubview(messageTextContainerView)
+        messageTextContainerView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        messageTextContainerView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        messageTextContainerView.heightAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: 0.4).isActive = true
+
         messageTextContainerView.addSubview(messageTextView)
-        messageTextView.topAnchor.constraint(equalTo: messageTextContainerView.topAnchor, constant: SPACE_XS).isActive = true
+        messageTextView.topAnchor.constraint(equalTo: messageTextContainerView.topAnchor, constant: SPACE_XXS).isActive = true
         messageTextView.leadingAnchor.constraint(equalTo: messageTextContainerView.leadingAnchor, constant: SPACE_XS).isActive = true
         messageTextView.trailingAnchor.constraint(equalTo: messageTextContainerView.trailingAnchor, constant: -SPACE_XS).isActive = true
-        messageTextView.bottomAnchor.constraint(equalTo: messageTextContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        messageTextView.bottomAnchor.constraint(equalTo: messageTextContainerView.bottomAnchor, constant: -(SPACE_XS + 12 + SPACE_XS)).isActive = true
         
-        // MARK: ConfigureView - Image
-        contentView.addSubview(imageTitleView)
-        imageTitleView.topAnchor.constraint(equalTo: messageTextView.bottomAnchor).isActive = true
-        imageTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        imageTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        messageTextContainerView.addSubview(messageCntLabel)
+        messageCntLabel.bottomAnchor.constraint(equalTo: messageTextContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        messageCntLabel.leadingAnchor.constraint(equalTo: messageTextContainerView.leadingAnchor, constant: SPACE_XS).isActive = true
         
-        contentView.addSubview(photoView)
-        photoView.topAnchor.constraint(equalTo: imageTitleView.bottomAnchor).isActive = true
-        photoView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        photoView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        photoView.heightAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        
-        photoView.addSubview(noPhotoLabel)
-        noPhotoLabel.centerXAnchor.constraint(equalTo: photoView.centerXAnchor).isActive = true
-        noPhotoLabel.centerYAnchor.constraint(equalTo: photoView.centerYAnchor).isActive = true
+        messageTextContainerView.addSubview(messageClearImageView)
+        messageClearImageView.trailingAnchor.constraint(equalTo: messageTextContainerView.trailingAnchor, constant: -SPACE_XS).isActive = true
+        messageClearImageView.centerYAnchor.constraint(equalTo: messageCntLabel.centerYAnchor).isActive = true
+        messageClearImageView.widthAnchor.constraint(equalToConstant: 18).isActive = true
+        messageClearImageView.heightAnchor.constraint(equalToConstant: 18).isActive = true
         
         // MARK: ConfigureView - Place
-        contentView.addSubview(placeTitleView)
-        placeTitleView.topAnchor.constraint(equalTo: photoView.bottomAnchor).isActive = true
-        placeTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        placeTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.addArrangedSubview(placeTitleLabel)
+        placeTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        placeTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(placeContainerView)
-        placeContainerView.topAnchor.constraint(equalTo: placeTitleView.bottomAnchor).isActive = true
-        placeContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        placeContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        placeContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -SPACE_XL).isActive = true
+        placeTitleLabel.addSubview(searchPlaceButton)
+        searchPlaceButton.centerYAnchor.constraint(equalTo: placeTitleLabel.centerYAnchor).isActive = true
+        searchPlaceButton.trailingAnchor.constraint(equalTo: placeTitleLabel.trailingAnchor).isActive = true
         
-        if selectedPlace == nil {
-            placeContainerView.addSubview(noPlaceContainerView)
-            noPlaceContainerView.topAnchor.constraint(equalTo: placeTitleView.bottomAnchor).isActive = true
-            noPlaceContainerView.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
-            noPlaceContainerView.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
-            noPlaceContainerView.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor).isActive = true
+        stackView.addArrangedSubview(noPlaceContainerView)
+        noPlaceContainerView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        noPlaceContainerView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
-            noPlaceContainerView.addSubview(noPlaceLabel)
-            noPlaceLabel.centerXAnchor.constraint(equalTo: noPlaceContainerView.centerXAnchor).isActive = true
-            noPlaceLabel.topAnchor.constraint(equalTo: noPlaceContainerView.topAnchor, constant: NO_DATA_SPACE).isActive = true
-            noPlaceLabel.bottomAnchor.constraint(equalTo: noPlaceContainerView.bottomAnchor, constant: -NO_DATA_SPACE).isActive = true
-        }
+        noPlaceContainerView.addSubview(noPlaceLabel)
+        noPlaceLabel.topAnchor.constraint(equalTo: noPlaceContainerView.topAnchor, constant: SPACE_XL).isActive = true
+        noPlaceLabel.centerXAnchor.constraint(equalTo: noPlaceContainerView.centerXAnchor).isActive = true
+        noPlaceLabel.bottomAnchor.constraint(equalTo: noPlaceContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
+        
+        stackView.addArrangedSubview(placeSmallView)
+        placeSmallView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        placeSmallView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        
+        // MARK: ConfigureView - Image
+        stackView.addArrangedSubview(imageTitleLabel)
+        imageTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        imageTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
+        
+        imageTitleLabel.addSubview(selectImageButton)
+        selectImageButton.centerYAnchor.constraint(equalTo: imageTitleLabel.centerYAnchor).isActive = true
+        selectImageButton.trailingAnchor.constraint(equalTo: imageTitleLabel.trailingAnchor).isActive = true
+        
+        stackView.addArrangedSubview(noImageContainerView)
+        noImageContainerView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        noImageContainerView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        
+        noImageContainerView.addSubview(noImageLabel)
+        noImageLabel.topAnchor.constraint(equalTo: noImageContainerView.topAnchor, constant: SPACE_XL).isActive = true
+        noImageLabel.centerXAnchor.constraint(equalTo: noImageContainerView.centerXAnchor).isActive = true
+        noImageLabel.bottomAnchor.constraint(equalTo: noImageContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
+        
+        stackView.addArrangedSubview(imageView)
+        imageView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        imageView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        imageView.heightAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
     }
     
     // MARK: Function - @OBJC
+    @objc func searchPlaceTapped() {
+        dismissKeyboard()
+        
+        let searchPlaceVC = SearchPlaceViewController()
+        searchPlaceVC.mode = "KEYWORD"
+        searchPlaceVC.delegate = self
+        navigationController?.pushViewController(searchPlaceVC, animated: true)
+    }
+    
+    @objc func selectImageTapped() {
+        dismissKeyboard()
+        
+        checkPhotoGallaryAvailable(allow: {
+            let ipc = UIImagePickerController()
+            ipc.sourceType = .photoLibrary
+            ipc.allowsEditing = false
+            ipc.delegate = self
+            self.present(ipc, animated: true, completion: nil)
+        })
+    }
+    
     @objc func postingTapped() {
         guard let place = selectedPlace else { return }
+        guard let image = selectedImage else { return }
+        
         showIndicator(idv: indicatorView, bov: blurOverlayView)
         
         if place.id == 0 {
             addPlaceRequest.fetch(vc: self, paramDict: ["kId": String(place.kId), "name": place.name, "categoryName": place.categoryName, "categoryGroupCode": place.categoryGroupCode, "categoryGroupName": place.categoryGroupName, "address": place.address, "roadAddress": place.roadAddress, "latitude": place.latitude, "longitude": place.longitude, "phone": place.phone])
             
         } else {
-            guard let image = selectedImage else {
-                hideIndicator(idv: indicatorView, bov: blurOverlayView)
-                return
-            }
             uploadImageRequest.fetch(vc: self, image: image)
         }
     }
-}
-
-
-// MARK: Extension - TitleView
-extension PostingViewController: TitleViewProtocol {
-    func action(actionMode: String) {
-        if messageTextView.isFirstResponder {
-            messageTextView.resignFirstResponder()
-        }
+    
+    @objc func messageClearTapped() {
+        messageTextView.text = ""
+        if !messageTextView.isFirstResponder { messageTextView.becomeFirstResponder() }
         
-        if actionMode == "SELECT_IMAGE" {
-            app.checkPhotoGallaryAvailable(vc: self)
-            
-        } else if actionMode == "SEARCH_PLACE" {
-            isOpenedChildVC = true
-            let searchPlaceVC = SearchPlaceViewController()
-            searchPlaceVC.mode = "KEYWORD"
-            searchPlaceVC.delegate = self
-            navigationController?.pushViewController(searchPlaceVC, animated: true)
+        messageCntLabel.text = "0 / 100"
+        
+        messageCntLabel.textColor = .systemBlue
+        guard let _ = selectedPlace else {
+            navigationItem.rightBarButtonItem = nil
+            return
         }
+        guard let _ = selectedImage else {
+            navigationItem.rightBarButtonItem = nil
+            return
+        }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시", style: .plain, target: self, action: #selector(postingTapped))
     }
 }
 
-// MARK: Extension - ImagePicker
+
+// MARK: ImagePicker
 extension PostingViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage {
-            selectedImage = image
-        } else if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            selectedImage = image
-        }
-        noPhotoLabel.removeView()
         
-        photoView.image = selectedImage
-        if selectedPlace != nil {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시하기", style: UIBarButtonItem.Style.plain, target: self, action: #selector(postingTapped))
+        var selectedImage: UIImage?
+        if let image = info[.editedImage] as? UIImage { selectedImage = image }
+        else if let image = info[.originalImage] as? UIImage { selectedImage = image }
+        
+        if let _selectedImage = selectedImage {
+            self.selectedImage = _selectedImage
         }
         
         dismiss(animated: true, completion: nil)
     }
 }
 
-// MARK: Extension - App
-extension PostingViewController: AppProtocol {
-    func pushNotification(isAllowed: Bool) { }
-    func photoGallary(isAllowed: Bool) {
-        if isAllowed {
-            let imagePickerController = UIImagePickerController()
-            imagePickerController.sourceType = .photoLibrary
-            imagePickerController.allowsEditing = false
-            imagePickerController.delegate = self
-            present(imagePickerController, animated: true, completion: nil)
-        }
-    }
-}
 
-// MARK: Extension - SearchPlace
+// MARK: SearchPlaceVC
 extension PostingViewController: SearchPlaceViewControllerProtocol {
-    func closeSearchPlaceVC(place: Place?) {
-        // searchKakaoPlaceVC가 종료되면 nil로 초기화 필수
-        // viewDidDisappear과 관련있음
-//        searchKakaoPlaceVC = nil
-        isOpenedChildVC = false
-        
-        if let place = place {
-            
-            // 똑같은 플레이스를 선택함
-            if let selectedPlace = self.selectedPlace {
-                if selectedPlace.id == place.id { return }
-            }
-            
-            selectedPlace = place
-            
-            if selectedImage != nil {
-                navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시하기", style: UIBarButtonItem.Style.plain, target: self, action: #selector(postingTapped))
-            }
-        }
+    func selectPlace(place: Place) {
+        selectedPlace = place
     }
 }
 
-// MARK: Extension - PlaceMediumView
-extension PostingViewController: PlaceMediumViewProtocol {
-    func openPlace(place: Place) {
-        if messageTextView.isFirstResponder {
-            messageTextView.resignFirstResponder()
-        }
-        isOpenedChildVC = true
-        let placeVC = PlaceViewController(place: place)
-        placeVC.delegate = self
-        navigationController?.pushViewController(placeVC, animated: true)
-    }
-}
-
-// MARK: Extension - ScrollView
-extension PostingViewController: UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if messageTextView.isFirstResponder {
-            messageTextView.resignFirstResponder()
-        }
-    }
-}
-
-// MARK: Extension - TextView
+// MARK: TextView
 extension PostingViewController: UITextViewDelegate {
-    // 입력을 시작할때 (커서가 올라갔을때)
+    func textViewDidChange(_ textView: UITextView) {
+        let message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        messageCntLabel.text = "\(message.count) / 100"
+        
+        if message.count > 100 {
+            messageCntLabel.textColor = .systemRed
+            navigationItem.rightBarButtonItem = nil
+        } else {
+            messageCntLabel.textColor = .systemBlue
+            guard let _ = selectedPlace else {
+                navigationItem.rightBarButtonItem = nil
+                return
+            }
+            guard let _ = selectedImage else {
+                navigationItem.rightBarButtonItem = nil
+                return
+            }
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시", style: .plain, target: self, action: #selector(postingTapped))
+        }
+    }
+    
     func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.textColor == UIColor.lightGray {
+        if textView.textColor == UIColor.systemGray {
             textView.text = ""
             textView.textColor = UIColor.systemBackground.inverted
         }
     }
-    
-    // 입력이 끝났을때 (커서가 내려갔을때)
+
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             textView.text = "이곳에 메시지를 입력합니다."
-            textView.textColor = UIColor.lightGray
+            textView.textColor = .systemGray
         }
     }
 }
 
-// MARK: Extension - AddPlace
+// MARK: HTTP - AddPlace
 extension PostingViewController: AddPlaceRequestProtocol {
     func response(place: Place?, addPlace status: String) {
+        print("[HTTP RES]", addPlaceRequest.apiUrl, status)
+        
         if status == "OK" {
-            if let place = place {
-                guard let image = selectedImage else {
-                    hideIndicator(idv: indicatorView, bov: blurOverlayView)
-                    return
-                }
-                selectedPlace = place
-                uploadImageRequest.fetch(vc: self, image: image)
-            }
-        } else {
-            hideIndicator(idv: indicatorView, bov: blurOverlayView)
-        }
+            guard let place = place else { return }
+            selectedPlace = place
+            
+            guard let image = selectedImage else { return }
+            uploadImageRequest.fetch(vc: self, image: image)
+            
+        } else { hideIndicator(idv: indicatorView, bov: blurOverlayView) }
     }
 }
 
-// MARK: Extension - UploadImage
+// MARK: HTTP - UploadImage
 extension PostingViewController: UploadImageRequestProtocol {
     func response(imageName: Int?, uploadImage status: String) {
+        print("[HTTP RES]", uploadImageRequest.apiUrl, status)
+        
         if status == "OK" {
-            if let piId = imageName {
-                guard let place = selectedPlace else { return }
-                
-                var message = ""
-                if messageTextView.textColor != UIColor.lightGray {
-                    message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-                }
-                
-                addPickRequest.fetch(vc: self, paramDict: ["message": message, "piId": String(piId), "pId": String(place.id)])
-            }
+            guard let imageName = imageName else { return }
+            guard let place = selectedPlace else { return }
+            let message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            addPickRequest.fetch(vc: self, paramDict: ["message": message, "piId": String(imageName), "pId": String(place.id)])
             
-        } else {
-            hideIndicator(idv: indicatorView, bov: blurOverlayView)
-        }
+        } else { hideIndicator(idv: indicatorView, bov: blurOverlayView) }
     }
 }
 
-// MARK: Extension - AddPick
+// MARK: HTTP - AddPick
 extension PostingViewController: AddPickRequestProtocol {
     func response(addPick status: String) {
+        print("[HTTP RES]", addPickRequest.apiUrl, status)
+        
         hideIndicator(idv: indicatorView, bov: blurOverlayView)
+        
         if status == "OK" {
-            isUploaded = true
-//            authAccountVC?.getPicks()
-            let alert = UIAlertController(title: "픽 게시하기", message: "새로운 픽이 게시되었습니다.", preferredStyle: UIAlertController.Style.alert)
-            alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.default, handler: { (_) in
+            delegate?.addPick()
+            
+            let alert = UIAlertController(title: "게시하기", message: "새로운 픽이 게시되었습니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_) in
                 self.navigationController?.popViewController(animated: true)
             }))
-            present(alert, animated: true)
+            present(alert, animated: true, completion: nil)
         }
     }
-}
-
-// MARK: Extension - PlaceVC
-extension PostingViewController: PlaceViewControllerProtocol {
-    func closePlaceVC() {
-        isOpenedChildVC = false
-    }
-    func reloadPlace() {}
 }

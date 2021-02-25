@@ -84,7 +84,6 @@ class GetPlacesRequest: HttpRequest {
                 self.delegate?.response(placeList: nil, getPlaces: "ERR_STATUS_DECODE")
                 return
             }
-            print("[HTTP RES]", self.apiUrl, status)
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
@@ -95,30 +94,55 @@ class GetPlacesRequest: HttpRequest {
             // MARK: Response
             do {
                 let response = try JSONDecoder().decode(PlacesRequestResult.self, from: data)
+                
                 let resPlaceList = response.result
                 
                 var placeList: [Place] = []
+                
                 for resPlace in resPlaceList {
-                    var mostPickList: [MostPick] = []
-                    if let pMostPicks = resPlace.pMostPicks {
-                        let splittedPMostPickList = pMostPicks.split(separator: "|")
-                        for splittedPMostPick in splittedPMostPickList {
-                            let splitted = splittedPMostPick.split(separator: ":")
-                            guard let id = Int(splitted[0]) else { continue }
-                            guard let uId = Int(splitted[1]) else { continue }
-                            let uNickName = String(splitted[2])
-                            let uProfileImage = (splitted.count < 4) ? "" : String(splitted[3])
-                            let mostPick = MostPick(id: id, uId: uId, uNickName: uNickName, uProfileImage: uProfileImage)
-                            mostPickList.append(mostPick)
+                    var pickImageList: [String] = []
+                    
+                    let picks = resPlace.picks
+                    
+                    if !picks.isEmpty {
+                        let splittedPicks = picks.split(separator: "|")
+                        for splittedPick in splittedPicks {
+                            let splitted = splittedPick.split(separator: ":")
+                            let piId = splitted[0]
+                            let uId = splitted[1]
+                            let image = "\(IMAGE_URL)/users/\(uId)/\(piId).jpg"
+                            pickImageList.append(image)
                             
-                            if mostPickList.count == MOST_PICKS_MAX_COUNT { break }
+                            if pickImageList.count == 10 { break } // 10개까지
                         }
                     }
                     
-                    let place = Place(id: resPlace.p_id, kId: resPlace.p_k_id, name: resPlace.p_name, categoryName: resPlace.p_category_name, categoryGroupName: resPlace.p_category_group_name, categoryGroupCode: resPlace.p_category_group_code, address: resPlace.p_address, roadAddress: resPlace.p_road_address, latitude: resPlace.p_latitude, longitude: resPlace.p_longitude, phone: resPlace.p_phone, plocCode: resPlace.p_ploc_code, clocCode: resPlace.p_cloc_code, mostPickList: mostPickList, likeCnt: resPlace.pLikeCnt, commentCnt: resPlace.pCommentCnt, pickCnt: resPlace.pPickCnt, isLike: resPlace.pIsLike)
+                    let place = Place(id: resPlace.p_id, kId: resPlace.p_k_id, name: resPlace.p_name, categoryName: resPlace.p_category_name, categoryGroupName: resPlace.p_category_group_name, categoryGroupCode: resPlace.p_category_group_code, address: resPlace.p_address, roadAddress: resPlace.p_road_address, latitude: resPlace.p_latitude, longitude: resPlace.p_longitude, phone: resPlace.p_phone, plocCode: resPlace.p_ploc_code, clocCode: resPlace.p_cloc_code, pickImageList: pickImageList, isLike: resPlace.isLike, likeCnt: resPlace.likeCnt, commentCnt: resPlace.commentCnt, pickCnt: resPlace.pickCnt)
                     
                     placeList.append(place)
                 }
+                
+//                for resPlace in resPlaceList {
+//                    var mostPickList: [MostPick] = []
+//                    if let pMostPicks = resPlace.pMostPicks {
+//                        let splittedPMostPickList = pMostPicks.split(separator: "|")
+//                        for splittedPMostPick in splittedPMostPickList {
+//                            let splitted = splittedPMostPick.split(separator: ":")
+//                            guard let id = Int(splitted[0]) else { continue }
+//                            guard let uId = Int(splitted[1]) else { continue }
+//                            let uNickName = String(splitted[2])
+//                            let uProfileImage = (splitted.count < 4) ? "" : String(splitted[3])
+//                            let mostPick = MostPick(id: id, uId: uId, uNickName: uNickName, uProfileImage: uProfileImage)
+//                            mostPickList.append(mostPick)
+//
+//                            if mostPickList.count == MOST_PICKS_MAX_COUNT { break }
+//                        }
+//                    }
+//
+//                    let place = Place(id: resPlace.p_id, kId: resPlace.p_k_id, name: resPlace.p_name, categoryName: resPlace.p_category_name, categoryGroupName: resPlace.p_category_group_name, categoryGroupCode: resPlace.p_category_group_code, address: resPlace.p_address, roadAddress: resPlace.p_road_address, latitude: resPlace.p_latitude, longitude: resPlace.p_longitude, phone: resPlace.p_phone, plocCode: resPlace.p_ploc_code, clocCode: resPlace.p_cloc_code, mostPickList: mostPickList, likeCnt: resPlace.pLikeCnt, commentCnt: resPlace.pCommentCnt, pickCnt: resPlace.pPickCnt, isLike: resPlace.pIsLike)
+//
+//                    placeList.append(place)
+//                }
                 
                 self.delegate?.response(placeList: placeList, getPlaces: "OK")
                 

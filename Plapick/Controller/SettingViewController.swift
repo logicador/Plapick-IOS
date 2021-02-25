@@ -8,45 +8,51 @@
 import UIKit
 
 
-protocol SettingViewControllerProtocol {
-    func closeSettingVC()
-}
-
-
 class SettingViewController: UIViewController {
     
     // MARK: Property
-    var delegate: SettingViewControllerProtocol?
     let app = App()
     let editPushNotificationDeviceRequest = EditPushNotificationDeviceRequest()
     let logoutRequest = LogoutRequest()
-//    var authAccountVC: AccountViewController?
-    var isOpenedChildVC: Bool = false
     
     
     // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
+        sv.alwaysBounceVertical = true
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
-    lazy var contentView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_XL
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     
     // MARK: View - Push
-    lazy var pushTitleView: TitleView = {
-        let tv = TitleView(text: "알림설정", style: .medium)
-        return tv
+    lazy var pushTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "알림설정"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
-    lazy var pushContainerView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = 20
-        view.backgroundColor = .systemGray6
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var pushStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.backgroundColor = .systemGray6
+        sv.layer.cornerRadius = SPACE_XS
+        sv.axis = .vertical
+        sv.layoutMargins = UIEdgeInsets(top: SPACE_S, left: 0, bottom: SPACE_S, right: 0)
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_S
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     lazy var followPushView: PushView = {
         let pv = PushView()
@@ -85,69 +91,88 @@ class SettingViewController: UIViewController {
     }()
     
     // MARK: View - Service
-    lazy var serviceTitleView: TitleView = {
-        let tv = TitleView(text: "고객센터", style: .medium)
-        return tv
+    lazy var serviceTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "고객센터"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
-    lazy var serviceContainerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemGray6
-        view.layer.cornerRadius = 20
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var serviceStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.backgroundColor = .systemGray6
+        sv.layer.cornerRadius = SPACE_XS
+        sv.axis = .vertical
+        sv.layoutMargins = UIEdgeInsets(top: SPACE_S, left: 0, bottom: SPACE_S, right: 0)
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_S
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
-    lazy var qaButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("문의하기 / 피드백", for: UIControl.State.normal)
+    lazy var qnaButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("문의하기 / 피드백", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
-        button.addTarget(self, action: #selector(qaTapped), for: UIControl.Event.touchUpInside)
+        button.addTarget(self, action: #selector(qnaTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     lazy var agreementButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("서비스 이용약관", for: UIControl.State.normal)
+        let button = UIButton(type: .system)
+        button.setTitle("서비스 이용약관", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
-        button.addTarget(self, action: #selector(agreementTapped), for: UIControl.Event.touchUpInside)
+        button.addTarget(self, action: #selector(agreementTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     lazy var locationButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("위치기반서비스 이용약관", for: UIControl.State.normal)
+        let button = UIButton(type: .system)
+        button.setTitle("위치기반서비스 이용약관", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
-        button.addTarget(self, action: #selector(locationTapped), for: UIControl.Event.touchUpInside)
+        button.addTarget(self, action: #selector(locationTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     lazy var privacyButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("개인정보 처리방침", for: UIControl.State.normal)
+        let button = UIButton(type: .system)
+        button.setTitle("개인정보 처리방침", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
-        button.addTarget(self, action: #selector(privacyTapped), for: UIControl.Event.touchUpInside)
+        button.addTarget(self, action: #selector(privacyTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
     // MARK: View - Etc
-    lazy var etcTitleView: TitleView = {
-        let tv = TitleView(text: "기타", style: .medium)
-        return tv
+    lazy var etcTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "기타"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
-    lazy var etcContainerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemGray6
-        view.layer.cornerRadius = 20
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
+    lazy var etcStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.isLayoutMarginsRelativeArrangement = true
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_S
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
     }()
     
-    // MARK: View - Etc - Personal
-    lazy var personalContainerView: UIView = {
+    lazy var editUserIconButton: IconButton = {
+        let ib = IconButton(type: .system)
+        ib.text = "프로필 편집"
+        ib.icon = "person"
+        ib.addTarget(self, action: #selector(editUserTapped), for: .touchUpInside)
+        return ib
+    }()
+    
+    // MARK: View - Etc - Type
+    lazy var typeContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -156,45 +181,58 @@ class SettingViewController: UIViewController {
         let label = UILabel()
         label.text = "가입 유형"
         label.textColor = .systemGray
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     lazy var typeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = .systemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    // MARK: View - Etc - Email
+    lazy var emailContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     lazy var emailTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "이메일"
         label.textColor = .systemGray
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     lazy var emailLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = .systemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    // MARK: View - Etc - Name
+    lazy var nameContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     lazy var nameTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "이름 또는 닉네임"
         label.textColor = .systemGray
-        label.font = UIFont.systemFont(ofSize: 12)
+        label.font = .systemFont(ofSize: 12)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     lazy var nameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
+        label.font = .systemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    // TODO: 이메일 회원이라면 비밀번호 변경도 (변경시 현재 비밀번호 인증 필요)
     
     // MARK: View - Etc - Version
     lazy var versionContainerView: UIView = {
@@ -202,48 +240,43 @@ class SettingViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    lazy var versionTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "버전정보"
+        label.textColor = .systemGray
+        label.font = .systemFont(ofSize: 12)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     lazy var versionLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 18)
+        label.font = .systemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     lazy var versionButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
+        let button = UIButton(type: .system)
+        button.titleLabel?.font = .systemFont(ofSize: 18)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    // MARK: View - Etc - Other
-    lazy var editUserButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("프로필 편집", for: UIControl.State.normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
-        button.addTarget(self, action: #selector(editUserTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+    // MARK: View - Etc - Button
+    lazy var logoutIconButton: IconButton = {
+        let ib = IconButton(type: .system)
+        ib.text = "로그아웃"
+        ib.icon = "power"
+        ib.addTarget(self, action: #selector(logoutTapped), for: .touchUpInside)
+        return ib
     }()
-    lazy var logoutButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("로그아웃", for: UIControl.State.normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
-        button.addTarget(self, action: #selector(logoutTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    lazy var leaveButton: UIButton = {
-        let button = UIButton(type: UIButton.ButtonType.system)
-        button.setTitle("회원탈퇴", for: UIControl.State.normal)
-        button.tintColor = .systemRed
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_XS, left: 0, bottom: SPACE_XS, right: 0)
-        button.addTarget(self, action: #selector(leaveTapped), for: UIControl.Event.touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+    lazy var leaveIconButton: IconButton = {
+        let ib = IconButton(type: .system)
+        ib.text = "회원탈퇴"
+        ib.icon = "escape"
+        ib.tintColor = .systemRed
+        ib.imageView?.tintColor = .systemRed
+        ib.addTarget(self, action: #selector(leaveTapped), for: .touchUpInside)
+        return ib
     }()
     
     
@@ -251,37 +284,26 @@ class SettingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = "설정"
+        view.backgroundColor = .systemBackground
         
-        isModalInPresentation = true // 후....
+        navigationItem.title = "설정"
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
         configureView()
         
-        setThemeColor()
-        
         editPushNotificationDeviceRequest.delegate = self
         logoutRequest.delegate = self
         
         let user = app.getUser()
-        if let type = user.type {
-            if type == "KAKAO" {
-                typeLabel.text = "카카오 로그인"
-            } else if type == "APPLE" {
-                typeLabel.text = "애플 로그인"
-            } else if type == "NAVER" {
-                typeLabel.text = "네이버 로그인"
-            } else {
-                typeLabel.text = "이메일 로그인"
-            }
-        }
-        if let email = user.email {
-            emailLabel.text = email
-        }
-        if let name = user.name {
-            nameLabel.text = name
-        }
+        
+        if user.type == "KAKAO" { typeLabel.text = "카카오 로그인" }
+        else if user.type == "APPLE" { typeLabel.text = "애플 로그인" }
+        else if user.type == "NAVER" { typeLabel.text = "네이버 로그인" }
+        else { typeLabel.text = "이메일 로그인" }
+        
+        if let email = user.email { emailLabel.text = email }
+        if let name = user.name { nameLabel.text = name }
         
         let curVersionCode = app.getCurVersionCode()
         let curVersionName = app.getCurVersionName()
@@ -290,53 +312,32 @@ class SettingViewController: UIViewController {
         versionLabel.text = "IOS App ver. \(curVersionName)"
         
         if newVersionCode == curVersionCode {
-            versionButton.setTitle("최신버전", for: UIControl.State.normal)
+            versionButton.setTitle("최신버전", for: .normal)
             versionButton.isEnabled = false
         } else {
-            versionButton.setTitle("업데이트", for: UIControl.State.normal)
-            versionButton.addTarget(self, action: #selector(updateTapped), for: UIControl.Event.touchUpInside)
+            versionButton.setTitle("업데이트", for: .normal)
+            versionButton.addTarget(self, action: #selector(updateTapped), for: .touchUpInside)
         }
         
         let pndId = app.getPndId()
         
-        if pndId.isEmpty {
-            app.checkPushNotificationAvailable(vc: self)
-            
-        } else {
+        if pndId.isEmpty { checkPushNotificationAvailable() }
+        else {
             let isAllowedFollow = app.getPushNotification(key: "FOLLOW")
             let isAllowedMyPickComment = app.getPushNotification(key: "MY_PICK_COMMENT")
             let isAllowedRecommendedPlace = app.getPushNotification(key: "RECOMMENDED_PLACE")
             let isAllowedAd = app.getPushNotification(key: "AD")
             let isAllowedEventNotice = app.getPushNotification(key: "EVENT_NOTICE")
             
-            followPushView.push.setOn((isAllowedFollow == "Y") ? true : false, animated: true)
-            myPickCommentPushView.push.setOn((isAllowedMyPickComment == "Y") ? true : false, animated: true)
-            recommendedPlacePushView.push.setOn((isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
-            adPushView.push.setOn((isAllowedAd == "Y") ? true : false, animated: true)
-            eventNoticePushView.push.setOn((isAllowedEventNotice == "Y") ? true : false, animated: true)
+            followPushView.sw.setOn((isAllowedFollow == "Y") ? true : false, animated: true)
+            myPickCommentPushView.sw.setOn((isAllowedMyPickComment == "Y") ? true : false, animated: true)
+            recommendedPlacePushView.sw.setOn((isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
+            adPushView.sw.setOn((isAllowedAd == "Y") ? true : false, animated: true)
+            eventNoticePushView.sw.setOn((isAllowedEventNotice == "Y") ? true : false, animated: true)
         }
     }
-    
-    
-    // MARK: ViewDidDisappear
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        if !isOpenedChildVC {
-            delegate?.closeSettingVC()
-        }
-    }
-    
     
     // MARK: Function
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
-    func setThemeColor() {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            view.backgroundColor = .black
-        } else {
-            view.backgroundColor = .white
-        }
-    }
-    
     func configureView() {
         view.addSubview(scrollView)
         scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -344,167 +345,153 @@ class SettingViewController: UIViewController {
         scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        scrollView.addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-        
+        scrollView.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: SPACE_XL).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+        stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor, constant: -SPACE_XL).isActive = true
+
         // MARK: ConfigureView - Push
-        contentView.addSubview(pushTitleView)
-        pushTitleView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        pushTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        pushTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.addArrangedSubview(pushTitleLabel)
+        pushTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        pushTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(pushContainerView)
-        pushContainerView.topAnchor.constraint(equalTo: pushTitleView.bottomAnchor).isActive = true
-        pushContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        pushContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        stackView.addArrangedSubview(pushStackView)
+        pushStackView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        pushStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
-        pushContainerView.addSubview(followPushView)
-        followPushView.topAnchor.constraint(equalTo: pushContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        followPushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        followPushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
+        pushStackView.addArrangedSubview(followPushView)
+        followPushView.centerXAnchor.constraint(equalTo: pushStackView.centerXAnchor).isActive = true
+        followPushView.widthAnchor.constraint(equalTo: pushStackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
         
-        pushContainerView.addSubview(myPickCommentPushView)
-        myPickCommentPushView.topAnchor.constraint(equalTo: followPushView.bottomAnchor).isActive = true
-        myPickCommentPushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        myPickCommentPushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
+        pushStackView.addArrangedSubview(myPickCommentPushView)
+        myPickCommentPushView.centerXAnchor.constraint(equalTo: pushStackView.centerXAnchor).isActive = true
+        myPickCommentPushView.widthAnchor.constraint(equalTo: pushStackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
         
-        contentView.addSubview(recommendedPlacePushView)
-        recommendedPlacePushView.topAnchor.constraint(equalTo: myPickCommentPushView.bottomAnchor).isActive = true
-        recommendedPlacePushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        recommendedPlacePushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
-
-        contentView.addSubview(adPushView)
-        adPushView.topAnchor.constraint(equalTo: recommendedPlacePushView.bottomAnchor).isActive = true
-        adPushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        adPushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
-
-        contentView.addSubview(eventNoticePushView)
-        eventNoticePushView.topAnchor.constraint(equalTo: adPushView.bottomAnchor).isActive = true
-        eventNoticePushView.leadingAnchor.constraint(equalTo: pushContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        eventNoticePushView.trailingAnchor.constraint(equalTo: pushContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
-        eventNoticePushView.bottomAnchor.constraint(equalTo: pushContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        pushStackView.addArrangedSubview(recommendedPlacePushView)
+        recommendedPlacePushView.centerXAnchor.constraint(equalTo: pushStackView.centerXAnchor).isActive = true
+        recommendedPlacePushView.widthAnchor.constraint(equalTo: pushStackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
+        
+        pushStackView.addArrangedSubview(adPushView)
+        adPushView.centerXAnchor.constraint(equalTo: pushStackView.centerXAnchor).isActive = true
+        adPushView.widthAnchor.constraint(equalTo: pushStackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
+        
+        pushStackView.addArrangedSubview(eventNoticePushView)
+        eventNoticePushView.centerXAnchor.constraint(equalTo: pushStackView.centerXAnchor).isActive = true
+        eventNoticePushView.widthAnchor.constraint(equalTo: pushStackView.widthAnchor, multiplier: CONTENTS_RATIO_S).isActive = true
         
         // MARK: ConfigureView - Service
-        contentView.addSubview(serviceTitleView)
-        serviceTitleView.topAnchor.constraint(equalTo: pushContainerView.bottomAnchor).isActive = true
-        serviceTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        serviceTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.addArrangedSubview(serviceTitleLabel)
+        serviceTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        serviceTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(serviceContainerView)
-        serviceContainerView.topAnchor.constraint(equalTo: serviceTitleView.bottomAnchor).isActive = true
-        serviceContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        serviceContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        stackView.addArrangedSubview(serviceStackView)
+        serviceStackView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        serviceStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
-        serviceContainerView.addSubview(qaButton)
-        qaButton.topAnchor.constraint(equalTo: serviceContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        qaButton.leadingAnchor.constraint(equalTo: serviceContainerView.leadingAnchor).isActive = true
-        qaButton.trailingAnchor.constraint(equalTo: serviceContainerView.trailingAnchor).isActive = true
+        serviceStackView.addArrangedSubview(qnaButton)
+        qnaButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
+        qnaButton.trailingAnchor.constraint(equalTo: serviceStackView.trailingAnchor).isActive = true
         
-        serviceContainerView.addSubview(agreementButton)
-        agreementButton.topAnchor.constraint(equalTo: qaButton.bottomAnchor).isActive = true
-        agreementButton.leadingAnchor.constraint(equalTo: serviceContainerView.leadingAnchor).isActive = true
-        agreementButton.trailingAnchor.constraint(equalTo: serviceContainerView.trailingAnchor).isActive = true
-
-        serviceContainerView.addSubview(locationButton)
-        locationButton.topAnchor.constraint(equalTo: agreementButton.bottomAnchor).isActive = true
-        locationButton.leadingAnchor.constraint(equalTo: serviceContainerView.leadingAnchor).isActive = true
-        locationButton.trailingAnchor.constraint(equalTo: serviceContainerView.trailingAnchor).isActive = true
-
-        serviceContainerView.addSubview(privacyButton)
-        privacyButton.topAnchor.constraint(equalTo: locationButton.bottomAnchor).isActive = true
-        privacyButton.leadingAnchor.constraint(equalTo: serviceContainerView.leadingAnchor).isActive = true
-        privacyButton.trailingAnchor.constraint(equalTo: serviceContainerView.trailingAnchor).isActive = true
-        privacyButton.bottomAnchor.constraint(equalTo: serviceContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        serviceStackView.addArrangedSubview(agreementButton)
+        agreementButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
+        agreementButton.trailingAnchor.constraint(equalTo: serviceStackView.trailingAnchor).isActive = true
+        
+        serviceStackView.addArrangedSubview(locationButton)
+        locationButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
+        locationButton.trailingAnchor.constraint(equalTo: serviceStackView.trailingAnchor).isActive = true
+        
+        serviceStackView.addArrangedSubview(privacyButton)
+        privacyButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
+        privacyButton.trailingAnchor.constraint(equalTo: serviceStackView.trailingAnchor).isActive = true
         
         // MARK: ConfigureView - Etc
-        contentView.addSubview(etcTitleView)
-        etcTitleView.topAnchor.constraint(equalTo: serviceContainerView.bottomAnchor).isActive = true
-        etcTitleView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        etcTitleView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        stackView.addArrangedSubview(etcTitleLabel)
+        etcTitleLabel.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        etcTitleLabel.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        contentView.addSubview(etcContainerView)
-        etcContainerView.topAnchor.constraint(equalTo: etcTitleView.bottomAnchor).isActive = true
-        etcContainerView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        etcContainerView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        etcContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        stackView.addArrangedSubview(etcStackView)
+        etcStackView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        etcStackView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
         
-        // MARK: ConfigureView - Etc - Personal
-        etcContainerView.addSubview(personalContainerView)
-        personalContainerView.topAnchor.constraint(equalTo: etcContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        personalContainerView.leadingAnchor.constraint(equalTo: etcContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        personalContainerView.trailingAnchor.constraint(equalTo: etcContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
+        etcStackView.addArrangedSubview(editUserIconButton)
+        editUserIconButton.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        editUserIconButton.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
         
-        personalContainerView.addSubview(typeTitleLabel)
-        typeTitleLabel.topAnchor.constraint(equalTo: personalContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        typeTitleLabel.leadingAnchor.constraint(equalTo: personalContainerView.leadingAnchor).isActive = true
-        typeTitleLabel.trailingAnchor.constraint(equalTo: personalContainerView.trailingAnchor).isActive = true
+        // MARK: ConfigureView - Etc - Type
+        etcStackView.addArrangedSubview(typeContainerView)
+        typeContainerView.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        typeContainerView.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
         
-        personalContainerView.addSubview(typeLabel)
-        typeLabel.topAnchor.constraint(equalTo: typeTitleLabel.bottomAnchor, constant: SPACE_XXXS).isActive = true
-        typeLabel.leadingAnchor.constraint(equalTo: personalContainerView.leadingAnchor).isActive = true
-        typeLabel.trailingAnchor.constraint(equalTo: personalContainerView.trailingAnchor).isActive = true
+        typeContainerView.addSubview(typeTitleLabel)
+        typeTitleLabel.topAnchor.constraint(equalTo: typeContainerView.topAnchor).isActive = true
+        typeTitleLabel.leadingAnchor.constraint(equalTo: typeContainerView.leadingAnchor).isActive = true
         
-        personalContainerView.addSubview(emailTitleLabel)
-        emailTitleLabel.topAnchor.constraint(equalTo: typeLabel.bottomAnchor, constant: SPACE).isActive = true
-        emailTitleLabel.leadingAnchor.constraint(equalTo: personalContainerView.leadingAnchor).isActive = true
-        emailTitleLabel.trailingAnchor.constraint(equalTo: personalContainerView.trailingAnchor).isActive = true
+        typeContainerView.addSubview(typeLabel)
+        typeLabel.topAnchor.constraint(equalTo: typeTitleLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        typeLabel.leadingAnchor.constraint(equalTo: typeContainerView.leadingAnchor).isActive = true
+        typeLabel.bottomAnchor.constraint(equalTo: typeContainerView.bottomAnchor).isActive = true
         
-        personalContainerView.addSubview(emailLabel)
-        emailLabel.topAnchor.constraint(equalTo: emailTitleLabel.bottomAnchor, constant: SPACE_XXXS).isActive = true
-        emailLabel.leadingAnchor.constraint(equalTo: personalContainerView.leadingAnchor).isActive = true
-        emailLabel.trailingAnchor.constraint(equalTo: personalContainerView.trailingAnchor).isActive = true
+        // MARK: ConfigureView - Etc - Email
+        etcStackView.addArrangedSubview(emailContainerView)
+        emailContainerView.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        emailContainerView.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
         
-        personalContainerView.addSubview(nameTitleLabel)
-        nameTitleLabel.topAnchor.constraint(equalTo: emailLabel.bottomAnchor, constant: SPACE).isActive = true
-        nameTitleLabel.leadingAnchor.constraint(equalTo: personalContainerView.leadingAnchor).isActive = true
-        nameTitleLabel.trailingAnchor.constraint(equalTo: personalContainerView.trailingAnchor).isActive = true
+        emailContainerView.addSubview(emailTitleLabel)
+        emailTitleLabel.topAnchor.constraint(equalTo: emailContainerView.topAnchor).isActive = true
+        emailTitleLabel.leadingAnchor.constraint(equalTo: emailContainerView.leadingAnchor).isActive = true
         
-        personalContainerView.addSubview(nameLabel)
-        nameLabel.topAnchor.constraint(equalTo: nameTitleLabel.bottomAnchor, constant: SPACE_XXXS).isActive = true
-        nameLabel.leadingAnchor.constraint(equalTo: personalContainerView.leadingAnchor).isActive = true
-        nameLabel.trailingAnchor.constraint(equalTo: personalContainerView.trailingAnchor).isActive = true
-        nameLabel.bottomAnchor.constraint(equalTo: personalContainerView.bottomAnchor).isActive = true
+        emailContainerView.addSubview(emailLabel)
+        emailLabel.topAnchor.constraint(equalTo: emailTitleLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        emailLabel.leadingAnchor.constraint(equalTo: emailContainerView.leadingAnchor).isActive = true
+        emailLabel.bottomAnchor.constraint(equalTo: emailContainerView.bottomAnchor).isActive = true
+        
+        // MARK: ConfigureView - Etc - Name
+        etcStackView.addArrangedSubview(nameContainerView)
+        nameContainerView.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        nameContainerView.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
+        
+        nameContainerView.addSubview(nameTitleLabel)
+        nameTitleLabel.topAnchor.constraint(equalTo: nameContainerView.topAnchor).isActive = true
+        nameTitleLabel.leadingAnchor.constraint(equalTo: nameContainerView.leadingAnchor).isActive = true
+        
+        nameContainerView.addSubview(nameLabel)
+        nameLabel.topAnchor.constraint(equalTo: nameTitleLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
+        nameLabel.leadingAnchor.constraint(equalTo: nameContainerView.leadingAnchor).isActive = true
+        nameLabel.bottomAnchor.constraint(equalTo: nameContainerView.bottomAnchor).isActive = true
         
         // MARK: ConfigureView - Etc - Version
-        etcContainerView.addSubview(versionContainerView)
-        versionContainerView.topAnchor.constraint(equalTo: personalContainerView.bottomAnchor, constant: SPACE_XS).isActive = true
-        versionContainerView.leadingAnchor.constraint(equalTo: etcContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        versionContainerView.trailingAnchor.constraint(equalTo: etcContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
+        etcStackView.addArrangedSubview(versionContainerView)
+        versionContainerView.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        versionContainerView.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
         
-        versionContainerView.addSubview(versionButton)
-        versionButton.topAnchor.constraint(equalTo: versionContainerView.topAnchor).isActive = true
-        versionButton.trailingAnchor.constraint(equalTo: versionContainerView.trailingAnchor).isActive = true
-        versionButton.bottomAnchor.constraint(equalTo: versionContainerView.bottomAnchor).isActive = true
+        versionContainerView.addSubview(versionTitleLabel)
+        versionTitleLabel.topAnchor.constraint(equalTo: versionContainerView.topAnchor).isActive = true
+        versionTitleLabel.leadingAnchor.constraint(equalTo: versionContainerView.leadingAnchor).isActive = true
         
         versionContainerView.addSubview(versionLabel)
+        versionLabel.topAnchor.constraint(equalTo: versionTitleLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
         versionLabel.leadingAnchor.constraint(equalTo: versionContainerView.leadingAnchor).isActive = true
-        versionLabel.centerYAnchor.constraint(equalTo: versionContainerView.centerYAnchor).isActive = true
+        versionLabel.bottomAnchor.constraint(equalTo: versionContainerView.bottomAnchor).isActive = true
         
-        // MARK: ConfigureView - Etc - Other
-        etcContainerView.addSubview(editUserButton)
-        editUserButton.topAnchor.constraint(equalTo: versionContainerView.bottomAnchor).isActive = true
-        editUserButton.leadingAnchor.constraint(equalTo: etcContainerView.leadingAnchor).isActive = true
-        editUserButton.trailingAnchor.constraint(equalTo: etcContainerView.trailingAnchor).isActive = true
+        versionContainerView.addSubview(versionButton)
+        versionButton.centerYAnchor.constraint(equalTo: versionContainerView.centerYAnchor).isActive = true
+        versionButton.trailingAnchor.constraint(equalTo: versionContainerView.trailingAnchor).isActive = true
         
-        etcContainerView.addSubview(logoutButton)
-        logoutButton.topAnchor.constraint(equalTo: editUserButton.bottomAnchor).isActive = true
-        logoutButton.leadingAnchor.constraint(equalTo: etcContainerView.leadingAnchor).isActive = true
-        logoutButton.trailingAnchor.constraint(equalTo: etcContainerView.trailingAnchor).isActive = true
-
-        etcContainerView.addSubview(leaveButton)
-        leaveButton.topAnchor.constraint(equalTo: logoutButton.bottomAnchor).isActive = true
-        leaveButton.leadingAnchor.constraint(equalTo: etcContainerView.leadingAnchor).isActive = true
-        leaveButton.trailingAnchor.constraint(equalTo: etcContainerView.trailingAnchor).isActive = true
-        leaveButton.bottomAnchor.constraint(equalTo: etcContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        // MARK: ConfigureView - Etc - Button
+        etcStackView.addArrangedSubview(logoutIconButton)
+        logoutIconButton.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        logoutIconButton.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
+        
+        etcStackView.addArrangedSubview(leaveIconButton)
+        leaveIconButton.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        leaveIconButton.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
-    @objc func qaTapped() {
-        
+    @objc func qnaTapped() {
+        navigationController?.pushViewController(QnaViewController(), animated: true)
     }
     
     @objc func agreementTapped() {
@@ -524,17 +511,13 @@ class SettingViewController: UIViewController {
     }
     
     @objc func editUserTapped() {
-        isOpenedChildVC = true
-        let editUserVC = EditUserViewController()
-//        editUserVC.authAccountVC = authAccountVC
-        editUserVC.delegate = self
-        navigationController?.pushViewController(editUserVC, animated: true)
+        navigationController?.pushViewController(EditUserViewController(), animated: true)
     }
     
     @objc func logoutTapped() {
-        let alert = UIAlertController(title: "로그아웃", message: "'플레픽'으로부터 로그아웃을 합니다. 계속하시겠습니까?", preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
-        alert.addAction(UIAlertAction(title: "로그아웃", style: UIAlertAction.Style.destructive, handler: { (_) in
+        let alert = UIAlertController(title: "로그아웃", message: "'플레픽'으로부터 로그아웃을 합니다. 계속하시겠습니까?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        alert.addAction(UIAlertAction(title: "로그아웃", style: .destructive, handler: { (_) in
             self.logoutRequest.fetch(vc: self, paramDict: [:])
         }))
         present(alert, animated: true, completion: nil)
@@ -545,27 +528,22 @@ class SettingViewController: UIViewController {
     }
 }
 
-// MARK: Extension - PushView
+
+// MARK: PushView
 extension SettingViewController: PushViewProtocol {
     func switching(actionMode: String) {
         var isAllowed = "N"
-        if actionMode == "FOLLOW" {
-            isAllowed = followPushView.push.isOn ? "Y" : "N"
-        } else if actionMode == "MY_PICK_COMMENT" {
-            isAllowed = myPickCommentPushView.push.isOn ? "Y" : "N"
-        } else if actionMode == "RECOMMENDED_PLACE" {
-            isAllowed = recommendedPlacePushView.push.isOn ? "Y" : "N"
-        } else if actionMode == "AD" {
-            isAllowed = adPushView.push.isOn ? "Y" : "N"
-        } else if actionMode == "EVENT_NOTICE" {
-            isAllowed = eventNoticePushView.push.isOn ? "Y" : "N"
-        }
+        if actionMode == "FOLLOW" { isAllowed = followPushView.sw.isOn ? "Y" : "N" }
+        else if actionMode == "MY_PICK_COMMENT" { isAllowed = myPickCommentPushView.sw.isOn ? "Y" : "N" }
+        else if actionMode == "RECOMMENDED_PLACE" { isAllowed = recommendedPlacePushView.sw.isOn ? "Y" : "N" }
+        else if actionMode == "AD" { isAllowed = adPushView.sw.isOn ? "Y" : "N" }
+        else if actionMode == "EVENT_NOTICE" { isAllowed = eventNoticePushView.sw.isOn ? "Y" : "N" }
         
         app.setPushNotification(key: actionMode, value: isAllowed)
         
         let pndId = app.getPndId()
         if pndId.isEmpty && isAllowed == "Y" {
-            app.checkPushNotificationAvailable(vc: self)
+            checkPushNotificationAvailable()
             return
         }
         
@@ -573,25 +551,20 @@ extension SettingViewController: PushViewProtocol {
     }
 }
 
-// MARK: Extension - EditPushNotificationDevice
-extension SettingViewController: EditPushNotificationDeviceRequestProtocol {
-    func response(editPushNotificationDevice status: String) {
-        // nothing to do...
-    }
-}
-
-// MARK: Extension - Logout
+// MARK: HTTP - Logout
 extension SettingViewController: LogoutRequestProtocol {
     func response(logout status: String) {
+        print("[HTTP RES]", logoutRequest.apiUrl, status)
+        
         if status == "OK" {
             changeRootViewController(rootViewController: LoginViewController())
         }
     }
 }
 
-// MARK: Extension - EditUserVC
-extension SettingViewController: EditUserViewControllerProtocol {
-    func closeEditUserVC() {
-        isOpenedChildVC = false
+// MARK: HTTP - EditPushNotificationDevice
+extension SettingViewController: EditPushNotificationDeviceRequestProtocol {
+    func response(editPushNotificationDevice status: String) {
+        print("[HTTP RES]", editPushNotificationDeviceRequest.apiUrl, status)
     }
 }

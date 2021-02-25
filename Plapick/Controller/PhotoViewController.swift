@@ -8,16 +8,9 @@
 import UIKit
 
 
-protocol PhotoViewControllerProtocol {
-    func closePhotoViewVC()
-}
-
-
 class PhotoViewController: UIViewController {
     
     // MARK: Property
-    var delegate: PhotoViewControllerProtocol?
-    var app = App()
     var image: UIImage? {
         didSet {
             guard let image = self.image else { return }
@@ -37,28 +30,6 @@ class PhotoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        isModalInPresentation = true // 후....
-        
-        setThemeColor()
-    }
-    
-    
-    // MARK: ViewDidDisappear
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        delegate?.closePhotoViewVC()
-    }
-    
-    
-    // MARK: Function
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        setThemeColor()
-    }
-    func setThemeColor() {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            view.backgroundColor = .black
-        } else {
-            view.backgroundColor = .white
-        }
+        view.backgroundColor = .systemBackground
     }
 }

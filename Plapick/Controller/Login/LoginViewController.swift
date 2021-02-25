@@ -31,7 +31,7 @@ class LoginViewController: UIViewController {
     lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "PLAPICK"
-        label.font = UIFont.boldSystemFont(ofSize: 40)
+        label.font = .boldSystemFont(ofSize: 40)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -62,8 +62,8 @@ class LoginViewController: UIViewController {
         return iv
     }()
     lazy var appleButton: ASAuthorizationAppleIDButton = {
-        let button = ASAuthorizationAppleIDButton(type: ASAuthorizationAppleIDButton.ButtonType.signIn, style: ASAuthorizationAppleIDButton.Style.whiteOutline)
-        button.addTarget(self, action: #selector(appleLoginTapped), for: UIControl.Event.touchUpInside)
+        let button = ASAuthorizationAppleIDButton(type: .signIn, style: .whiteOutline)
+        button.addTarget(self, action: #selector(appleLoginTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -76,7 +76,7 @@ class LoginViewController: UIViewController {
         return aiv
     }()
     lazy var blurOverlayView: UIVisualEffectView = {
-        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
+        let blurEffect = UIBlurEffect(style: .light)
         let vev = UIVisualEffectView(effect: blurEffect)
         vev.alpha = 0.3
         vev.translatesAutoresizingMaskIntoConstraints = false
@@ -95,8 +95,6 @@ class LoginViewController: UIViewController {
         loginRequest.delegate = self
         getVersionRequest.delegate = self
         getPushNotificationDeviceRequest.delegate = self
-        
-        
     }
     
     
@@ -145,44 +143,20 @@ class LoginViewController: UIViewController {
     }
     
     func showLoginFailedAlert(message: String) {
-        let alert = UIAlertController(title: "로그인 실패", message: message, preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: "확인", style: UIAlertAction.Style.cancel))
-        self.present(alert, animated: true)
-    }
-    
-    // MARK: Function - Indicator
-    func showIndicator() {
-        view.addSubview(blurOverlayView)
-        blurOverlayView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        blurOverlayView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        blurOverlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        blurOverlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-
-        view.addSubview(indicatorView)
-        indicatorView.centerXAnchor.constraint(equalTo: blurOverlayView.centerXAnchor).isActive = true
-        indicatorView.centerYAnchor.constraint(equalTo: blurOverlayView.centerYAnchor).isActive = true
-        indicatorView.startAnimating()
-    }
-    func hideIndicator() {
-        self.indicatorView.stopAnimating()
-        self.indicatorView.removeView()
-        self.blurOverlayView.removeView()
+        let alert = UIAlertController(title: "로그인 실패", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .cancel))
+        present(alert, animated: true)
     }
     
     func fetchKakaoLogin(user: KakaoSDKUser.User) {
-        var socialId = ""
-        var email = ""
-        var name = ""
-        var profileImage = ""
+        let socialId = String(user.id)
         
-        socialId = String(user.id)
-        if let kakaoAccount = user.kakaoAccount {
-            if let _email = kakaoAccount.email { email = _email }
-        }
-        if let properties = user.properties {
-            if let _name = properties["nickname"] { name = _name }
-            if let _profileImage = properties["profile_image"] { profileImage = _profileImage }
-        }
+        guard let kakaoAccount = user.kakaoAccount else { return }
+        let email = kakaoAccount.email ?? ""
+        
+        guard let properties = user.properties else { return }
+        let name = properties["nickname"] ?? ""
+        let profileImage = properties["profile_image"] ?? ""
         
         loginRequest.fetch(vc: self, paramDict: ["type": "KAKAO", "socialId": socialId, "email": email, "name": name, "profileImage": profileImage])
     }
@@ -190,7 +164,7 @@ class LoginViewController: UIViewController {
     
     // MARK: Function - @OBJC
     @objc func appleLoginTapped() {
-        showIndicator()
+        showIndicator(idv: indicatorView, bov: blurOverlayView)
         let appleIDProvider = ASAuthorizationAppleIDProvider()
         let request = appleIDProvider.createRequest()
         request.requestedScopes = [.fullName, .email]
@@ -202,23 +176,23 @@ class LoginViewController: UIViewController {
     }
     
     @objc func kakaoLoginTapped() {
-        showIndicator()
+        showIndicator(idv: indicatorView, bov: blurOverlayView)
         if (AuthApi.isKakaoTalkLoginAvailable()) {
             // KAKAO App Login
             AuthApi.shared.loginWithKakaoTalk {(oauthToken, error) in
                 if let _ = error {
-                    self.hideIndicator()
+                    self.hideIndicator(idv: self.indicatorView, bov: self.blurOverlayView)
                     self.showLoginFailedAlert(message: "사용자에 의해 카카오 로그인이 취소되었습니다.")
                     return
                 }
                 UserApi.shared.me() { (user, error) in
                     if let _ = error {
-                        self.hideIndicator()
+                        self.hideIndicator(idv: self.indicatorView, bov: self.blurOverlayView)
                         self.showLoginFailedAlert(message: "사용자 정보를 가져올 수 없습니다.")
                         return
                     }
                     guard let user = user else {
-                        self.hideIndicator()
+                        self.hideIndicator(idv: self.indicatorView, bov: self.blurOverlayView)
                         self.showLoginFailedAlert(message: "사용자 정보를 가져올 수 없습니다.")
                         return
                     }
@@ -230,18 +204,18 @@ class LoginViewController: UIViewController {
             // KAKAO Web Login
             AuthApi.shared.loginWithKakaoAccount {(oauthToken, error) in
                 if let _ = error {
-                    self.hideIndicator()
+                    self.hideIndicator(idv: self.indicatorView, bov: self.blurOverlayView)
                     self.showLoginFailedAlert(message: "사용자에 의해 카카오 로그인이 취소되었습니다.")
                     return
                 }
                 UserApi.shared.me() { (user, error) in
                     if let _ = error {
-                        self.hideIndicator()
+                        self.hideIndicator(idv: self.indicatorView, bov: self.blurOverlayView)
                         self.showLoginFailedAlert(message: "사용자 정보를 가져올 수 없습니다.")
                         return
                     }
                     guard let user = user else {
-                        self.hideIndicator()
+                        self.hideIndicator(idv: self.indicatorView, bov: self.blurOverlayView)
                         self.showLoginFailedAlert(message: "사용자 정보를 가져올 수 없습니다.")
                         return
                     }
@@ -265,17 +239,16 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
         switch authorization.credential {
         case let appleIDCredential as ASAuthorizationAppleIDCredential:
             let socialId = appleIDCredential.user
-            var email = ""
+            
+            let email = appleIDCredential.email ?? ""
+            
             var name = ""
-            if let _email = appleIDCredential.email { email = _email }
-            if let fullName = appleIDCredential.fullName {
-                if let familyName = fullName.familyName { name += familyName }
-                if let givenName = fullName.givenName { name += givenName }
-            }
+            if let fullName = appleIDCredential.fullName { name = "\(fullName.familyName ?? "")\(fullName.givenName ?? "")" }
+            
             loginRequest.fetch(vc: self, paramDict: ["type": "APPLE", "socialId": socialId, "email": email, "name": name])
             
         default:
-            hideIndicator()
+            hideIndicator(idv: indicatorView, bov: blurOverlayView)
             showLoginFailedAlert(message: "사용자 정보를 가져올 수 없습니다.")
             break
         }
@@ -287,63 +260,64 @@ extension LoginViewController: ASAuthorizationControllerPresentationContextProvi
     }
 }
 
-
+// MARK: HTTP - Login
 extension LoginViewController: LoginRequestProtocol {
     func response(user: User?, login status: String) {
-        hideIndicator()
+        print("[HTTP RES]", loginRequest.apiUrl, status)
+        
+        hideIndicator(idv: indicatorView, bov: blurOverlayView)
         if status == "OK" {
-            if let user = user {
-                app.login(user: user)
-                
-                getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
-            }
+            guard let user = user else { return }
+            app.login(user: user)
+            getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
         }
     }
 }
 
-
-// MARK: Extension - GetVersion
+// MARK: HTTP - GetVersion
 extension LoginViewController: GetVersionRequestProtocol {
     func response(versionCode: Int?, versionName: String?, getVersion status: String) {
+        print("[HTTP RES]", getVersionRequest.apiUrl, status)
+        
         if status == "OK" {
             guard let versionCode = versionCode else { return }
             guard let versionName = versionName else { return }
-            
             app.setNewVersionCode(newVersionCode: versionCode)
             app.setNewVersionName(newVersionName: versionName)
             
             guard let infoDictionary = Bundle.main.infoDictionary else { return }
-            let code = infoDictionary["CFBundleVersion"] as? String
-            let name = infoDictionary["CFBundleShortVersionString"] as? String
-            if let versionCode = code {
-                if let curVersionCode = Int(versionCode) {
-                    app.setCurVersionCode(curVersionCode: curVersionCode)
-                }
-            }
-            if let curVersionName = name {
-                app.setCurVersionName(curVersionName: curVersionName)
-            }
+            guard let code = infoDictionary["CFBundleVersion"] as? String else { return }
+            guard let curVersionName = infoDictionary["CFBundleShortVersionString"] as? String else { return }
+            guard let curVersionCode = Int(code) else { return }
+            app.setCurVersionCode(curVersionCode: curVersionCode)
+            app.setCurVersionName(curVersionName: curVersionName)
             
             let pndId = app.getPndId()
-            if pndId.isEmpty {
-                changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
-            } else {
-                getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": pndId])
-            }
+            if pndId.isEmpty { changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController())) }
+            else { getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": pndId]) }
         }
     }
 }
 
-// MARK: Extension - GetPushNotificationDevice
+// MARK: HTTP - GetPushNotificationDevice
 extension LoginViewController: GetPushNotificationDeviceRequestProtocol {
     func response(isAllowedFollow: String?, isAllowedMyPickComment: String?, isAllowedRecommendedPlace: String?, isAllowedAd: String?, isAllowedEventNotice: String?, getPushNotificationDevice status: String) {
+        print("[HTTP RES]", getPushNotificationDeviceRequest.apiUrl, status)
         
-        app.setPushNotification(key: "FOLLOW", value: isAllowedFollow ?? "Y")
-        app.setPushNotification(key: "MY_PICK_COMMENT", value: isAllowedMyPickComment ?? "Y")
-        app.setPushNotification(key: "RECOMMENDED_PLACE", value: isAllowedRecommendedPlace ?? "Y")
-        app.setPushNotification(key: "AD", value: isAllowedAd ?? "Y")
-        app.setPushNotification(key: "EVENT_NOTICE", value: isAllowedEventNotice ?? "Y")
-        
-        changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+        if status == "OK" {
+            guard let isAllowedFollow = isAllowedFollow else { return }
+            guard let isAllowedMyPickComment = isAllowedMyPickComment else { return }
+            guard let isAllowedRecommendedPlace = isAllowedRecommendedPlace else { return }
+            guard let isAllowedAd = isAllowedAd else { return }
+            guard let isAllowedEventNotice = isAllowedEventNotice else { return }
+            
+            app.setPushNotification(key: "FOLLOW", value: isAllowedFollow)
+            app.setPushNotification(key: "MY_PICK_COMMENT", value: isAllowedMyPickComment)
+            app.setPushNotification(key: "RECOMMENDED_PLACE", value: isAllowedRecommendedPlace)
+            app.setPushNotification(key: "AD", value: isAllowedAd)
+            app.setPushNotification(key: "EVENT_NOTICE", value: isAllowedEventNotice)
+            
+            changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+        }
     }
 }

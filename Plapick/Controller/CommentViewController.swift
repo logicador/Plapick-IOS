@@ -30,7 +30,6 @@ class CommentViewController: UIViewController {
     // MARK: View
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
-        sv.delegate = self
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
@@ -44,14 +43,6 @@ class CommentViewController: UIViewController {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
-    }()
-    lazy var noCommentLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        label.text = "등록된 댓글이 없습니다."
-        label.textColor = .systemGray
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
     }()
     
     // MARK: View - Write
@@ -104,9 +95,7 @@ class CommentViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        isModalInPresentation = true
-        
-        navigationItem.title = "댓글"
+        navigationItem.title = "댓글 0개"
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -162,10 +151,6 @@ class CommentViewController: UIViewController {
         commentContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
         commentContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        contentView.addSubview(noCommentLabel)
-        noCommentLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: SCREEN_WIDTH / 2).isActive = true
-        noCommentLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        
         // MARK: View - Write
         view.addSubview(commentWriteContainerView)
         commentWriteContainerBottomCons = commentWriteContainerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -203,6 +188,16 @@ class CommentViewController: UIViewController {
         guard let mode = self.mode else { return }
         guard let id = self.id else { return }
         getCommentsRequest.fetch(vc: self, paramDict: ["mode": mode, "id": String(id)])
+    }
+    
+    func setNoCommentView() {
+        let ndv = NoDataView(size: 16, text: "댓글이 없습니다.")
+        
+        commentContainerView.addSubview(ndv)
+        ndv.topAnchor.constraint(equalTo: commentContainerView.topAnchor, constant: SPACE_XXL).isActive = true
+        ndv.centerXAnchor.constraint(equalTo: commentContainerView.centerXAnchor).isActive = true
+        ndv.widthAnchor.constraint(equalTo: commentContainerView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        ndv.bottomAnchor.constraint(equalTo: commentContainerView.bottomAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
@@ -247,41 +242,32 @@ class CommentViewController: UIViewController {
 }
 
 
-// MARK: ScrollView
-extension CommentViewController: UIScrollViewDelegate {
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if textField.isFirstResponder {
-            textField.resignFirstResponder()
-        }
-    }
-}
-
-
 // MARK: CommentView
-extension CommentViewController: CommentViewProtocol {
-    func openUser(uId: Int) {
-        if textField.isFirstResponder {
-            textField.resignFirstResponder()
-        }
-        
-        present(UINavigationController(rootViewController: AccountViewController(uId: uId)), animated: true, completion: nil)
-    }
-    
-    func removeComment(comment: Comment) {
-        if textField.isFirstResponder {
-            textField.resignFirstResponder()
-        }
-        
-        guard let mode = self.mode else { return }
-        if comment.uId != app.getUId() { return }
-        let alert = UIAlertController(title: "댓글 삭제", message: "작성하신 댓글을 삭제하시겠습니까?", preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
-        alert.addAction(UIAlertAction(title: "삭제", style: UIAlertAction.Style.destructive, handler: { (_) in
-            self.removeCommentRequest.fetch(vc: self, paramDict: ["mode": mode, "id": String(comment.id)])
-        }))
-        present(alert, animated: true, completion: nil)
-    }
-}
+//extension CommentViewController: CommentViewProtocol {
+//    func openUser(uId: Int) {
+//        if textField.isFirstResponder {
+//            textField.resignFirstResponder()
+//        }
+//        let accountVC = AccountViewController()
+////        accountVC.uId = uId
+//        present(UINavigationController(rootViewController: accountVC), animated: true, completion: nil)
+//    }
+//
+//    func removeComment(comment: Comment) {
+//        if textField.isFirstResponder {
+//            textField.resignFirstResponder()
+//        }
+//
+//        guard let mode = self.mode else { return }
+//        if comment.uId != app.getUId() { return }
+//        let alert = UIAlertController(title: "댓글 삭제", message: "작성하신 댓글을 삭제하시겠습니까?", preferredStyle: UIAlertController.Style.alert)
+//        alert.addAction(UIAlertAction(title: "취소", style: UIAlertAction.Style.cancel))
+//        alert.addAction(UIAlertAction(title: "삭제", style: UIAlertAction.Style.destructive, handler: { (_) in
+//            self.removeCommentRequest.fetch(vc: self, paramDict: ["mode": mode, "id": String(comment.id)])
+//        }))
+//        present(alert, animated: true, completion: nil)
+//    }
+//}
 
 
 // MARK: HTTP - GetComments
@@ -295,11 +281,10 @@ extension CommentViewController: GetCommentsRequestProtocol {
             navigationItem.title = "댓글 \(commentList.count)개"
             
             if commentList.count > 0 {
-                noCommentLabel.isHidden = true
                 for (i, comment) in commentList.enumerated() {
                     let cv = CommentView()
-                    cv.comment = comment
-                    cv.delegate = self
+//                    cv.comment = comment
+//                    cv.delegate = self
                     
                     commentContainerView.addSubview(cv)
                     
@@ -312,12 +297,12 @@ extension CommentViewController: GetCommentsRequestProtocol {
                         cv.topAnchor.constraint(equalTo: commentContainerView.subviews[commentContainerView.subviews.count - 2].bottomAnchor, constant: SPACE_S).isActive = true
                     }
                     if i == commentList.count - 1 {
-                        cv.bottomAnchor.constraint(equalTo: commentContainerView.bottomAnchor).isActive = true
+                        cv.bottomAnchor.constraint(equalTo: commentContainerView.bottomAnchor, constant: -SPACE_S).isActive = true
                     }
                 }
                 
             } else {
-                noCommentLabel.isHidden = false
+                setNoCommentView()
             }
         }
     }

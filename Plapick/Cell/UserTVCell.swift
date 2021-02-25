@@ -16,20 +16,29 @@ class UserTVCell: UITableViewCell {
         didSet {
             guard let user = self.user else { return }
             
-            photoView.setProfileImage(uId: user.id, profileImage: user.profileImage)
-            
+            let cntMabs = NSMutableAttributedString()
+                .normal("게시한 픽 ", size: 12, color: .systemGray)
+                .bold(String(user.pickCnt), size: 12)
+                .normal("  팔로워 ", size: 12, color: .systemGray)
+                .bold(String(user.followerCnt), size: 12)
+            cntLabel.attributedText = cntMabs
             nickNameLabel.text = user.nickName
-            followerCntLabel.text = String(user.followerCnt)
-            pickCntLabel.text = String(user.pickCnt)
+            
+            guard let profileImage = user.profileImage else { return }
+            profileImageView.setProfileImage(uId: user.id, profileImage: profileImage)
         }
     }
     
     
     // MARK: View
-    lazy var photoView: PhotoView = {
-        let pv = PhotoView()
-        pv.layer.cornerRadius = 25
-        return pv
+    lazy var profileImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.backgroundColor = .systemGray6
+        iv.layer.cornerRadius = 25
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
     }()
     
     lazy var labelContainerView: UIView = {
@@ -38,45 +47,15 @@ class UserTVCell: UITableViewCell {
         return view
     }()
     
+    lazy var cntLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     lazy var nickNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    lazy var cntContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    lazy var pickCntTitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "게시한 픽 "
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .systemGray
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    lazy var pickCntLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 12)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    lazy var followerCntTitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "팔로워 "
-        label.font = UIFont.systemFont(ofSize: 12)
-        label.textColor = .systemGray
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    lazy var followerCntLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 12)
+        label.font = .systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -87,62 +66,30 @@ class UserTVCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         configureView()
-        
-        setThemeColor()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    // MARK: Function
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        setThemeColor()
-    }
-    func setThemeColor() {
-        if self.traitCollection.userInterfaceStyle == .dark {
-            backgroundColor = .black
-        } else {
-            backgroundColor = .white
-        }
-    }
-    
     func configureView() {
-        addSubview(photoView)
-        photoView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        photoView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: SPACE).isActive = true
-        photoView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        photoView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        addSubview(profileImageView)
+        profileImageView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        profileImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: SPACE).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         addSubview(labelContainerView)
-        labelContainerView.leadingAnchor.constraint(equalTo: photoView.trailingAnchor, constant: SPACE).isActive = true
+        labelContainerView.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
+        labelContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         labelContainerView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
-        labelContainerView.addSubview(cntContainerView)
-        cntContainerView.topAnchor.constraint(equalTo: labelContainerView.topAnchor).isActive = true
-        cntContainerView.leadingAnchor.constraint(equalTo: labelContainerView.leadingAnchor).isActive = true
-        
-        cntContainerView.addSubview(pickCntTitleLabel)
-        pickCntTitleLabel.centerYAnchor.constraint(equalTo: cntContainerView.centerYAnchor).isActive = true
-        pickCntTitleLabel.leadingAnchor.constraint(equalTo: cntContainerView.leadingAnchor).isActive = true
-        
-        cntContainerView.addSubview(pickCntLabel)
-        pickCntLabel.leadingAnchor.constraint(equalTo: pickCntTitleLabel.trailingAnchor).isActive = true
-        pickCntLabel.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
-        pickCntLabel.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
-        
-        cntContainerView.addSubview(followerCntTitleLabel)
-        followerCntTitleLabel.leadingAnchor.constraint(equalTo: pickCntLabel.trailingAnchor, constant: SPACE_XXS).isActive = true
-        followerCntTitleLabel.centerYAnchor.constraint(equalTo: cntContainerView.centerYAnchor).isActive = true
-        
-        cntContainerView.addSubview(followerCntLabel)
-        followerCntLabel.leadingAnchor.constraint(equalTo: followerCntTitleLabel.trailingAnchor).isActive = true
-        followerCntLabel.topAnchor.constraint(equalTo: cntContainerView.topAnchor).isActive = true
-        followerCntLabel.bottomAnchor.constraint(equalTo: cntContainerView.bottomAnchor).isActive = true
+        labelContainerView.addSubview(cntLabel)
+        cntLabel.topAnchor.constraint(equalTo: labelContainerView.topAnchor).isActive = true
+        cntLabel.leadingAnchor.constraint(equalTo: labelContainerView.leadingAnchor).isActive = true
         
         labelContainerView.addSubview(nickNameLabel)
-        nickNameLabel.topAnchor.constraint(equalTo: cntContainerView.bottomAnchor, constant: SPACE_XXS).isActive = true
+        nickNameLabel.topAnchor.constraint(equalTo: cntLabel.bottomAnchor, constant: SPACE_XXXS).isActive = true
         nickNameLabel.leadingAnchor.constraint(equalTo: labelContainerView.leadingAnchor).isActive = true
         nickNameLabel.bottomAnchor.constraint(equalTo: labelContainerView.bottomAnchor).isActive = true
     }

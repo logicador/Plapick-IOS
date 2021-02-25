@@ -17,6 +17,7 @@ class NoticeViewController: UIViewController {
     // MARK: VIew
     lazy var scrollView: UIScrollView = {
         let sv = UIScrollView()
+        sv.alwaysBounceVertical = true
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
@@ -24,23 +25,12 @@ class NoticeViewController: UIViewController {
     lazy var stackView: UIStackView = {
         let sv = UIStackView()
         sv.axis = .vertical
-        sv.distribution = .fillProportionally
+        sv.distribution = .fill
         sv.alignment = .center
         sv.spacing = 10
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
-    
-    
-    // MARK: Init
-    init(mainVC: MainViewController) {
-        super.init(nibName: nil, bundle: nil)
-        self.mainVC = mainVC
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     
     // MARK: ViewDidLoad
@@ -53,14 +43,14 @@ class NoticeViewController: UIViewController {
     }
     
     
-    // MARK: ViewWillAppear
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        mainVC?.title = "알림"
-        mainVC?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "설정", style: UIBarButtonItem.Style.plain, target: self, action: nil)
-        mainVC?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "모두 삭제", style: UIBarButtonItem.Style.plain, target: self, action: nil)
-    }
+//    // MARK: ViewWillAppear
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        
+//        mainVC?.title = "알림"
+//        mainVC?.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "설정", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+//        mainVC?.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "모두 삭제", style: UIBarButtonItem.Style.plain, target: self, action: nil)
+//    }
     
     
     // MARK: Function

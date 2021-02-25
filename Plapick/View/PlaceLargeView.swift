@@ -30,7 +30,7 @@ class PlaceLargeView: UIView {
         didSet {
             guard let place = self.place else { return }
             
-            let categoryName = app.getCategoryString(categoryName: place.categoryName)
+            let categoryName = app.getCategoryName(categoryName: place.categoryName)
             categoryNameLabel.text = categoryName
             
             nameLabel.text = place.name
@@ -41,9 +41,9 @@ class PlaceLargeView: UIView {
             commentCntButton.setTitle("댓글 \(place.commentCnt)개", for: UIControl.State.normal)
             pickCntButton.setTitle("픽 \(place.pickCnt)개", for: UIControl.State.normal)
             
-            mostPickList = place.mostPickList
+//            mostPickList = place.mostPickList
             collectionView.reloadData()
-            pageControl.numberOfPages = place.mostPickList.count
+//            pageControl.numberOfPages = place.mostPickList.count
         }
     }
     
