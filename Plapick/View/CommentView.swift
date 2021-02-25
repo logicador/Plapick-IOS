@@ -140,6 +140,7 @@ class CommentView: UIView {
         containerView.addSubview(commentLabel)
         commentLabel.topAnchor.constraint(equalTo: profileImageView.bottomAnchor ,constant: -12).isActive = true
         commentLabel.leadingAnchor.constraint(equalTo: profileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
+        commentLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
         commentLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
     }
     

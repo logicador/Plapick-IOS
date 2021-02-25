@@ -55,6 +55,16 @@
 		5792F5C225AB494E00015FE9 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5792F5C125AB494E00015FE9 /* LoginViewController.swift */; };
 		5792F5C625AB4BB600015FE9 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 5792F5C525AB4BB600015FE9 /* logo.png */; };
 		57A5527625B682BC009EABA3 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A5527525B682BC009EABA3 /* PhotoViewController.swift */; };
+		57A8B3B925E7487C005B7BE5 /* GetPickCommentsRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3B825E7487C005B7BE5 /* GetPickCommentsRequest.swift */; };
+		57A8B3BC25E748A5005B7BE5 /* PickComments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3BB25E748A5005B7BE5 /* PickComments.swift */; };
+		57A8B3BF25E74E82005B7BE5 /* LikePickRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3BE25E74E82005B7BE5 /* LikePickRequest.swift */; };
+		57A8B3C225E7594C005B7BE5 /* PickCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3C125E7594C005B7BE5 /* PickCommentViewController.swift */; };
+		57A8B3C525E75E92005B7BE5 /* AddPickCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3C425E75E92005B7BE5 /* AddPickCommentRequest.swift */; };
+		57A8B3C825E75E9E005B7BE5 /* RemovePickCommentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3C725E75E9E005B7BE5 /* RemovePickCommentRequest.swift */; };
+		57A8B3CB25E77325005B7BE5 /* RemovePickRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3CA25E77325005B7BE5 /* RemovePickRequest.swift */; };
+		57A8B3CE25E77D76005B7BE5 /* CheckPickRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3CD25E77D76005B7BE5 /* CheckPickRequest.swift */; };
+		57A8B3D125E7F6CE005B7BE5 /* AddUserDeviceRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3D025E7F6CE005B7BE5 /* AddUserDeviceRequest.swift */; };
+		57A8B3D425E7FDB8005B7BE5 /* EditUserPushRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A8B3D325E7FDB8005B7BE5 /* EditUserPushRequest.swift */; };
 		57A97D4F25AD6A4300E8F982 /* LogoutRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A97D4E25AD6A4300E8F982 /* LogoutRequest.swift */; };
 		57A97D5525AD9A6E00E8F982 /* NoticeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A97D5425AD9A6E00E8F982 /* NoticeViewController.swift */; };
 		57A9966825C7E64C0016CDA5 /* PlaceMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A9966725C7E64C0016CDA5 /* PlaceMapViewController.swift */; };
@@ -155,6 +165,16 @@
 		5792F5C125AB494E00015FE9 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		5792F5C525AB4BB600015FE9 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		57A5527525B682BC009EABA3 /* PhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
+		57A8B3B825E7487C005B7BE5 /* GetPickCommentsRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetPickCommentsRequest.swift; sourceTree = "<group>"; };
+		57A8B3BB25E748A5005B7BE5 /* PickComments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickComments.swift; sourceTree = "<group>"; };
+		57A8B3BE25E74E82005B7BE5 /* LikePickRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikePickRequest.swift; sourceTree = "<group>"; };
+		57A8B3C125E7594C005B7BE5 /* PickCommentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickCommentViewController.swift; sourceTree = "<group>"; };
+		57A8B3C425E75E92005B7BE5 /* AddPickCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPickCommentRequest.swift; sourceTree = "<group>"; };
+		57A8B3C725E75E9E005B7BE5 /* RemovePickCommentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemovePickCommentRequest.swift; sourceTree = "<group>"; };
+		57A8B3CA25E77325005B7BE5 /* RemovePickRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemovePickRequest.swift; sourceTree = "<group>"; };
+		57A8B3CD25E77D76005B7BE5 /* CheckPickRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckPickRequest.swift; sourceTree = "<group>"; };
+		57A8B3D025E7F6CE005B7BE5 /* AddUserDeviceRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddUserDeviceRequest.swift; sourceTree = "<group>"; };
+		57A8B3D325E7FDB8005B7BE5 /* EditUserPushRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditUserPushRequest.swift; sourceTree = "<group>"; };
 		57A97D4E25AD6A4300E8F982 /* LogoutRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutRequest.swift; sourceTree = "<group>"; };
 		57A97D5425AD9A6E00E8F982 /* NoticeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeViewController.swift; sourceTree = "<group>"; };
 		57A9966725C7E64C0016CDA5 /* PlaceMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceMapViewController.swift; sourceTree = "<group>"; };
@@ -319,6 +339,7 @@
 				5778BBB525E0DCEE00377A52 /* WriteQnaViewController.swift */,
 				57755BD425B47F4B00CF0849 /* PickViewController.swift */,
 				57E971A625E4F6F400D86FC5 /* PlaceCommentViewController.swift */,
+				57A8B3C125E7594C005B7BE5 /* PickCommentViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -371,6 +392,7 @@
 				573E42ED25CAB6DA00D6231A /* ChildLocation.swift */,
 				5710A7DE25CDA1D6000C5D8D /* Qna.swift */,
 				57E9719525E4DE1500D86FC5 /* PlaceComment.swift */,
+				57A8B3BB25E748A5005B7BE5 /* PickComments.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -417,6 +439,7 @@
 				57A9967725C860C90016CDA5 /* GetCommentsRequest.swift */,
 				5778BBBC25E0F3EA00377A52 /* GetQnasRequest.swift */,
 				57E9719225E4DAE900D86FC5 /* GetPlaceCommentsRequest.swift */,
+				57A8B3B825E7487C005B7BE5 /* GetPickCommentsRequest.swift */,
 			);
 			path = Get;
 			sourceTree = "<group>";
@@ -441,6 +464,13 @@
 				57BA5F1225E2CBBB00C8A628 /* RemoveQnaRequest.swift */,
 				57E971A925E50CEA00D86FC5 /* AddPlaceCommentRequest.swift */,
 				57E971AC25E5148D00D86FC5 /* RemovePlaceCommentRequest.swift */,
+				57A8B3BE25E74E82005B7BE5 /* LikePickRequest.swift */,
+				57A8B3C425E75E92005B7BE5 /* AddPickCommentRequest.swift */,
+				57A8B3C725E75E9E005B7BE5 /* RemovePickCommentRequest.swift */,
+				57A8B3CA25E77325005B7BE5 /* RemovePickRequest.swift */,
+				57A8B3CD25E77D76005B7BE5 /* CheckPickRequest.swift */,
+				57A8B3D025E7F6CE005B7BE5 /* AddUserDeviceRequest.swift */,
+				57A8B3D325E7FDB8005B7BE5 /* EditUserPushRequest.swift */,
 			);
 			path = Post;
 			sourceTree = "<group>";
@@ -580,6 +610,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				577A87CD25C9228900ABC145 /* AddCommentRequest.swift in Sources */,
+				57A8B3C825E75E9E005B7BE5 /* RemovePickCommentRequest.swift in Sources */,
 				5792F5BF25AB493C00015FE9 /* LaunchViewController.swift in Sources */,
 				573864CA25BDD4A60025AF1A /* MostPick.swift in Sources */,
 				5778BBBD25E0F3EA00377A52 /* GetQnasRequest.swift in Sources */,
@@ -592,10 +623,12 @@
 				57D9552725C3D69100CD2C6F /* PlaceViewController.swift in Sources */,
 				57A9966F25C815F70016CDA5 /* Comment.swift in Sources */,
 				57FB7F8125AC6681007BE142 /* App.swift in Sources */,
+				57A8B3D125E7F6CE005B7BE5 /* AddUserDeviceRequest.swift in Sources */,
 				57755BD525B47F4B00CF0849 /* PickViewController.swift in Sources */,
 				57B0E8E225CA85B500F123E7 /* GetKakaoPlacesRequest.swift in Sources */,
 				57266D3225C6BE82004C8187 /* MostPickLargeCVCell.swift in Sources */,
 				57B0E8EE25CAA49D00F123E7 /* SearchPlaceLocationViewController.swift in Sources */,
+				57A8B3BC25E748A5005B7BE5 /* PickComments.swift in Sources */,
 				5780FDA025C1AFBE002F89F2 /* EditPushNotificationDeviceRequest.swift in Sources */,
 				57C04105259996DF00856F61 /* AccountViewController.swift in Sources */,
 				57D9554425C3F16800CD2C6F /* IconButton.swift in Sources */,
@@ -607,11 +640,13 @@
 				57266D4025C70FB8004C8187 /* GetPlaceRequest.swift in Sources */,
 				577A87D125C9634300ABC145 /* SearchPlaceMapViewController.swift in Sources */,
 				57A9967825C860C90016CDA5 /* GetCommentsRequest.swift in Sources */,
+				57A8B3CB25E77325005B7BE5 /* RemovePickRequest.swift in Sources */,
 				57D9555325C4445F00CD2C6F /* FollowRequest.swift in Sources */,
 				5778BBBA25E0F1F500377A52 /* AddQnaRequest.swift in Sources */,
 				57A9967B25C86F3A0016CDA5 /* CommentViewController.swift in Sources */,
 				57D9554C25C4098A00CD2C6F /* UserCVCell.swift in Sources */,
 				57C040D925998CCA00856F61 /* AppDelegate.swift in Sources */,
+				57A8B3C525E75E92005B7BE5 /* AddPickCommentRequest.swift in Sources */,
 				57A9966825C7E64C0016CDA5 /* PlaceMapViewController.swift in Sources */,
 				5792854D25AF4C750060F00C /* AddPickRequest.swift in Sources */,
 				57DCD7D325C289630040AC01 /* CheckUserNickNameRequest.swift in Sources */,
@@ -630,6 +665,7 @@
 				57266D3625C6C3D3004C8187 /* MostPickSmallCVCell.swift in Sources */,
 				573864A625BD652B0025AF1A /* GetRecentPicksRequest.swift in Sources */,
 				57EFB3AD25AC01220001CF59 /* LoginRequest.swift in Sources */,
+				57A8B3C225E7594C005B7BE5 /* PickCommentViewController.swift in Sources */,
 				57BA5F1325E2CBBB00C8A628 /* RemoveQnaRequest.swift in Sources */,
 				57C040DB25998CCA00856F61 /* SceneDelegate.swift in Sources */,
 				57A5527625B682BC009EABA3 /* PhotoViewController.swift in Sources */,
@@ -643,6 +679,7 @@
 				57D9552D25C3DF3200CD2C6F /* SearchUserViewController.swift in Sources */,
 				57BA5F0925E2407900C8A628 /* PlaceView.swift in Sources */,
 				5780FD9C25C1845B002F89F2 /* PushView.swift in Sources */,
+				57A8B3BF25E74E82005B7BE5 /* LikePickRequest.swift in Sources */,
 				57755BCF25B471CD00CF0849 /* GetPushNotificationDeviceRequest.swift in Sources */,
 				57BA5F0D25E2588200C8A628 /* PickImageCVCell.swift in Sources */,
 				5780FDA425C1C305002F89F2 /* GetVersionRequest.swift in Sources */,
@@ -655,6 +692,7 @@
 				57B0E8EA25CA899D00F123E7 /* KakaoPlaceTVCell.swift in Sources */,
 				57E971AD25E5148D00D86FC5 /* RemovePlaceCommentRequest.swift in Sources */,
 				57B0E8E525CA870E00F123E7 /* KakaoPlace.swift in Sources */,
+				57A8B3D425E7FDB8005B7BE5 /* EditUserPushRequest.swift in Sources */,
 				57DCD7D025C2834D0040AC01 /* EditUserRequest.swift in Sources */,
 				57DCD7BE25C27D080040AC01 /* EditUserViewController.swift in Sources */,
 				5710A7DC25CDA170000C5D8D /* QnaView.swift in Sources */,
@@ -664,10 +702,12 @@
 				572D31E125A579AD00A93FD9 /* Pick.swift in Sources */,
 				57C041262599FA1C00856F61 /* PlaceLargeView.swift in Sources */,
 				574ADFB625CBB397001EAC7B /* NoDataView.swift in Sources */,
+				57A8B3CE25E77D76005B7BE5 /* CheckPickRequest.swift in Sources */,
 				57C040F92599963800856F61 /* Extension.swift in Sources */,
 				57C040FF259996B600856F61 /* PostingViewController.swift in Sources */,
 				5792854A25AF48A10060F00C /* UploadImageRequest.swift in Sources */,
 				5792F5B625AB0A2100015FE9 /* Static.swift in Sources */,
+				57A8B3B925E7487C005B7BE5 /* GetPickCommentsRequest.swift in Sources */,
 				57EFB3D025AC353B0001CF59 /* User.swift in Sources */,
 				5738649925BD325E0025AF1A /* HttpRequest.swift in Sources */,
 			);

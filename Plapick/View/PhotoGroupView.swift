@@ -18,10 +18,10 @@ protocol PhotoGroupViewProtocol {
 class PhotoGroupView: UIView {
     
     // MARK: Property
-    var app = App()
     var delegate: PhotoGroupViewProtocol?
+    var vc: UIViewController?
+    var app = App()
     let imageSize = (SCREEN_WIDTH / 3) - (2 / 3)
-//    var photoViewList: [PhotoView] = [PhotoView(), PhotoView(), PhotoView()]
     var pickList: [Pick] = [] {
         didSet {
             if pickList.count > 0 {
@@ -38,14 +38,10 @@ class PhotoGroupView: UIView {
                 guard let url = URL(string: "\(IMAGE_URL)/users/\(pickList[2].uId)/\(pickList[2].id).jpg") else { return }
                 iv3.sd_setImage(with: url, completed: nil)
             }
-            
-//            for (i, pick) in self.pickList.enumerated() {
-//                if let url = URL(string: "\(IMAGE_URL)/users/\(pick.uId)/\(pick.id).jpg") {
-//                    photoViewList[i].sd_setImage(with: url, completed: nil)
-//                }
-//            }
         }
     }
+    let checkPickRequest = CheckPickRequest()
+    var tempPick: Pick?
     
     
     // MARK: View
@@ -82,10 +78,9 @@ class PhotoGroupView: UIView {
     init(direction: Int = 0) {
         super.init(frame: CGRect.zero)
         
-//        let emptyPick = Pick(id: 0, uId: 0, pId: 0, message: "", createdDate: "", updatedDate: "")
-//        self.pickList = [emptyPick, emptyPick, emptyPick]
-        
         configureView(direction: direction)
+        
+        checkPickRequest.delegate = self
         
         translatesAutoresizingMaskIntoConstraints = false
     }
@@ -100,9 +95,6 @@ class PhotoGroupView: UIView {
         addSubview(iv1)
         addSubview(iv2)
         addSubview(iv3)
-//        for photoView in photoViewList {
-//            addSubview(photoView)
-//        }
         
         if direction == 1 {
             configureL()
@@ -170,14 +162,42 @@ class PhotoGroupView: UIView {
     // MARK: Function - @OBJC
     @objc func iv1Tapped() {
         if pickList.count < 1 { return }
-        delegate?.detailPick(pick: pickList[0])
+        tempPick = pickList[0]
+        
+        guard let vc = self.vc else { return }
+        checkPickRequest.fetch(vc: vc, paramDict: ["piId": String(pickList[0].id)])
     }
     @objc func iv2Tapped() {
         if pickList.count < 2 { return }
-        delegate?.detailPick(pick: pickList[1])
+        tempPick = pickList[1]
+        
+        guard let vc = self.vc else { return }
+        checkPickRequest.fetch(vc: vc, paramDict: ["piId": String(pickList[1].id)])
     }
     @objc func iv3Tapped() {
         if pickList.count < 3 { return }
-        delegate?.detailPick(pick: pickList[2])
+        tempPick = pickList[2]
+        
+        guard let vc = self.vc else { return }
+        checkPickRequest.fetch(vc: vc, paramDict: ["piId": String(pickList[2].id)])
+    }
+}
+
+// MARK: HTTP - CheckPick
+extension PhotoGroupView: CheckPickRequestProtocol {
+    func response(checkPick status: String) {
+        print("[HTTP RES]", checkPickRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let pick = self.tempPick else { return }
+            delegate?.detailPick(pick: pick)
+            
+        } else if status == "NO_PICK" {
+            guard let vc = self.vc else { return }
+            
+            let alert = UIAlertController(title: nil, message: "삭제되었거나 존재하지 않는 픽 입니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .cancel))
+            vc.present(alert, animated: true, completion: nil)
+        }
     }
 }

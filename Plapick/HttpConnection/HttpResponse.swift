@@ -63,6 +63,10 @@ struct PlaceCommentsRequestResult: Codable {
     var result: [PlaceCommentResultResponse]
 }
 
+struct PickCommentsRequestResult: Codable {
+    var result: [PickCommentResultResponse]
+}
+
 
 struct UserResultResponse: Codable {
     var u_id: Int
@@ -76,6 +80,14 @@ struct UserResultResponse: Codable {
     var u_status: String? = ""
     var u_last_login_platform: String? = ""
     var u_is_logined: String? = ""
+    
+    var u_device: String? = ""
+    var u_is_allowed_follow: String? = "Y"
+    var u_is_allowed_my_pick_comment: String? = "Y"
+    var u_is_allowed_recommended_place: String? = "Y"
+    var u_is_allowed_ad: String? = "Y"
+    var u_is_allowed_event_notice: String? = "Y"
+    
     var u_created_date: String? = ""
     var u_updated_date: String? = ""
     var u_connected_date: String
@@ -213,6 +225,26 @@ struct PlaceCommentResultResponse: Codable {
     var mcp_comment: String
     var mcp_created_date: String
     var mcp_updated_date: String
+    
+    var u_nick_name: String
+    var u_profile_image: String
+    var u_connected_date: String
+    
+    var isFollow: String
+    var followerCnt: Int
+    var followingCnt: Int
+    var pickCnt: Int
+    var likePickCnt: Int
+    var likePlaceCnt: Int
+}
+
+struct PickCommentResultResponse: Codable {
+    var mcpi_id: Int
+    var mcpi_u_id: Int
+    var mcpi_pi_id: Int
+    var mcpi_comment: String
+    var mcpi_created_date: String
+    var mcpi_updated_date: String
     
     var u_nick_name: String
     var u_profile_image: String

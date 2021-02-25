@@ -205,6 +205,7 @@ extension SearchPlaceViewController: GetPlacesRequestProtocol {
                 
                 for (i, place) in placeList.enumerated() {
                     let pv = PlaceView()
+                    pv.vc = self
                     pv.place = place
                     pv.selectButton.isHidden = isSelectButtonHidden
                     pv.delegate = self
@@ -248,9 +249,6 @@ extension SearchPlaceViewController: PlaceViewProtocol {
         
         let pickVC = PickViewController()
         pickVC.navigationItem.title = place.name
-//        pickVC.placeContainerView.isHidden = true
-//        pickVC.placeView.isHidden = true
-//        pickVC.placeTopLine.isHidden = true
         pickVC.order = "POPULAR"
         pickVC.pId = place.id
         pickVC.id = piId

@@ -472,7 +472,8 @@ extension PostingViewController: UploadImageRequestProtocol {
         if status == "OK" {
             guard let imageName = imageName else { return }
             guard let place = selectedPlace else { return }
-            let message = messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            let message = (messageTextView.textColor == .systemGray) ? "" : messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
             addPickRequest.fetch(vc: self, paramDict: ["message": message, "piId": String(imageName), "pId": String(place.id)])
             
         } else { hideIndicator(idv: indicatorView, bov: blurOverlayView) }

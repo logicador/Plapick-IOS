@@ -12,11 +12,37 @@ import SDWebImage
 class PickViewController: UIViewController {
     
     // MARK: Property
+    let app = App()
     let getPicksRequest = GetPicksRequest()
+    let getPickCommentsRequest = GetPickCommentsRequest()
+    let removePickRequest = RemovePickRequest()
+    let likePickRequest = LikePickRequest()
     var order: String = "RECENT"
-    var uId: Int?
-    var pId: Int?
-    var id: Int?
+    var uId: Int? {
+        didSet {
+            userContainerView.isHidden = true
+            userBottomLineContainerView.isHidden = true
+        }
+    }
+    var pId: Int? {
+        didSet {
+            placeContainerView.isHidden = true
+            userBottomLineContainerView.isHidden = true
+        }
+    }
+    var mlpiUId: Int?
+    var id: Int? {
+        didSet {
+            guard let id = self.id else { return }
+            
+            for v in commentStackView.subviews {
+                if v == noCommentContainerView { continue }
+                v.removeFromSuperview()
+            }
+            
+            getPickCommentsRequest.fetch(vc: self, paramDict: ["piId": String(id), "page": "1", "limit": "2"])
+        }
+    }
     var pick: Pick? { // selected / showing
         didSet {
             guard let pick = self.pick else { return }
@@ -26,20 +52,37 @@ class PickViewController: UIViewController {
             
             if let profileImage = user.profileImage { userProfileImageView.setProfileImage(uId: user.id, profileImage: profileImage) }
             
-            let userCntMabs = NSMutableAttributedString()
-                .normal("게시한 픽 ", size: 12, color: .systemGray)
-                .bold(String(user.pickCnt), size: 12)
-                .normal("  팔로워 ", size: 12, color: .systemGray)
-                .bold(String(user.followerCnt), size: 12)
-            userCntLabel.attributedText = userCntMabs
+            if user.id == app.getUId() {
+                navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(removePickTapped))
+                navigationItem.rightBarButtonItem?.tintColor = .systemRed
+                
+            } else {
+                navigationItem.rightBarButtonItem = (pick.isLike == "Y") ? UIBarButtonItem(image: UIImage(systemName: "heart.fill"), style: .plain, target: self, action: #selector(likeTapped)) : UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(likeTapped))
+                navigationItem.rightBarButtonItem?.tintColor = .systemBlue
+            }
+            
             userNickNameLabel.text = user.nickName
             
-//            placeView.place = place
             placeNameLabel.text = place.name
             
-            if let url = URL(string: "\(IMAGE_URL)/users/\(pick.uId)/\(pick.id).jpg") { pickImageView.sd_setImage(with: url, completed: nil) }
+            pickDateLabel.text = String(pick.createdDate.split(separator: " ")[0])
             
-            navigationItem.rightBarButtonItem = (pick.isLike == "Y") ? UIBarButtonItem(image: UIImage(systemName: "heart.fill"), style: .plain, target: self, action: #selector(likeTapped)) : UIBarButtonItem(image: UIImage(systemName: "heart"), style: .plain, target: self, action: #selector(likeTapped))
+            let pickCntMabs = NSMutableAttributedString()
+                .normal("좋아요 ", size: 14, color: .systemGray)
+                .bold(String(pick.likeCnt), size: 14)
+                .normal("  댓글 ", size: 14, color: .systemGray)
+                .bold(String(pick.commentCnt), size: 14)
+            pickCntLabel.attributedText = pickCntMabs
+            
+            if let message = pick.message {
+                if !message.isEmpty {
+                    messageContainerView.isHidden = false
+                    messageLabel.text = message
+                    
+                } else { messageContainerView.isHidden = true }
+            } else { messageContainerView.isHidden = true }
+            
+            if let url = URL(string: "\(IMAGE_URL)/users/\(pick.uId)/\(pick.id).jpg") { pickImageView.sd_setImage(with: url, completed: nil) }
         }
     }
     var isEnded = false
@@ -88,65 +131,81 @@ class PickViewController: UIViewController {
     // MARK: View - User
     lazy var userContainerView: UIView = {
         let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(detailUserTapped)))
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     lazy var userProfileImageView: UIImageView = {
         let iv = UIImageView()
         iv.backgroundColor = .systemGray6
-        iv.layer.cornerRadius = 25
+        iv.layer.cornerRadius = 15
         iv.clipsToBounds = true
         iv.contentMode = .scaleAspectFill
-        iv.isUserInteractionEnabled = true
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(detailUserTapped)))
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
-    lazy var userLabelContainerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    lazy var userCntLabel: UILabel = {
-        let label = UILabel()
-        label.isUserInteractionEnabled = true
-        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(detailUserTapped)))
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
     lazy var userNickNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16)
-        label.isUserInteractionEnabled = true
-        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(detailUserTapped)))
+        label.font = .systemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    // MARK: View - Place
-//    lazy var placeTopLine: LineView = {
-//        let lv = LineView()
-//        return lv
-//    }()
-//    lazy var placeView: PlaceView = {
-//        let pv = PlaceView()
-//        pv.selectButton.isHidden = true
-//        pv.detailButton.isHidden = true
-//        return pv
-//    }()
-    lazy var placeContainerView: UIView = {
+    lazy var userBottomLineContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    lazy var userBottomLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
+    
+    // MARK: View - Place
+    lazy var placeContainerView: UIView = {
+        let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(detailPlaceTapped)))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var placeImageView: UIImageView = {
+        let image = UIImage(systemName: "airplane.circle.fill")
+        let iv = UIImageView(image: image)
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
     lazy var placeNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 22)
+        label.font = .boldSystemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     // MARK: View - Pick
+    lazy var pickCntTopLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
+    
+    lazy var pickCntContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var pickDateLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .systemGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var pickCntLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     lazy var pickImageTopLine: LineView = {
         let lv = LineView()
         return lv
@@ -165,6 +224,73 @@ class PickViewController: UIViewController {
         return lv
     }()
     
+    lazy var messageContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var messageLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var messageBottomLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
+    
+    // MARK: View - Comment
+    lazy var commentContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var commentTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "댓글"
+        label.font = .boldSystemFont(ofSize: 22)
+        label.isUserInteractionEnabled = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var allCommentButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("모두 보기 / 댓글 쓰기", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14)
+        button.addTarget(self, action: #selector(allCommentTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    lazy var commentStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_S
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
+    lazy var noCommentContainerView: UIView = {
+        let view = UIView()
+        view.isHidden = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var noCommentTopLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
+    lazy var noCommentLabel: UILabel = {
+        let label = UILabel()
+        label.text = "댓글이 없습니다."
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .systemGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     
     // MARK: ViewDidLoad
     override func viewDidLoad() {
@@ -177,6 +303,9 @@ class PickViewController: UIViewController {
         configureView()
         
         getPicksRequest.delegate = self
+        getPickCommentsRequest.delegate = self
+        removePickRequest.delegate = self
+        likePickRequest.delegate = self
         
         getPicks()
     }
@@ -216,44 +345,58 @@ class PickViewController: UIViewController {
         userContainerView.addSubview(userProfileImageView)
         userProfileImageView.topAnchor.constraint(equalTo: userContainerView.topAnchor, constant: SPACE_XS).isActive = true
         userProfileImageView.leadingAnchor.constraint(equalTo: userContainerView.leadingAnchor).isActive = true
-        userProfileImageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
-        userProfileImageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        userProfileImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        userProfileImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
         userProfileImageView.bottomAnchor.constraint(equalTo: userContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
         
-        userContainerView.addSubview(userLabelContainerView)
-        userLabelContainerView.leadingAnchor.constraint(equalTo: userProfileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
-        userLabelContainerView.trailingAnchor.constraint(equalTo: userContainerView.trailingAnchor).isActive = true
-        userLabelContainerView.centerYAnchor.constraint(equalTo: userProfileImageView.centerYAnchor).isActive = true
+        userContainerView.addSubview(userNickNameLabel)
+        userNickNameLabel.centerYAnchor.constraint(equalTo: userProfileImageView.centerYAnchor).isActive = true
+        userNickNameLabel.leadingAnchor.constraint(equalTo: userProfileImageView.trailingAnchor, constant: SPACE_XS).isActive = true
         
-        userLabelContainerView.addSubview(userCntLabel)
-        userCntLabel.topAnchor.constraint(equalTo: userLabelContainerView.topAnchor).isActive = true
-        userCntLabel.leadingAnchor.constraint(equalTo: userLabelContainerView.leadingAnchor).isActive = true
+        stackView.addArrangedSubview(userBottomLineContainerView)
+        userBottomLineContainerView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        userBottomLineContainerView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
         
-        userLabelContainerView.addSubview(userNickNameLabel)
-        userNickNameLabel.topAnchor.constraint(equalTo: userCntLabel.bottomAnchor, constant: SPACE_XXXS).isActive = true
-        userNickNameLabel.leadingAnchor.constraint(equalTo: userLabelContainerView.leadingAnchor).isActive = true
-        userNickNameLabel.bottomAnchor.constraint(equalTo: userLabelContainerView.bottomAnchor).isActive = true
+        userBottomLineContainerView.addSubview(userBottomLine)
+        userBottomLine.topAnchor.constraint(equalTo: userBottomLineContainerView.topAnchor).isActive = true
+        userBottomLine.leadingAnchor.constraint(equalTo: userBottomLineContainerView.leadingAnchor, constant: ((SCREEN_WIDTH * (1 - CONTENTS_RATIO)) / 2) + 30 + SPACE_XS).isActive = true
+        userBottomLine.trailingAnchor.constraint(equalTo: userBottomLineContainerView.trailingAnchor).isActive = true
+        userBottomLine.bottomAnchor.constraint(equalTo: userBottomLineContainerView.bottomAnchor).isActive = true
         
         // MARK: ConfigureView - Place
-//        stackView.addArrangedSubview(placeTopLine)
-//        placeTopLine.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
-//        placeTopLine.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
-//        
-//        stackView.addArrangedSubview(placeView)
-//        placeView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
-//        placeView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        
         stackView.addArrangedSubview(placeContainerView)
         placeContainerView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
         placeContainerView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-
+        
+        placeContainerView.addSubview(placeImageView)
+        placeImageView.topAnchor.constraint(equalTo: placeContainerView.topAnchor, constant: SPACE_XS).isActive = true
+        placeImageView.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
+        placeImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        placeImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+        placeImageView.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        
         placeContainerView.addSubview(placeNameLabel)
-        placeNameLabel.topAnchor.constraint(equalTo: placeContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        placeNameLabel.leadingAnchor.constraint(equalTo: placeContainerView.leadingAnchor).isActive = true
-        placeNameLabel.trailingAnchor.constraint(equalTo: placeContainerView.trailingAnchor).isActive = true
-        placeNameLabel.bottomAnchor.constraint(equalTo: placeContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        placeNameLabel.centerYAnchor.constraint(equalTo: placeImageView.centerYAnchor).isActive = true
+        placeNameLabel.leadingAnchor.constraint(equalTo: placeImageView.trailingAnchor, constant: SPACE_XS).isActive = true
         
         // MARK: ConfigureView - Pick
+        stackView.addArrangedSubview(pickCntTopLine)
+        pickCntTopLine.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        pickCntTopLine.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        stackView.addArrangedSubview(pickCntContainerView)
+        pickCntContainerView.centerXAnchor.constraint(equalTo: stackView.centerXAnchor).isActive = true
+        pickCntContainerView.widthAnchor.constraint(equalTo: stackView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        
+        pickCntContainerView.addSubview(pickDateLabel)
+        pickDateLabel.topAnchor.constraint(equalTo: pickCntContainerView.topAnchor, constant: SPACE_XS).isActive = true
+        pickDateLabel.leadingAnchor.constraint(equalTo: pickCntContainerView.leadingAnchor).isActive = true
+        pickDateLabel.bottomAnchor.constraint(equalTo: pickCntContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        
+        pickCntContainerView.addSubview(pickCntLabel)
+        pickCntLabel.centerYAnchor.constraint(equalTo: pickDateLabel.centerYAnchor).isActive = true
+        pickCntLabel.trailingAnchor.constraint(equalTo: pickCntContainerView.trailingAnchor).isActive = true
+        
         stackView.addArrangedSubview(pickImageView)
         pickImageView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
         pickImageView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
@@ -268,6 +411,55 @@ class PickViewController: UIViewController {
         pickImageBottomLine.bottomAnchor.constraint(equalTo: pickImageView.bottomAnchor).isActive = true
         pickImageBottomLine.leadingAnchor.constraint(equalTo: pickImageView.leadingAnchor).isActive = true
         pickImageBottomLine.trailingAnchor.constraint(equalTo: pickImageView.trailingAnchor).isActive = true
+        
+        stackView.addArrangedSubview(messageContainerView)
+        messageContainerView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        messageContainerView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        messageContainerView.addSubview(messageLabel)
+        messageLabel.topAnchor.constraint(equalTo: messageContainerView.topAnchor, constant: SPACE_XL).isActive = true
+        messageLabel.centerXAnchor.constraint(equalTo: messageContainerView.centerXAnchor).isActive = true
+        messageLabel.widthAnchor.constraint(equalTo: messageContainerView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        messageLabel.bottomAnchor.constraint(equalTo: messageContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
+        
+        messageContainerView.addSubview(messageBottomLine)
+        messageBottomLine.bottomAnchor.constraint(equalTo: messageContainerView.bottomAnchor).isActive = true
+        messageBottomLine.leadingAnchor.constraint(equalTo: messageContainerView.leadingAnchor).isActive = true
+        messageBottomLine.trailingAnchor.constraint(equalTo: messageContainerView.trailingAnchor).isActive = true
+        
+        // MARK: ConfigureView - Comment
+        stackView.addArrangedSubview(commentContainerView)
+        commentContainerView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        commentContainerView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        commentContainerView.addSubview(commentTitleLabel)
+        commentTitleLabel.topAnchor.constraint(equalTo: commentContainerView.topAnchor, constant: SPACE_XL).isActive = true
+        commentTitleLabel.centerXAnchor.constraint(equalTo: commentContainerView.centerXAnchor).isActive = true
+        commentTitleLabel.widthAnchor.constraint(equalTo: commentContainerView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
+        
+        commentTitleLabel.addSubview(allCommentButton)
+        allCommentButton.centerYAnchor.constraint(equalTo: commentTitleLabel.centerYAnchor).isActive = true
+        allCommentButton.trailingAnchor.constraint(equalTo: commentTitleLabel.trailingAnchor).isActive = true
+        
+        commentContainerView.addSubview(commentStackView)
+        commentStackView.topAnchor.constraint(equalTo: commentTitleLabel.bottomAnchor, constant: SPACE_XL).isActive = true
+        commentStackView.centerXAnchor.constraint(equalTo: commentContainerView.centerXAnchor).isActive = true
+        commentStackView.widthAnchor.constraint(equalTo: commentContainerView.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        commentStackView.bottomAnchor.constraint(equalTo: commentContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
+        
+        commentStackView.addArrangedSubview(noCommentContainerView)
+        noCommentContainerView.leadingAnchor.constraint(equalTo: commentStackView.leadingAnchor).isActive = true
+        noCommentContainerView.trailingAnchor.constraint(equalTo: commentStackView.trailingAnchor).isActive = true
+        
+        noCommentContainerView.addSubview(noCommentTopLine)
+        noCommentTopLine.topAnchor.constraint(equalTo: noCommentContainerView.topAnchor).isActive = true
+        noCommentTopLine.leadingAnchor.constraint(equalTo: noCommentContainerView.leadingAnchor).isActive = true
+        noCommentTopLine.trailingAnchor.constraint(equalTo: noCommentContainerView.trailingAnchor).isActive = true
+        
+        noCommentContainerView.addSubview(noCommentLabel)
+        noCommentLabel.topAnchor.constraint(equalTo: noCommentTopLine.bottomAnchor, constant: SPACE_XL).isActive = true
+        noCommentLabel.centerXAnchor.constraint(equalTo: noCommentContainerView.centerXAnchor).isActive = true
+        noCommentLabel.bottomAnchor.constraint(equalTo: noCommentContainerView.bottomAnchor, constant: -SPACE_XL).isActive = true
     }
     
     func getPicks() {
@@ -275,6 +467,7 @@ class PickViewController: UIViewController {
         paramDict["order"] = order
         if let uId = self.uId { paramDict["uId"] = String(uId) }
         if let pId = self.pId { paramDict["pId"] = String(pId) }
+        if let mlpiUId = self.mlpiUId { paramDict["mlpiUId"] = String(mlpiUId) }
         paramDict["page"] = String(page)
         
         isLoading = true
@@ -321,8 +514,20 @@ class PickViewController: UIViewController {
         navigationController?.pushViewController(photoVC, animated: true)
     }
     
-    @objc func likeTapped() {
+    @objc func removePickTapped() {
+        guard let pick = self.pick else { return }
         
+        let alert = UIAlertController(title: nil, message: "해당 픽을 삭제하시겠습니까?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        alert.addAction(UIAlertAction(title: "삭제", style: .destructive, handler: { (_) in
+            self.removePickRequest.fetch(vc: self, paramDict: ["piId": String(pick.id)])
+        }))
+        present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func likeTapped() {
+        guard let pick = self.pick else { return }
+        likePickRequest.fetch(vc: self, paramDict: ["piId": String(pick.id)])
     }
     
     @objc func detailUserTapped() {
@@ -331,6 +536,22 @@ class PickViewController: UIViewController {
         let accountVC = AccountViewController()
         accountVC.user = pick.user
         navigationController?.pushViewController(accountVC, animated: true)
+    }
+    
+    @objc func detailPlaceTapped() {
+        guard let pick = self.pick else { return }
+        
+        let placeVC = PlaceViewController()
+        placeVC.place = pick.place
+        navigationController?.pushViewController(placeVC, animated: true)
+    }
+    
+    @objc func allCommentTapped() {
+        guard let pick = self.pick else { return }
+        
+        let pickCommentVC = PickCommentViewController()
+        pickCommentVC.pick = pick
+        navigationController?.pushViewController(pickCommentVC, animated: true)
     }
 }
 
@@ -348,7 +569,13 @@ extension PickViewController: GetPicksRequestProtocol {
                 isEnded = false
                 
                 var isFindPick = false
-                for pick in pickList {
+                for (i, pick) in pickList.enumerated() {
+                    if i == 0 && id == 0 { // 선택되어 들어온 픽이 없음. 맨 첫번째 픽을 선택함
+                        isFindPick = true
+                        self.id = pick.id
+                        self.pick = pick
+                    }
+                    
                     if pick.id == id {
                         isFindPick = true
                         self.pick = pick
@@ -367,6 +594,91 @@ extension PickViewController: GetPicksRequestProtocol {
             } else { isEnded = true }
         }
         isLoading = false
+    }
+}
+
+// MARK: HTTP - GetPickComments
+extension PickViewController: GetPickCommentsRequestProtocol {
+    func response(pickCommentList: [PickComment]?, getPickComments status: String) {
+        print("[HTTP RES]", getPickCommentsRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let pickCommentList = pickCommentList else { return }
+            
+            if pickCommentList.count > 0 {
+                noCommentContainerView.isHidden = true
+                for pickComment in pickCommentList {
+                    let cv = CommentView()
+                    cv.id = pickComment.id
+                    cv.date = pickComment.createdDate
+                    cv.comment = pickComment.comment
+                    cv.user = pickComment.user
+                    cv.removeButton.isHidden = true
+                    cv.delegate = self
+                    
+                    commentStackView.addArrangedSubview(cv)
+                    cv.leadingAnchor.constraint(equalTo: commentStackView.leadingAnchor).isActive = true
+                    cv.trailingAnchor.constraint(equalTo: commentStackView.trailingAnchor).isActive = true
+                }
+            } else { if commentStackView.subviews.count == 1 { noCommentContainerView.isHidden = false } }
+        }
+    }
+}
+
+// MARK: HTTP - RemovePick
+extension PickViewController: RemovePickRequestProtocol {
+    func response(removePick status: String) {
+        print("[HTTP RES]", removePickRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let pick = self.pick else { return }
+            
+            for (i, pi) in pickList.enumerated() {
+                if pi.id == pick.id {
+                    var nextIndex = i
+                    
+                    if pickList.count > i + 1 { // 뒤에 픽이 더 있음
+                        id = pickList[i + 1].id
+                        self.pick = pickList[i + 1]
+                        
+                    } else {
+                        if pickList.count > 1 { // 앞에 픽이 더 있음
+                            id = pickList[i - 1].id
+                            self.pick = pickList[i - 1]
+                            nextIndex -= 1
+                            
+                        } else { // 픽이 자기 자신밖에 없었음
+                            navigationController?.popViewController(animated: true)
+                            break
+                        }
+                    }
+                    
+                    pickList.remove(at: i)
+                    collectionView.reloadData()
+                    collectionView.selectItem(at: IndexPath(row: nextIndex, section: 0), animated: true, scrollPosition: .centeredHorizontally)
+                    break
+                }
+            }
+        }
+    }
+}
+
+// MARK: HTTP - LikePick
+extension PickViewController: LikePickRequestProtocol {
+    func response(likePick status: String) {
+        print("[HTTP RES]", likePickRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let pick = self.pick else { return }
+            self.pick?.isLike = (pick.isLike == "Y") ? "N" : "Y"
+            
+            for (i, pi) in pickList.enumerated() {
+                if pi.id == pick.id {
+                    pickList[i].isLike = (pick.isLike == "Y") ? "N" : "Y"
+                    break
+                }
+            }
+        }
     }
 }
 
@@ -395,9 +707,23 @@ extension PickViewController: UICollectionViewDelegate, UICollectionViewDataSour
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let pick = pickList[indexPath.row]
-        id = pick.id
-        self.pick = pick
+        
+        if id != pick.id {
+            id = pick.id
+            self.pick = pick
+        }
     }
+}
+
+// MARK: CommentView
+extension PickViewController: CommentViewProtocol {
+    func detailUser(user: User) {
+        let accountVC = AccountViewController()
+        accountVC.user = user
+        navigationController?.pushViewController(accountVC, animated: true)
+    }
+    
+    func removeComment(id: Int) { }
 }
     
     

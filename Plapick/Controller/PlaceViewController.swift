@@ -621,24 +621,7 @@ extension PlaceViewController: GetPlaceRequestProtocol {
         
         if status == "OK" {
             guard let place = place else { return }
-            
-            self.place?.commentCnt = place.commentCnt
-            
-            categoryLabel.text = place.categoryName.toCategory()
-            let cntMabs = NSMutableAttributedString()
-                .normal("좋아요 ", size: 14, color: .systemGray)
-                .bold(String(place.likeCnt), size: 14)
-                .normal("  댓글 ", size: 14, color: .systemGray)
-                .bold(String(place.commentCnt), size: 14)
-                .normal("  픽 ", size: 14, color: .systemGray)
-                .bold(String(place.pickCnt), size: 14)
-            cntLabel.attributedText = cntMabs
-            nameLabel.text = place.name
-            
-            roadAddressContainerView.isHidden = (place.roadAddress.isEmpty) ? true : false
-            roadAddressLabel.text = place.roadAddress
-            addressContainerView.isHidden = (place.address.isEmpty) ? true : false
-            addressLabel.text = place.address
+            self.place = place
             
             isLike = place.isLike
             app.addRecentPlace(place: place)
@@ -691,6 +674,7 @@ extension PlaceViewController: GetPicksRequestProtocol {
                     _pickList.append(pick)
                     if ((i + 1) % 3 == 0 || ((i + 1) == pickList.count && _pickList.count > 0)) {
                         let pgv = PhotoGroupView(direction: ((i + 1) == pickList.count && _pickList.count > 0) ? 0 : .random(in: 0...2))
+                        pgv.vc = self
                         pgv.pickList = _pickList
                         pgv.delegate = self
                         

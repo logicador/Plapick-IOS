@@ -268,8 +268,6 @@ class AccountViewController: UIViewController {
         super.viewWillAppear(animated)
         
         getUser()
-//        guard let user = self.user else { return }
-//        getUserRequest.fetch(vc: self, paramDict: ["uId": String(user.id)])
     }
     
     
@@ -443,6 +441,7 @@ class AccountViewController: UIViewController {
     // MARK: Function - @OBJC
     @objc func likePlaceCntTapped() {
         guard let user = self.user else { return }
+        if user.likePlaceCnt == 0 { return }
         
         let searchPlaceVC = SearchPlaceViewController()
         searchPlaceVC.user = user
@@ -451,11 +450,19 @@ class AccountViewController: UIViewController {
     }
     
     @objc func likePickCntTapped() {
+        guard let user = self.user else { return }
+        if user.likePickCnt == 0 { return }
         
+        let pickVC = PickViewController()
+        pickVC.navigationItem.title = "좋아요한 픽"
+        pickVC.mlpiUId = user.id
+        pickVC.id = 0
+        navigationController?.pushViewController(pickVC, animated: true)
     }
     
     @objc func followerCntTapped() {
         guard let user = self.user else { return }
+        if user.followerCnt == 0 { return }
         
         let searchUserVC = SearchUserViewController()
         searchUserVC.user = user
@@ -465,6 +472,7 @@ class AccountViewController: UIViewController {
     
     @objc func followingCntTapped() {
         guard let user = self.user else { return }
+        if user.followingCnt == 0 { return }
         
         let searchUserVC = SearchUserViewController()
         searchUserVC.user = user
@@ -500,8 +508,6 @@ extension AccountViewController: PhotoGroupViewProtocol {
         
         let pickVC = PickViewController()
         pickVC.navigationItem.title = "\(user.nickName)님의 픽"
-        pickVC.userContainerView.isHidden = true
-//        pickVC.placeTopLine.isHidden = true
         pickVC.uId = user.id
         pickVC.id = pick.id
         navigationController?.pushViewController(pickVC, animated: true)
@@ -525,6 +531,7 @@ extension AccountViewController: GetPicksRequestProtocol {
                     _pickList.append(pick)
                     if ((i + 1) % 3 == 0 || ((i + 1) == pickList.count && _pickList.count > 0)) {
                         let pgv = PhotoGroupView() // 은영이 의견 수렴
+                        pgv.vc = self
 //                        let pgv = PhotoGroupView(direction: ((i + 1) == pickList.count && _pickList.count > 0) ? 0 : .random(in: 0...2))
                         pgv.pickList = _pickList
                         pgv.delegate = self
@@ -570,14 +577,7 @@ extension AccountViewController: GetUserRequestProtocol {
         
         if status == "OK" {
             guard let user = user else { return }
-            
-            profileImageView.setProfileImage(uId: user.id, profileImage: user.profileImage ?? "")
-            nickNameLabel.text = user.nickName
-            pickCntLabel.text = "\(String(user.pickCnt))개"
-            followerCntLabel.text = String(user.followerCnt)
-            followingCntLabel.text = String(user.followingCnt)
-            likePickCntLabel.text = String(user.likePickCnt)
-            likePlaceCntLabel.text = String(user.likePlaceCnt)
+            self.user = user
             
             if user.id != app.getUId() {
                 isFollow = user.isFollow

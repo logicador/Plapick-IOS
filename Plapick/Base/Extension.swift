@@ -95,7 +95,7 @@ extension UIViewController {
         view.window?.makeKeyAndVisible()
     }
     
-    func checkPushNotificationAvailable() {
+    func checkPushNotificationAvailable(allow: (() -> Void)?) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { (isAllowed, error) in DispatchQueue.main.async {
             if let _ = error {
                 self.requestSettingAlert(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.")
@@ -103,7 +103,7 @@ extension UIViewController {
             }
             
             if isAllowed {
-                UIApplication.shared.registerForRemoteNotifications()
+                allow?()
             } else {
                 self.requestSettingAlert(title: "알림 액세스 허용하기", message: "'플레픽'에서 알림을 보내고자 합니다.")
             }
@@ -115,14 +115,7 @@ extension UIViewController {
         if status == .notDetermined || status == .denied {
             PHPhotoLibrary.requestAuthorization({ (status) in DispatchQueue.main.async {
                 if status == .notDetermined || status == .denied {
-                    let alert = UIAlertController(title: "앨범 액세스 허용하기", message: "'펫프로젝트'에서 앨범에 접근하고자 합니다.", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
-                    alert.addAction(UIAlertAction(title: "설정", style: .default, handler: { (_) in
-                        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
-                            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
-                        }
-                    }))
-                    self.present(alert, animated: true)
+                    self.requestSettingAlert(title: "앨범 액세스 허용하기", message: "'플레픽'에서 앨범에 접근하고자 합니다.")
                     return
                 }
                 allow?()
@@ -148,9 +141,9 @@ extension UIViewController {
     }
     
     func requestSettingAlert(title: String?, message: String?) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: "닫기", style: UIAlertAction.Style.cancel))
-        alert.addAction(UIAlertAction(title: "설정", style: UIAlertAction.Style.default, handler: { (_) in
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+        alert.addAction(UIAlertAction(title: "설정", style: .default, handler: { (_) in
             if let appSettings = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
             }

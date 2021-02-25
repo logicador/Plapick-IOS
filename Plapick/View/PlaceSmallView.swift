@@ -87,7 +87,7 @@ class PlaceSmallView: UIView {
         containerView.addSubview(iconImageView)
         iconImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_XS).isActive = true
         iconImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: SPACE_XS).isActive = true
-        iconImageView.widthAnchor.constraint(equalToConstant: SPACE_XL).isActive = true
-        iconImageView.heightAnchor.constraint(equalToConstant: SPACE_XL).isActive = true
+        iconImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+        iconImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
     }
 }

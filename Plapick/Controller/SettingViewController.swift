@@ -14,6 +14,7 @@ class SettingViewController: UIViewController {
     let app = App()
     let editPushNotificationDeviceRequest = EditPushNotificationDeviceRequest()
     let logoutRequest = LogoutRequest()
+    let editUserPushRequest = EditUserPushRequest()
     
     
     // MARK: View
@@ -294,6 +295,7 @@ class SettingViewController: UIViewController {
         
         editPushNotificationDeviceRequest.delegate = self
         logoutRequest.delegate = self
+        editUserPushRequest.delegate = self
         
         let user = app.getUser()
         
@@ -308,9 +310,9 @@ class SettingViewController: UIViewController {
         let curVersionCode = app.getCurVersionCode()
         let curVersionName = app.getCurVersionName()
         let newVersionCode = app.getNewVersionCode()
-        
+
         versionLabel.text = "IOS App ver. \(curVersionName)"
-        
+
         if newVersionCode == curVersionCode {
             versionButton.setTitle("최신버전", for: .normal)
             versionButton.isEnabled = false
@@ -319,22 +321,31 @@ class SettingViewController: UIViewController {
             versionButton.addTarget(self, action: #selector(updateTapped), for: .touchUpInside)
         }
         
-        let pndId = app.getPndId()
+        followPushView.sw.setOn((user.isAllowedFollow == "Y") ? true : false, animated: true)
+        myPickCommentPushView.sw.setOn((user.isAllowedMyPickComment == "Y") ? true : false, animated: true)
+        recommendedPlacePushView.sw.setOn((user.isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
+        adPushView.sw.setOn((user.isAllowedAd == "Y") ? true : false, animated: true)
+        eventNoticePushView.sw.setOn((user.isAllowedEventNotice == "Y") ? true : false, animated: true)
         
-        if pndId.isEmpty { checkPushNotificationAvailable() }
-        else {
-            let isAllowedFollow = app.getPushNotification(key: "FOLLOW")
-            let isAllowedMyPickComment = app.getPushNotification(key: "MY_PICK_COMMENT")
-            let isAllowedRecommendedPlace = app.getPushNotification(key: "RECOMMENDED_PLACE")
-            let isAllowedAd = app.getPushNotification(key: "AD")
-            let isAllowedEventNotice = app.getPushNotification(key: "EVENT_NOTICE")
-            
-            followPushView.sw.setOn((isAllowedFollow == "Y") ? true : false, animated: true)
-            myPickCommentPushView.sw.setOn((isAllowedMyPickComment == "Y") ? true : false, animated: true)
-            recommendedPlacePushView.sw.setOn((isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
-            adPushView.sw.setOn((isAllowedAd == "Y") ? true : false, animated: true)
-            eventNoticePushView.sw.setOn((isAllowedEventNotice == "Y") ? true : false, animated: true)
-        }
+//        let pndId = app.getPndId()
+//
+//        if pndId.isEmpty{
+//            checkPushNotificationAvailable(allow: {
+//                UIApplication.shared.registerForRemoteNotifications()
+//            })
+//        } else {
+//            let isAllowedFollow = app.getPushNotification(key: "FOLLOW")
+//            let isAllowedMyPickComment = app.getPushNotification(key: "MY_PICK_COMMENT")
+//            let isAllowedRecommendedPlace = app.getPushNotification(key: "RECOMMENDED_PLACE")
+//            let isAllowedAd = app.getPushNotification(key: "AD")
+//            let isAllowedEventNotice = app.getPushNotification(key: "EVENT_NOTICE")
+//
+//            followPushView.sw.setOn((isAllowedFollow == "Y") ? true : false, animated: true)
+//            myPickCommentPushView.sw.setOn((isAllowedMyPickComment == "Y") ? true : false, animated: true)
+//            recommendedPlacePushView.sw.setOn((isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
+//            adPushView.sw.setOn((isAllowedAd == "Y") ? true : false, animated: true)
+//            eventNoticePushView.sw.setOn((isAllowedEventNotice == "Y") ? true : false, animated: true)
+//        }
     }
     
     // MARK: Function
@@ -532,22 +543,45 @@ class SettingViewController: UIViewController {
 // MARK: PushView
 extension SettingViewController: PushViewProtocol {
     func switching(actionMode: String) {
+        let userDefaults = UserDefaults.standard
+        
         var isAllowed = "N"
-        if actionMode == "FOLLOW" { isAllowed = followPushView.sw.isOn ? "Y" : "N" }
-        else if actionMode == "MY_PICK_COMMENT" { isAllowed = myPickCommentPushView.sw.isOn ? "Y" : "N" }
-        else if actionMode == "RECOMMENDED_PLACE" { isAllowed = recommendedPlacePushView.sw.isOn ? "Y" : "N" }
-        else if actionMode == "AD" { isAllowed = adPushView.sw.isOn ? "Y" : "N" }
-        else if actionMode == "EVENT_NOTICE" { isAllowed = eventNoticePushView.sw.isOn ? "Y" : "N" }
-        
-        app.setPushNotification(key: actionMode, value: isAllowed)
-        
-        let pndId = app.getPndId()
-        if pndId.isEmpty && isAllowed == "Y" {
-            checkPushNotificationAvailable()
-            return
+        if actionMode == "FOLLOW" {
+            isAllowed = followPushView.sw.isOn ? "Y" : "N"
+            userDefaults.set(isAllowed, forKey: "uIsAllowedFollow")
+        }  else if actionMode == "MY_PICK_COMMENT" {
+            isAllowed = myPickCommentPushView.sw.isOn ? "Y" : "N"
+            userDefaults.set(isAllowed, forKey: "uIsAllowedMyPickComment")
+        } else if actionMode == "RECOMMENDED_PLACE" {
+            isAllowed = recommendedPlacePushView.sw.isOn ? "Y" : "N"
+            userDefaults.set(isAllowed, forKey: "uIsAllowedRecommendedPlace")
+        } else if actionMode == "AD" {
+            isAllowed = adPushView.sw.isOn ? "Y" : "N"
+            userDefaults.set(isAllowed, forKey: "uIsAllowedAd")
+        } else if actionMode == "EVENT_NOTICE" {
+            isAllowed = eventNoticePushView.sw.isOn ? "Y" : "N"
+            userDefaults.set(isAllowed, forKey: "uIsAllowedEventNotice")
         }
         
-        editPushNotificationDeviceRequest.fetch(vc: self, paramDict: ["pndId": pndId, "isAllowed": isAllowed, "actionMode": actionMode])
+        if isAllowed == "Y" {
+            checkPushNotificationAvailable(allow: {
+                UIApplication.shared.registerForRemoteNotifications()
+            })
+        }
+        
+        editUserPushRequest.fetch(vc: self, paramDict: ["isAllowed": isAllowed, "actionMode": actionMode])
+        
+//        app.setPushNotification(key: actionMode, value: isAllowed)
+//
+//        let pndId = app.getPndId()
+//        if pndId.isEmpty && isAllowed == "Y" {
+//            checkPushNotificationAvailable(allow: {
+//                UIApplication.shared.registerForRemoteNotifications()
+//            })
+//            return
+//        }
+//
+//        editPushNotificationDeviceRequest.fetch(vc: self, paramDict: ["pndId": pndId, "isAllowed": isAllowed, "actionMode": actionMode])
     }
 }
 
@@ -557,6 +591,8 @@ extension SettingViewController: LogoutRequestProtocol {
         print("[HTTP RES]", logoutRequest.apiUrl, status)
         
         if status == "OK" {
+            app.logout()
+            
             changeRootViewController(rootViewController: LoginViewController())
         }
     }
@@ -566,5 +602,12 @@ extension SettingViewController: LogoutRequestProtocol {
 extension SettingViewController: EditPushNotificationDeviceRequestProtocol {
     func response(editPushNotificationDevice status: String) {
         print("[HTTP RES]", editPushNotificationDeviceRequest.apiUrl, status)
+    }
+}
+
+// MARK: HTTP - EditUserPush
+extension SettingViewController: EditUserPushRequestProtocol {
+    func response(editUserPush status: String) {
+        print("[HTTP RES]", editUserPushRequest.apiUrl, status)
     }
 }

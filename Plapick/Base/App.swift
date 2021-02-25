@@ -13,34 +13,10 @@ import CoreLocation
 import SDWebImage
 
 
-protocol AppProtocol {
-    func pushNotification(isAllowed: Bool)
-    func photoGallary(isAllowed: Bool)
-}
-
-
 class App {
     
     // MARK: Property
-    var delegate: AppProtocol?
     var userDefaults = UserDefaults.standard
-    
-    func getCategoryName(categoryName: String, replaceStr: String = "-") -> String {
-        if categoryName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return replaceStr
-        }
-        
-        if let splittedCategoryName = categoryName.split(separator: ">").last {
-            let str = String(splittedCategoryName).trimmingCharacters(in: .whitespacesAndNewlines)
-            if str.isEmpty {
-                return replaceStr
-            } else {
-                return str
-            }
-        }
-        
-        return replaceStr
-    }
     
     func isLogined() -> Bool {
         return self.userDefaults.bool(forKey: "isLogined")
@@ -58,6 +34,14 @@ class App {
         let status = userDefaults.string(forKey: "uStatus") ?? ""
         let lastLoginPlatform = userDefaults.string(forKey: "uLastLoginPlatform") ?? ""
         let isLogined = userDefaults.string(forKey: "uIsLogined") ?? ""
+        
+        let device = userDefaults.string(forKey: "uDevice") ?? ""
+        let isAllowedFollow = userDefaults.string(forKey: "uIsAllowedFollow") ?? "Y"
+        let isAllowedMyPickComment = userDefaults.string(forKey: "uIsAllowedMyPickComment") ?? "Y"
+        let isAllowedRecommendedPlace = userDefaults.string(forKey: "uIsAllowedRecommendedPlace") ?? "Y"
+        let isAllowedAd = userDefaults.string(forKey: "uIsAllowedAd") ?? "Y"
+        let isAllowedEventNotice = userDefaults.string(forKey: "uIsAllowedEventNotice") ?? "Y"
+        
         let createdDate = userDefaults.string(forKey: "uCreatedDate") ?? ""
         let updatedDate = userDefaults.string(forKey: "uUpdatedDate") ?? ""
         let connectedDate = userDefaults.string(forKey: "uConnectedDate") ?? ""
@@ -68,7 +52,7 @@ class App {
         let likePickCnt = userDefaults.integer(forKey: "uLikePickCnt")
         let likePlaceCnt = userDefaults.integer(forKey: "uLikePlaceCnt")
         
-        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate, isFollow: "N", followerCnt: followerCnt, followingCnt: followingCnt, pickCnt: pickCnt, likePickCnt: likePickCnt, likePlaceCnt: likePlaceCnt)
+        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, device: device, isAllowedFollow: isAllowedFollow, isAllowedMyPickComment: isAllowedMyPickComment, isAllowedRecommendedPlace: isAllowedRecommendedPlace, isAllowedAd: isAllowedAd, isAllowedEventNotice: isAllowedEventNotice, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate, isFollow: "N", followerCnt: followerCnt, followingCnt: followingCnt, pickCnt: pickCnt, likePickCnt: likePickCnt, likePlaceCnt: likePlaceCnt)
     }
     
     func login(user: User) {
@@ -84,6 +68,14 @@ class App {
         userDefaults.set(user.status, forKey: "uStatus")
         userDefaults.set(user.lastLoginPlatform, forKey: "uLastLoginPlatform")
         userDefaults.set(user.isLogined, forKey: "uIsLogined")
+        
+        userDefaults.set(user.device, forKey: "uDevice")
+        userDefaults.set(user.isAllowedFollow, forKey: "uIsAllowedFollow")
+        userDefaults.set(user.isAllowedMyPickComment, forKey: "uIsAllowedMyPickComment")
+        userDefaults.set(user.isAllowedRecommendedPlace, forKey: "uIsAllowedRecommendedPlace")
+        userDefaults.set(user.isAllowedAd, forKey: "uIsAllowedAd")
+        userDefaults.set(user.isAllowedEventNotice, forKey: "uIsAllowedEventNotice")
+        
         userDefaults.set(user.createdDate, forKey: "uCreatedDate")
         userDefaults.set(user.updatedDate, forKey: "uUpdatedDate")
         userDefaults.set(user.connectedDate, forKey: "uConnectedDate")
@@ -97,20 +89,37 @@ class App {
     
     func logout() {
         userDefaults.set(false, forKey: "isLogined")
-//        userDefaults.removeObject(forKey: "uId")
-//        userDefaults.removeObject(forKey: "uType")
-//        userDefaults.removeObject(forKey: "uSocialId")
-//        userDefaults.removeObject(forKey: "uName")
-//        userDefaults.removeObject(forKey: "uNickName")
-//        userDefaults.removeObject(forKey: "uEmail")
-//        userDefaults.removeObject(forKey: "uPassword")
-//        userDefaults.removeObject(forKey: "uProfileImage")
-//        userDefaults.removeObject(forKey: "uStatus")
-//        userDefaults.removeObject(forKey: "uLastLoginPlatform")
-//        userDefaults.removeObject(forKey: "uIsLogined")
-//        userDefaults.removeObject(forKey: "uCreatedDate")
-//        userDefaults.removeObject(forKey: "uUpdatedDate")
-//        userDefaults.removeObject(forKey: "uConnectedDate")
+        userDefaults.removeObject(forKey: "uId")
+        userDefaults.removeObject(forKey: "uType")
+        userDefaults.removeObject(forKey: "uSocialId")
+        userDefaults.removeObject(forKey: "uName")
+        userDefaults.removeObject(forKey: "uNickName")
+        userDefaults.removeObject(forKey: "uEmail")
+        userDefaults.removeObject(forKey: "uPassword")
+        userDefaults.removeObject(forKey: "uProfileImage")
+        userDefaults.removeObject(forKey: "uStatus")
+        userDefaults.removeObject(forKey: "uLastLoginPlatform")
+        userDefaults.removeObject(forKey: "uIsLogined")
+        
+        userDefaults.removeObject(forKey: "uDevice")
+        userDefaults.removeObject(forKey: "uIsAllowedFollow")
+        userDefaults.removeObject(forKey: "uIsAllowedMyPickComment")
+        userDefaults.removeObject(forKey: "uIsAllowedRecommendedPlace")
+        userDefaults.removeObject(forKey: "uIsAllowedAd")
+        userDefaults.removeObject(forKey: "uIsAllowedEventNotice")
+        
+        userDefaults.removeObject(forKey: "uCreatedDate")
+        userDefaults.removeObject(forKey: "uUpdatedDate")
+        userDefaults.removeObject(forKey: "uConnectedDate")
+        
+        userDefaults.removeObject(forKey: "uFollowerCnt")
+        userDefaults.removeObject(forKey: "uFollowingCnt")
+        userDefaults.removeObject(forKey: "uPickCnt")
+        userDefaults.removeObject(forKey: "uLikePickCnt")
+        userDefaults.removeObject(forKey: "uLikePlaceCnt")
+        
+        userDefaults.removeObject(forKey: "recentPlaceList")
+        userDefaults.removeObject(forKey: "recentUserList")
     }
     
     func getNickName() -> String {

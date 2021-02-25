@@ -20,6 +20,14 @@ struct User: Codable {
     var status: String? = ""
     var lastLoginPlatform: String? = ""
     var isLogined: String? = ""
+    
+    var device: String? = ""
+    var isAllowedFollow: String? = "Y"
+    var isAllowedMyPickComment: String? = "Y"
+    var isAllowedRecommendedPlace: String? = "Y"
+    var isAllowedAd: String? = "Y"
+    var isAllowedEventNotice: String? = "Y"
+    
     var createdDate: String? = ""
     var updatedDate: String? = ""
     var connectedDate: String

@@ -13,6 +13,7 @@ class HomeViewController: UIViewController {
     // MARK: Property
     let app = App()
     let getPicksRequest = GetPicksRequest()
+    let getVersionRequest = GetVersionRequest()
     var isEnded = false
     var isLoading = false
     var page = 1
@@ -58,10 +59,14 @@ class HomeViewController: UIViewController {
         configureView()
         
         getPicksRequest.delegate = self
+        getVersionRequest.delegate = self
         
-        checkPushNotificationAvailable()
+        checkPushNotificationAvailable(allow: {
+            UIApplication.shared.registerForRemoteNotifications()
+        })
         
         getPicks()
+        getVersionRequest.fetch(vc: self, paramDict: [:])
     }
     
     
@@ -129,6 +134,7 @@ extension HomeViewController: GetPicksRequestProtocol {
                     _pickList.append(pick)
                     if ((i + 1) % 3 == 0) {
                         let pgv = PhotoGroupView(direction: .random(in: 0...2))
+                        pgv.vc = self
                         pgv.pickList = _pickList
                         pgv.delegate = self
                         
@@ -141,6 +147,7 @@ extension HomeViewController: GetPicksRequestProtocol {
                         if ((i + 1) == pickList.count && _pickList.count > 0) {
                             // 마지막 direction은 무조건 0
                             let pgv = PhotoGroupView()
+                            pgv.vc = self
                             pgv.pickList = _pickList
                             pgv.delegate = self
                             
@@ -153,5 +160,30 @@ extension HomeViewController: GetPicksRequestProtocol {
             } else { isEnded = true }
         }
         isLoading = false
+    }
+}
+
+// MARK: HTTP - GetVersion
+extension HomeViewController: GetVersionRequestProtocol {
+    func response(versionCode: Int?, versionName: String?, getVersion status: String) {
+        print("[HTTP RES]", getVersionRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let newVersionCode = versionCode else { return }
+            guard let newVersionName = versionName else { return }
+            app.setNewVersionCode(newVersionCode: newVersionCode)
+            app.setNewVersionName(newVersionName: newVersionName)
+            
+            guard let infoDictionary = Bundle.main.infoDictionary else { return }
+            guard let code = infoDictionary["CFBundleVersion"] as? String else { return }
+            guard let curVersionName = infoDictionary["CFBundleShortVersionString"] as? String else { return }
+            guard let curVersionCode = Int(code) else { return }
+            app.setCurVersionCode(curVersionCode: curVersionCode)
+            app.setCurVersionName(curVersionName: curVersionName)
+            
+            if newVersionCode > curVersionCode {
+                
+            }
+        }
     }
 }

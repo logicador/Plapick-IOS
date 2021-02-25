@@ -101,7 +101,8 @@ extension LaunchViewController: LoginRequestProtocol {
         if status == "OK" {
             guard let user = user else { return }
             app.login(user: user)
-            getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
+            changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+//            getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
         }
     }
 }
@@ -150,6 +151,9 @@ extension LaunchViewController: GetPushNotificationDeviceRequestProtocol {
             app.setPushNotification(key: "EVENT_NOTICE", value: isAllowedEventNotice)
             
             changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
+        } else {
+            app.logout()
+            changeRootViewController(rootViewController: LoginViewController())
         }
     }
 }

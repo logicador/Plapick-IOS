@@ -12,7 +12,8 @@ import KakaoSDKCommon
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    let addUserDeviceRequest = AddUserDeviceRequest()
+    let addPushNotificationDeviceRequest = AddPushNotificationDeviceRequest()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -38,11 +39,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02x", $1)})
         
-        let app = App()
-        app.setPndId(pndId: deviceTokenString)
-        let addPushNotificationDeviceRequest = AddPushNotificationDeviceRequest()
+//        let app = App()
+//        app.setPndId(pndId: deviceTokenString)
 //        addPushNotificationDeviceRequest.delegate = self
-        addPushNotificationDeviceRequest.fetch(isShowAlert: false, paramDict: ["pndId" : deviceTokenString])
+//        addPushNotificationDeviceRequest.fetch(isShowAlert: false, paramDict: ["device" : deviceTokenString])
+        
+        addUserDeviceRequest.delegate = self
+        addUserDeviceRequest.fetch(paramDict: ["device": deviceTokenString])
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -51,8 +54,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 
-//extension AppDelegate: AddPushNotificationDeviceRequestProtocol {
-//    func response(status: String) {
-//        // nothing to do
-//    }
-//}
+// MARK: HTTP - AddUserDevice
+extension AppDelegate: AddUserDeviceRequestProtocol {
+    func response(addUserDevice status: String) {
+        print("[HTTP RES]", addUserDeviceRequest.apiUrl, status)
+    }
+}

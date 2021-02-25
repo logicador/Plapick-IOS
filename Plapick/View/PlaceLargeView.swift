@@ -30,8 +30,8 @@ class PlaceLargeView: UIView {
         didSet {
             guard let place = self.place else { return }
             
-            let categoryName = app.getCategoryName(categoryName: place.categoryName)
-            categoryNameLabel.text = categoryName
+//            let categoryName = app.getCategoryName(categoryName: place.categoryName)
+//            categoryNameLabel.text = categoryName
             
             nameLabel.text = place.name
             

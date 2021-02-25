@@ -19,6 +19,7 @@ class PlaceView: UIView {
     
     // MARK: Property
     var delegate: PlaceViewProtocol?
+    var vc: UIViewController?
     let imageSize = (SCREEN_WIDTH / 3) - (2 / 3)
     var pickImageList: [String] = []
     var place: Place? {
@@ -42,6 +43,9 @@ class PlaceView: UIView {
             else { collectionContainerView.isHidden = true }
         }
     }
+    let checkPickRequest = CheckPickRequest()
+    var tempPlace: Place?
+    var tempPiId: Int?
     
     
     // MARK: View
@@ -141,6 +145,8 @@ class PlaceView: UIView {
         super.init(frame: .zero)
         
         configureView()
+        
+        checkPickRequest.delegate = self
         
         translatesAutoresizingMaskIntoConstraints = false
     }
@@ -247,6 +253,31 @@ extension PlaceView: UICollectionViewDelegate, UICollectionViewDataSource, UICol
         let splitted = pickImageList[indexPath.row].split(separator: "/")
         let piId = splitted[splitted.count - 1].replacingOccurrences(of: ".jpg", with: "")
         guard let id = Int(piId) else { return }
-        delegate?.detailPick(place: place, piId: id)
+        tempPlace = place
+        tempPiId = id
+        
+        guard let vc = self.vc else { return }
+        checkPickRequest.fetch(vc: vc, paramDict: ["piId": piId])
+    }
+}
+
+// MARK: HTTP - CheckPick
+extension PlaceView: CheckPickRequestProtocol {
+    func response(checkPick status: String) {
+        print("[HTTP RES]", checkPickRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let place = self.tempPlace else { return }
+            guard let piId = self.tempPiId else { return }
+            
+            delegate?.detailPick(place: place, piId: piId)
+            
+        } else if status == "NO_PICK" {
+            guard let vc = self.vc else { return }
+            
+            let alert = UIAlertController(title: nil, message: "삭제되었거나 존재하지 않는 픽 입니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "확인", style: .cancel))
+            vc.present(alert, animated: true, completion: nil)
+        }
     }
 }
