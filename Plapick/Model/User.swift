@@ -38,4 +38,5 @@ struct User: Codable {
     var pickCnt: Int
     var likePickCnt: Int
     var likePlaceCnt: Int
+    var isBlocked: String
 }

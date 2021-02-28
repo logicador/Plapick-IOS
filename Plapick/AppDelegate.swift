@@ -13,7 +13,6 @@ import KakaoSDKCommon
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     let addUserDeviceRequest = AddUserDeviceRequest()
-    let addPushNotificationDeviceRequest = AddPushNotificationDeviceRequest()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -38,11 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02x", $1)})
-        
-//        let app = App()
-//        app.setPndId(pndId: deviceTokenString)
-//        addPushNotificationDeviceRequest.delegate = self
-//        addPushNotificationDeviceRequest.fetch(isShowAlert: false, paramDict: ["device" : deviceTokenString])
         
         addUserDeviceRequest.delegate = self
         addUserDeviceRequest.fetch(paramDict: ["device": deviceTokenString])

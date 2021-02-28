@@ -45,7 +45,7 @@ class UserCVCell: UICollectionViewCell {
     
     lazy var label: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12)
+        label.font = .boldSystemFont(ofSize: 12)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         return label

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 
-public let PLAPICK_URL = "http://121.138.167.244:3001" // http://plapick.com http://121.138.167.244:3001
+public let PLAPICK_URL = "http://plapick.com" // http://plapick.com http://121.138.167.244:3001
 public let IMAGE_URL = PLAPICK_URL + "/images"
 public let API_URL = PLAPICK_URL + "/api"
 public let KAKAO_NATIVE_APP_KEY = "746689b818804d4d3509d851a17a37c0"
@@ -56,6 +56,7 @@ public let CONTENTS_RATIO_XXXS: CGFloat = 0.8
 public let CONTENTS_RATIO_XXXXS: CGFloat = 0.76
 public let CONTENTS_RATIO_XXXXXS: CGFloat = 0.72
 public let CONTENTS_RATIO_XXXXXXS: CGFloat = 0.66
+public let CONTENTS_RATIO_XXXXXXXS: CGFloat = 0.6
 
 public let SCREEN_WIDTH: CGFloat = UIScreen.main.bounds.size.width
 public let SCREEN_HEIGHT: CGFloat = UIScreen.main.bounds.size.height

@@ -111,6 +111,8 @@ class QnaViewController: UIViewController {
 // MARK: WriteQnaVC
 extension QnaViewController: WriteQnaViewControllerProtocol {
     func addQna(qna: Qna) {
+        noQnaContainerView.isHidden = true
+        
         let qv = QnaView()
         qv.qna = qna
         

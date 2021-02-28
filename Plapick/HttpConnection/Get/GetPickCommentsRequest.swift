@@ -98,7 +98,9 @@ class GetPickCommentsRequest: HttpRequest {
                 var pickCommentList: [PickComment] = []
                 
                 for resPickComment in resPickCommentList {
-                    let user = User(id: resPickComment.mcpi_u_id, nickName: resPickComment.u_nick_name, profileImage: resPickComment.u_profile_image, connectedDate: resPickComment.u_connected_date, isFollow: resPickComment.isFollow, followerCnt: resPickComment.followerCnt, followingCnt: resPickComment.followingCnt, pickCnt: resPickComment.pickCnt, likePickCnt: resPickComment.likePickCnt, likePlaceCnt: resPickComment.likePlaceCnt)
+                    if resPickComment.isBlocked == "Y" { continue }
+                    
+                    let user = User(id: resPickComment.mcpi_u_id, nickName: resPickComment.u_nick_name, profileImage: resPickComment.u_profile_image, connectedDate: resPickComment.u_connected_date, isFollow: resPickComment.isFollow, followerCnt: resPickComment.followerCnt, followingCnt: resPickComment.followingCnt, pickCnt: resPickComment.pickCnt, likePickCnt: resPickComment.likePickCnt, likePlaceCnt: resPickComment.likePlaceCnt, isBlocked: resPickComment.isBlocked)
                     let pickComment = PickComment(id: resPickComment.mcpi_id, piId: resPickComment.mcpi_pi_id, comment: resPickComment.mcpi_comment, createdDate: resPickComment.mcpi_created_date, updatedDate: resPickComment.mcpi_updated_date, user: user)
                     
                     pickCommentList.append(pickComment)

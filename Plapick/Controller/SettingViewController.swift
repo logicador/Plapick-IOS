@@ -12,7 +12,6 @@ class SettingViewController: UIViewController {
     
     // MARK: Property
     let app = App()
-    let editPushNotificationDeviceRequest = EditPushNotificationDeviceRequest()
     let logoutRequest = LogoutRequest()
     let editUserPushRequest = EditUserPushRequest()
     
@@ -128,14 +127,14 @@ class SettingViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    lazy var locationButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("위치기반서비스 이용약관", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
-        button.addTarget(self, action: #selector(locationTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
+//    lazy var locationButton: UIButton = {
+//        let button = UIButton(type: .system)
+//        button.setTitle("위치기반서비스 이용약관", for: .normal)
+//        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+//        button.addTarget(self, action: #selector(locationTapped), for: .touchUpInside)
+//        button.translatesAutoresizingMaskIntoConstraints = false
+//        return button
+//    }()
     lazy var privacyButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("개인정보 처리방침", for: .normal)
@@ -169,6 +168,22 @@ class SettingViewController: UIViewController {
         ib.text = "프로필 편집"
         ib.icon = "person"
         ib.addTarget(self, action: #selector(editUserTapped), for: .touchUpInside)
+        return ib
+    }()
+    
+    lazy var blockUserIconButton: IconButton = {
+        let ib = IconButton(type: .system)
+        ib.text = "차단한 사용자 목록"
+        ib.icon = "person.crop.circle.badge.xmark"
+        ib.addTarget(self, action: #selector(blockUserTapped), for: .touchUpInside)
+        return ib
+    }()
+    
+    lazy var blockPickIconButton: IconButton = {
+        let ib = IconButton(type: .system)
+        ib.text = "차단한 픽 목록"
+        ib.icon = "rectangle.badge.xmark"
+        ib.addTarget(self, action: #selector(blockPickTapped), for: .touchUpInside)
         return ib
     }()
     
@@ -293,7 +308,7 @@ class SettingViewController: UIViewController {
         
         configureView()
         
-        editPushNotificationDeviceRequest.delegate = self
+//        editPushNotificationDeviceRequest.delegate = self
         logoutRequest.delegate = self
         editUserPushRequest.delegate = self
         
@@ -326,26 +341,6 @@ class SettingViewController: UIViewController {
         recommendedPlacePushView.sw.setOn((user.isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
         adPushView.sw.setOn((user.isAllowedAd == "Y") ? true : false, animated: true)
         eventNoticePushView.sw.setOn((user.isAllowedEventNotice == "Y") ? true : false, animated: true)
-        
-//        let pndId = app.getPndId()
-//
-//        if pndId.isEmpty{
-//            checkPushNotificationAvailable(allow: {
-//                UIApplication.shared.registerForRemoteNotifications()
-//            })
-//        } else {
-//            let isAllowedFollow = app.getPushNotification(key: "FOLLOW")
-//            let isAllowedMyPickComment = app.getPushNotification(key: "MY_PICK_COMMENT")
-//            let isAllowedRecommendedPlace = app.getPushNotification(key: "RECOMMENDED_PLACE")
-//            let isAllowedAd = app.getPushNotification(key: "AD")
-//            let isAllowedEventNotice = app.getPushNotification(key: "EVENT_NOTICE")
-//
-//            followPushView.sw.setOn((isAllowedFollow == "Y") ? true : false, animated: true)
-//            myPickCommentPushView.sw.setOn((isAllowedMyPickComment == "Y") ? true : false, animated: true)
-//            recommendedPlacePushView.sw.setOn((isAllowedRecommendedPlace == "Y") ? true : false, animated: true)
-//            adPushView.sw.setOn((isAllowedAd == "Y") ? true : false, animated: true)
-//            eventNoticePushView.sw.setOn((isAllowedEventNotice == "Y") ? true : false, animated: true)
-//        }
     }
     
     // MARK: Function
@@ -409,9 +404,9 @@ class SettingViewController: UIViewController {
         agreementButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
         agreementButton.trailingAnchor.constraint(equalTo: serviceStackView.trailingAnchor).isActive = true
         
-        serviceStackView.addArrangedSubview(locationButton)
-        locationButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
-        locationButton.trailingAnchor.constraint(equalTo: serviceStackView.trailingAnchor).isActive = true
+//        serviceStackView.addArrangedSubview(locationButton)
+//        locationButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
+//        locationButton.trailingAnchor.constraint(equalTo: serviceStackView.trailingAnchor).isActive = true
         
         serviceStackView.addArrangedSubview(privacyButton)
         privacyButton.leadingAnchor.constraint(equalTo: serviceStackView.leadingAnchor).isActive = true
@@ -429,6 +424,14 @@ class SettingViewController: UIViewController {
         etcStackView.addArrangedSubview(editUserIconButton)
         editUserIconButton.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
         editUserIconButton.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
+        
+        etcStackView.addArrangedSubview(blockUserIconButton)
+        blockUserIconButton.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        blockUserIconButton.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
+        
+        etcStackView.addArrangedSubview(blockPickIconButton)
+        blockPickIconButton.leadingAnchor.constraint(equalTo: etcStackView.leadingAnchor).isActive = true
+        blockPickIconButton.trailingAnchor.constraint(equalTo: etcStackView.trailingAnchor).isActive = true
         
         // MARK: ConfigureView - Etc - Type
         etcStackView.addArrangedSubview(typeContainerView)
@@ -506,15 +509,21 @@ class SettingViewController: UIViewController {
     }
     
     @objc func agreementTapped() {
-        
+        let termsVC = TermsViewController()
+        termsVC.navigationItem.title = "이용약관"
+        termsVC.path = "agreement"
+        navigationController?.pushViewController(termsVC, animated: true)
     }
     
-    @objc func locationTapped() {
-        
-    }
+//    @objc func locationTapped() {
+//
+//    }
     
     @objc func privacyTapped() {
-        
+        let termsVC = TermsViewController()
+        termsVC.navigationItem.title = "개인정보 처리방침"
+        termsVC.path = "privacy"
+        navigationController?.pushViewController(termsVC, animated: true)
     }
     
     @objc func updateTapped() {
@@ -523,6 +532,20 @@ class SettingViewController: UIViewController {
     
     @objc func editUserTapped() {
         navigationController?.pushViewController(EditUserViewController(), animated: true)
+    }
+    
+    @objc func blockUserTapped() {
+        let searchUserVC = SearchUserViewController()
+        searchUserVC.mode = "BLOCK"
+        navigationController?.pushViewController(searchUserVC, animated: true)
+    }
+    
+    @objc func blockPickTapped() {
+        let pickVC = PickViewController()
+        pickVC.navigationItem.title = "차단한 픽 목록"
+        pickVC.bpiUId = app.getUId()
+        pickVC.id = 0
+        navigationController?.pushViewController(pickVC, animated: true)
     }
     
     @objc func logoutTapped() {
@@ -535,7 +558,12 @@ class SettingViewController: UIViewController {
     }
     
     @objc func leaveTapped() {
-        
+        let alert = UIAlertController(title: "회원탈퇴", message: "'플레픽'으로부터 회원탈퇴를 합니다. 계속하시겠습니까?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+        alert.addAction(UIAlertAction(title: "회원탈퇴", style: .destructive, handler: { (_) in
+            self.logoutRequest.fetch(vc: self, paramDict: [:])
+        }))
+        present(alert, animated: true, completion: nil)
     }
 }
 
@@ -570,18 +598,6 @@ extension SettingViewController: PushViewProtocol {
         }
         
         editUserPushRequest.fetch(vc: self, paramDict: ["isAllowed": isAllowed, "actionMode": actionMode])
-        
-//        app.setPushNotification(key: actionMode, value: isAllowed)
-//
-//        let pndId = app.getPndId()
-//        if pndId.isEmpty && isAllowed == "Y" {
-//            checkPushNotificationAvailable(allow: {
-//                UIApplication.shared.registerForRemoteNotifications()
-//            })
-//            return
-//        }
-//
-//        editPushNotificationDeviceRequest.fetch(vc: self, paramDict: ["pndId": pndId, "isAllowed": isAllowed, "actionMode": actionMode])
     }
 }
 
@@ -595,13 +611,6 @@ extension SettingViewController: LogoutRequestProtocol {
             
             changeRootViewController(rootViewController: LoginViewController())
         }
-    }
-}
-
-// MARK: HTTP - EditPushNotificationDevice
-extension SettingViewController: EditPushNotificationDeviceRequestProtocol {
-    func response(editPushNotificationDevice status: String) {
-        print("[HTTP RES]", editPushNotificationDeviceRequest.apiUrl, status)
     }
 }
 

@@ -37,10 +37,9 @@ class PlaceMapViewController: UIViewController {
     
     lazy var buttonContainerView: UIView = {
         let view = UIView()
+        view.backgroundColor = .systemBackground
         view.layer.cornerRadius = SPACE_XS
-        view.layer.shadowOpacity = 0.3 // 그림자 진한정도?
-        view.layer.shadowOffset = CGSize(width: 0.0, height: 2.0) // 그림자 방향?
-        view.layer.shadowRadius = SPACE_XS
+        view.layer.borderWidth = LINE_WIDTH
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
@@ -51,8 +50,8 @@ class PlaceMapViewController: UIViewController {
         return view
     }()
     lazy var markerImageView: UIImageView = {
-        let img = UIImage(systemName: "flag")
-        let iv = UIImageView(image: img)
+        let image = UIImage(systemName: "flag")
+        let iv = UIImageView(image: image)
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
@@ -64,8 +63,8 @@ class PlaceMapViewController: UIViewController {
         return view
     }()
     lazy var gpsImageView: UIImageView = {
-        let img = UIImage(systemName: "scope")
-        let iv = UIImageView(image: img)
+        let image = UIImage(systemName: "scope")
+        let iv = UIImageView(image: image)
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
@@ -112,7 +111,7 @@ class PlaceMapViewController: UIViewController {
     
     // MARK: Function
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
-    func setThemeColor() { buttonContainerView.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white }
+    func setThemeColor() { buttonContainerView.layer.borderColor = UIColor.separator.cgColor }
     
     func configureView() {
         view.addSubview(mapView)
@@ -134,10 +133,10 @@ class PlaceMapViewController: UIViewController {
         markerView.heightAnchor.constraint(equalTo: buttonContainerView.heightAnchor, multiplier: 0.5).isActive = true
         
         markerView.addSubview(markerImageView)
-        markerImageView.topAnchor.constraint(equalTo: markerView.topAnchor, constant: SPACE_XS + 1).isActive = true
-        markerImageView.leadingAnchor.constraint(equalTo: markerView.leadingAnchor, constant: SPACE_XS + 1).isActive = true
-        markerImageView.trailingAnchor.constraint(equalTo: markerView.trailingAnchor, constant: -(SPACE_XS + 1)).isActive = true
-        markerImageView.bottomAnchor.constraint(equalTo: markerView.bottomAnchor, constant: -(SPACE_XS + 1)).isActive = true
+        markerImageView.topAnchor.constraint(equalTo: markerView.topAnchor, constant: 12).isActive = true
+        markerImageView.leadingAnchor.constraint(equalTo: markerView.leadingAnchor, constant: 12).isActive = true
+        markerImageView.trailingAnchor.constraint(equalTo: markerView.trailingAnchor, constant: -12).isActive = true
+        markerImageView.bottomAnchor.constraint(equalTo: markerView.bottomAnchor, constant: -12).isActive = true
         
         buttonContainerView.addSubview(gpsView)
         gpsView.bottomAnchor.constraint(equalTo: buttonContainerView.bottomAnchor).isActive = true
@@ -146,10 +145,10 @@ class PlaceMapViewController: UIViewController {
         gpsView.heightAnchor.constraint(equalTo: buttonContainerView.heightAnchor, multiplier: 0.5).isActive = true
         
         gpsView.addSubview(gpsImageView)
-        gpsImageView.topAnchor.constraint(equalTo: gpsView.topAnchor, constant: SPACE_XS + 1).isActive = true
-        gpsImageView.leadingAnchor.constraint(equalTo: gpsView.leadingAnchor, constant: SPACE_XS + 1).isActive = true
-        gpsImageView.trailingAnchor.constraint(equalTo: gpsView.trailingAnchor, constant: -(SPACE_XS + 1)).isActive = true
-        gpsImageView.bottomAnchor.constraint(equalTo: gpsView.bottomAnchor, constant: -(SPACE_XS + 1)).isActive = true
+        gpsImageView.topAnchor.constraint(equalTo: gpsView.topAnchor, constant: 12).isActive = true
+        gpsImageView.leadingAnchor.constraint(equalTo: gpsView.leadingAnchor, constant: 12).isActive = true
+        gpsImageView.trailingAnchor.constraint(equalTo: gpsView.trailingAnchor, constant: -12).isActive = true
+        gpsImageView.bottomAnchor.constraint(equalTo: gpsView.bottomAnchor, constant: -12).isActive = true
         
         buttonContainerView.addSubview(buttonLine)
         buttonLine.centerYAnchor.constraint(equalTo: buttonContainerView.centerYAnchor).isActive = true

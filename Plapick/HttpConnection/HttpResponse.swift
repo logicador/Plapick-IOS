@@ -40,14 +40,6 @@ struct PicksRequestResult: Codable {
     var result: [PickResultResponse]
 }
 
-struct CommentsRequestResult: Codable {
-    var result: [CommentResultResponse]
-}
-
-struct PushNotificationDeviceRequestResult: Codable {
-    var result: PushNotificationDeviceResultResponse
-}
-
 struct VersionRequestResult: Codable {
     var result: VersionResultResponse
 }
@@ -98,6 +90,7 @@ struct UserResultResponse: Codable {
     var pickCnt: Int
     var likePickCnt: Int
     var likePlaceCnt: Int
+    var isBlocked: String
 }
 
 struct PlaceResultResponse: Codable {
@@ -165,6 +158,7 @@ struct PickResultResponse: Codable {
     var isLike: String
     var likeCnt: Int
     var commentCnt: Int
+    var isBlocked: String
     
     var uIsFollow: String
     var uFollowerCnt: Int
@@ -172,6 +166,7 @@ struct PickResultResponse: Codable {
     var uPickCnt: Int
     var uLikePickCnt: Int
     var uLikePlaceCnt: Int
+    var uIsBlocked: String
     
     var pPicks: String
     var pIsLike: String
@@ -180,30 +175,9 @@ struct PickResultResponse: Codable {
     var pPickCnt: Int
 }
 
-struct PushNotificationDeviceResultResponse: Codable {
-    var pnd_is_allowed_follow: String
-    var pnd_is_allowed_my_pick_comment: String
-    var pnd_is_allowed_recommended_place: String
-    var pnd_is_allowed_ad: String
-    var pnd_is_allowed_event_notice: String
-}
-
 struct VersionResultResponse: Codable {
     var versionCode: Int
     var versionName: String
-}
-
-struct CommentResultResponse: Codable {
-    var id: Int
-    var u_id: Int
-    var p_id: Int? = 0
-    var pi_id: Int? = 0
-    var comment: String
-    var created_date: String
-    var updated_date: String
-    
-    var u_nick_name: String
-    var u_profile_image: String
 }
 
 struct QnaResultResponse: Codable {
@@ -236,6 +210,7 @@ struct PlaceCommentResultResponse: Codable {
     var pickCnt: Int
     var likePickCnt: Int
     var likePlaceCnt: Int
+    var isBlocked: String
 }
 
 struct PickCommentResultResponse: Codable {
@@ -256,4 +231,5 @@ struct PickCommentResultResponse: Codable {
     var pickCnt: Int
     var likePickCnt: Int
     var likePlaceCnt: Int
+    var isBlocked: String
 }

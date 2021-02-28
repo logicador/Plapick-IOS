@@ -131,6 +131,7 @@ extension HomeViewController: GetPicksRequestProtocol {
                 
                 var _pickList: [Pick] = []
                 for (i, pick) in pickList.enumerated() {
+                    
                     _pickList.append(pick)
                     if ((i + 1) % 3 == 0) {
                         let pgv = PhotoGroupView(direction: .random(in: 0...2))

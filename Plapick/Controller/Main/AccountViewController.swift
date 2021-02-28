@@ -10,7 +10,6 @@ import SDWebImage
 
 
 protocol AccountViewControllerProtocol {
-//    func follow(user: User)
     func follow()
 }
 
@@ -19,10 +18,12 @@ class AccountViewController: UIViewController {
     
     // MARK: Property
     let app = App()
+//    var isAuth: Bool = false
     var delegate: AccountViewControllerProtocol?
     let getPicksRequest = GetPicksRequest()
     let followRequest = FollowRequest()
     let getUserRequest = GetUserRequest()
+    let blockUserRequest = BlockUserRequest()
     var user: User? {
         didSet {
             guard let user = self.user else { return }
@@ -38,8 +39,11 @@ class AccountViewController: UIViewController {
     }
     var isFollow = "N" {
         didSet {
-            navigationItem.rightBarButtonItem = (isFollow == "Y") ? UIBarButtonItem(title: "팔로우 취소", style: .plain, target: self, action: #selector(followTapped)) : UIBarButtonItem(title: "팔로우", style: .plain, target: self, action: #selector(followTapped))
-            navigationItem.rightBarButtonItem?.tintColor = (isFollow == "Y") ? .systemRed : .systemBlue
+            followButton.isHidden = false
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "exclamationmark.circle"), style: .plain, target: self, action: #selector(moreTapped))
+            
+            followButton.setTitle((isFollow == "Y") ? "팔로우 취소" : "팔로우", for: .normal)
+            followButton.tintColor = (isFollow == "Y") ? .systemRed : .systemBlue
         }
     }
     var isEnded = false
@@ -52,6 +56,8 @@ class AccountViewController: UIViewController {
         let sv = UIScrollView()
         sv.delegate = self
         sv.alwaysBounceVertical = true
+        sv.refreshControl = UIRefreshControl()
+        sv.refreshControl?.addTarget(self, action: #selector(refreshed), for: .valueChanged)
         sv.translatesAutoresizingMaskIntoConstraints = false
         return sv
     }()
@@ -106,6 +112,14 @@ class AccountViewController: UIViewController {
         label.font = .boldSystemFont(ofSize: 18)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    lazy var followButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.isHidden = true
+        button.titleLabel?.font = .systemFont(ofSize: 18)
+        button.addTarget(self, action: #selector(followTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     lazy var profileBottomLine: LineView = {
         let lv = LineView()
@@ -258,6 +272,7 @@ class AccountViewController: UIViewController {
         getPicksRequest.delegate = self
         followRequest.delegate = self
         getUserRequest.delegate = self
+        blockUserRequest.delegate = self
         
         getPicks()
     }
@@ -314,6 +329,10 @@ class AccountViewController: UIViewController {
         pickCntLabel.topAnchor.constraint(equalTo: pickCntTitleLabel.bottomAnchor, constant: SPACE_XXXXXS).isActive = true
         pickCntLabel.leadingAnchor.constraint(equalTo: profileLabelContainerView.leadingAnchor).isActive = true
         pickCntLabel.bottomAnchor.constraint(equalTo: profileLabelContainerView.bottomAnchor).isActive = true
+        
+        profileLabelContainerView.addSubview(followButton)
+        followButton.centerYAnchor.constraint(equalTo: pickCntLabel.centerYAnchor).isActive = true
+        followButton.trailingAnchor.constraint(equalTo: profileLabelContainerView.trailingAnchor).isActive = true
         
         profileContainerView.addSubview(profileBottomLine)
         profileBottomLine.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: SPACE_L).isActive = true
@@ -455,6 +474,7 @@ class AccountViewController: UIViewController {
         
         let pickVC = PickViewController()
         pickVC.navigationItem.title = "좋아요한 픽"
+//        pickVC.isAuth = isAuth
         pickVC.mlpiUId = user.id
         pickVC.id = 0
         navigationController?.pushViewController(pickVC, animated: true)
@@ -499,6 +519,48 @@ class AccountViewController: UIViewController {
         photoVC.navigationItem.title = "\(user.nickName)님의 사진"
         navigationController?.pushViewController(photoVC, animated: true)
     }
+    
+    @objc func refreshed() {
+        getUser()
+        
+        for v in pickStackView.subviews {
+            if v == noPickContainerView { continue }
+            v.removeFromSuperview()
+        }
+
+        scrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: false) // 스크롤 맨 위로
+        page = 1
+        isEnded = false
+        getPicks()
+    }
+    
+    @objc func moreTapped() {
+        guard let user = self.user else { return }
+        
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+        if user.isBlocked == "Y" {
+            alert.addAction(UIAlertAction(title: "차단해제", style: .default, handler: { (_) in
+                self.blockUserRequest.fetch(vc: self, paramDict: ["blockUId": String(user.id)])
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "차단하기", style: .destructive, handler: { (_) in
+                let alert = UIAlertController(title: "차단하기", message: "해당 사용자를 차단합니다. 차단한 사용자는 자신이 차단 당했는지 알 수 없습니다. 또한 차단한 사용자의 게시물이 더이상 보이지 않습니다. 정말 차단하시겠습니까?", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "취소", style: .cancel))
+                alert.addAction(UIAlertAction(title: "차단", style: .destructive, handler: { (_) in
+                    self.blockUserRequest.fetch(vc: self, paramDict: ["blockUId": String(user.id)])
+                }))
+                self.present(alert, animated: true, completion: nil)
+            }))
+        }
+        
+        alert.addAction(UIAlertAction(title: "신고하기", style: .destructive, handler: { (_) in
+            let userReportVC = UserReportViewController()
+            userReportVC.user = user
+            self.present(UINavigationController(rootViewController: userReportVC), animated: true, completion: nil)
+        }))
+        present(alert, animated: true)
+    }
 }
 
 // MARK: PhotoGroupView
@@ -508,6 +570,7 @@ extension AccountViewController: PhotoGroupViewProtocol {
         
         let pickVC = PickViewController()
         pickVC.navigationItem.title = "\(user.nickName)님의 픽"
+//        pickVC.isAuth = isAuth
         pickVC.uId = user.id
         pickVC.id = pick.id
         navigationController?.pushViewController(pickVC, animated: true)
@@ -549,6 +612,7 @@ extension AccountViewController: GetPicksRequestProtocol {
             }
         }
         isLoading = false
+        scrollView.refreshControl?.endRefreshing()
     }
 }
 
@@ -581,8 +645,22 @@ extension AccountViewController: GetUserRequestProtocol {
             
             if user.id != app.getUId() {
                 isFollow = user.isFollow
-                app.addRecentUser(user: user)
+                if user.isBlocked == "N" {
+                    app.addRecentUser(user: user)
+                }
             }
+        }
+    }
+}
+
+// MARK: HTTP - BlockUser
+extension AccountViewController: BlockUserRequestProtocol {
+    func response(blockUser status: String) {
+        print("[HTTP RES]", blockUserRequest.apiUrl, status)
+        
+        if status == "OK" {
+            app.removeAllRecentUserList()
+            changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
         }
     }
 }

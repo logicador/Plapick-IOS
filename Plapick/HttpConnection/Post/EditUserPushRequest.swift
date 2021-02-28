@@ -85,9 +85,7 @@ class EditUserPushRequest: HttpRequest {
             }
             
             if status != "OK" {
-                if status != "NO_PICK" {
-                    if isShowAlert { vc.requestErrorAlert(title: status) }
-                }
+                if isShowAlert { vc.requestErrorAlert(title: status) }
                 self.delegate?.response(editUserPush: status)
                 return
             }

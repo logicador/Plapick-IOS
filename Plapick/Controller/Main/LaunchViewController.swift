@@ -13,8 +13,6 @@ class LaunchViewController: UIViewController {
     // MARK: Property
     var app = App()
     let loginRequest = LoginRequest()
-    let getVersionRequest = GetVersionRequest()
-    let getPushNotificationDeviceRequest = GetPushNotificationDeviceRequest()
     
     
     // MARK: View
@@ -48,8 +46,8 @@ class LaunchViewController: UIViewController {
         configureView()
         
         loginRequest.delegate = self
-        getVersionRequest.delegate = self
-        getPushNotificationDeviceRequest.delegate = self
+//        getVersionRequest.delegate = self
+//        getPushNotificationDeviceRequest.delegate = self
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
             if self.app.isLogined() {
@@ -102,58 +100,6 @@ extension LaunchViewController: LoginRequestProtocol {
             guard let user = user else { return }
             app.login(user: user)
             changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
-//            getVersionRequest.fetch(vc: self, isShowAlert: false, paramDict: [:])
-        }
-    }
-}
-
-// MARK: HTTP - GetVersion
-extension LaunchViewController: GetVersionRequestProtocol {
-    func response(versionCode: Int?, versionName: String?, getVersion status: String) {
-        print("[HTTP RES]", getVersionRequest.apiUrl, status)
-        
-        if status == "OK" {
-            guard let versionCode = versionCode else { return }
-            guard let versionName = versionName else { return }
-            app.setNewVersionCode(newVersionCode: versionCode)
-            app.setNewVersionName(newVersionName: versionName)
-            
-            guard let infoDictionary = Bundle.main.infoDictionary else { return }
-            guard let code = infoDictionary["CFBundleVersion"] as? String else { return }
-            guard let curVersionName = infoDictionary["CFBundleShortVersionString"] as? String else { return }
-            guard let curVersionCode = Int(code) else { return }
-            app.setCurVersionCode(curVersionCode: curVersionCode)
-            app.setCurVersionName(curVersionName: curVersionName)
-            
-            let pndId = app.getPndId()
-            if pndId.isEmpty { changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController())) }
-            else { getPushNotificationDeviceRequest.fetch(vc: self, isShowAlert: false, paramDict: ["pndId": pndId]) }
-        }
-    }
-}
-
-// MARK: HTTP - GetPushNotificationDevice
-extension LaunchViewController: GetPushNotificationDeviceRequestProtocol {
-    func response(isAllowedFollow: String?, isAllowedMyPickComment: String?, isAllowedRecommendedPlace: String?, isAllowedAd: String?, isAllowedEventNotice: String?, getPushNotificationDevice status: String) {
-        print("[HTTP RES]", getPushNotificationDeviceRequest.apiUrl, status)
-        
-        if status == "OK" {
-            guard let isAllowedFollow = isAllowedFollow else { return }
-            guard let isAllowedMyPickComment = isAllowedMyPickComment else { return }
-            guard let isAllowedRecommendedPlace = isAllowedRecommendedPlace else { return }
-            guard let isAllowedAd = isAllowedAd else { return }
-            guard let isAllowedEventNotice = isAllowedEventNotice else { return }
-            
-            app.setPushNotification(key: "FOLLOW", value: isAllowedFollow)
-            app.setPushNotification(key: "MY_PICK_COMMENT", value: isAllowedMyPickComment)
-            app.setPushNotification(key: "RECOMMENDED_PLACE", value: isAllowedRecommendedPlace)
-            app.setPushNotification(key: "AD", value: isAllowedAd)
-            app.setPushNotification(key: "EVENT_NOTICE", value: isAllowedEventNotice)
-            
-            changeRootViewController(rootViewController: UINavigationController(rootViewController: MainViewController()))
-        } else {
-            app.logout()
-            changeRootViewController(rootViewController: LoginViewController())
         }
     }
 }

@@ -21,6 +21,36 @@ class SearchPlaceMapViewController: UIViewController {
     
     
     // MARK: View
+    lazy var bottomStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.backgroundColor = .systemBackground
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = 0
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
+    lazy var bottomStackTopLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
+    lazy var searchButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = .systemBackground
+        button.setTitle("이 위치에서 찾기", for: .normal)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 16)
+        button.contentEdgeInsets = UIEdgeInsets(top: SPACE_S, left: 0, bottom: SPACE_S, right: 0)
+        button.addTarget(self, action: #selector(searchTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    lazy var bottomContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     lazy var mapView: NMFMapView = {
         let nmv = NMFMapView()
         nmv.allowsRotating = false
@@ -33,17 +63,15 @@ class SearchPlaceMapViewController: UIViewController {
     lazy var gpsView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBackground
+        view.layer.borderWidth = LINE_WIDTH
         view.layer.cornerRadius = SPACE_XS
-        view.layer.shadowOpacity = 0.3 // 그림자 진한정도?
-        view.layer.shadowOffset = CGSize(width: 0.0, height: 2.0) // 그림자 방향?
-        view.layer.shadowRadius = SPACE_XS
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(gpsTapped)))
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     lazy var gpsImageView: UIImageView = {
-        let img = UIImage(systemName: "scope")
-        let iv = UIImageView(image: img)
+        let image = UIImage(systemName: "scope")
+        let iv = UIImageView(image: image)
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
@@ -55,21 +83,6 @@ class SearchPlaceMapViewController: UIViewController {
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
-    }()
-    
-    lazy var searchButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.backgroundColor = .systemBackground
-        button.layer.cornerRadius = SPACE_XS
-        button.layer.shadowOpacity = 0.3 // 그림자 진한정도?
-        button.layer.shadowOffset = CGSize(width: 0.0, height: 2.0) // 그림자 방향?
-        button.layer.shadowRadius = SPACE_XS
-        button.setTitle("이 위치에서 찾기", for: .normal)
-        button.titleLabel?.font = .boldSystemFont(ofSize: 16)
-        button.contentEdgeInsets = UIEdgeInsets(top: (SPACE_S + 2), left: 0, bottom: (SPACE_S + 2), right: 0)
-        button.addTarget(self, action: #selector(searchTapped), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
     }()
     
     lazy var tableView: UITableView = {
@@ -107,6 +120,8 @@ class SearchPlaceMapViewController: UIViewController {
         
         configureView()
         
+        setThemeColor()
+        
         getKakaoPlacesRequest.delegate = self
         
         let latitude = app.getLatitude()
@@ -122,12 +137,34 @@ class SearchPlaceMapViewController: UIViewController {
     
     
     // MARK: Function
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
+    func setThemeColor() { gpsView.layer.borderColor = UIColor.separator.cgColor }
+    
     func configureView() {
+        view.addSubview(bottomStackView)
+        bottomStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        bottomStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        bottomStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        view.addSubview(bottomStackTopLine)
+        bottomStackTopLine.topAnchor.constraint(equalTo: bottomStackView.topAnchor).isActive = true
+        bottomStackTopLine.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        bottomStackTopLine.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        bottomStackView.addArrangedSubview(searchButton)
+        searchButton.leadingAnchor.constraint(equalTo: bottomStackView.leadingAnchor).isActive = true
+        searchButton.trailingAnchor.constraint(equalTo: bottomStackView.trailingAnchor).isActive = true
+        
+        bottomStackView.addArrangedSubview(bottomContainerView)
+        bottomContainerView.leadingAnchor.constraint(equalTo: bottomStackView.leadingAnchor).isActive = true
+        bottomContainerView.trailingAnchor.constraint(equalTo: bottomStackView.trailingAnchor).isActive = true
+        bottomContainerView.heightAnchor.constraint(equalToConstant: BOTTOM_SPACING).isActive = true
+        
         view.addSubview(mapView)
         mapView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        mapView.bottomAnchor.constraint(equalTo: bottomStackView.topAnchor).isActive = true
 
         view.addSubview(gpsView)
         gpsView.topAnchor.constraint(equalTo: mapView.topAnchor, constant: SPACE_XS).isActive = true
@@ -136,21 +173,16 @@ class SearchPlaceMapViewController: UIViewController {
         gpsView.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -SPACE_XS).isActive = true
 
         gpsView.addSubview(gpsImageView)
-        gpsImageView.topAnchor.constraint(equalTo: gpsView.topAnchor, constant: SPACE_XS + 1).isActive = true
-        gpsImageView.leadingAnchor.constraint(equalTo: gpsView.leadingAnchor, constant: SPACE_XS + 1).isActive = true
-        gpsImageView.trailingAnchor.constraint(equalTo: gpsView.trailingAnchor, constant: -(SPACE_XS + 1)).isActive = true
-        gpsImageView.bottomAnchor.constraint(equalTo: gpsView.bottomAnchor, constant: -(SPACE_XS + 1)).isActive = true
+        gpsImageView.topAnchor.constraint(equalTo: gpsView.topAnchor, constant: 12).isActive = true
+        gpsImageView.leadingAnchor.constraint(equalTo: gpsView.leadingAnchor, constant: 12).isActive = true
+        gpsImageView.trailingAnchor.constraint(equalTo: gpsView.trailingAnchor, constant: -12).isActive = true
+        gpsImageView.bottomAnchor.constraint(equalTo: gpsView.bottomAnchor, constant: -12).isActive = true
 
         view.addSubview(centerImageView)
         centerImageView.centerXAnchor.constraint(equalTo: mapView.centerXAnchor).isActive = true
         centerImageView.centerYAnchor.constraint(equalTo: mapView.centerYAnchor).isActive = true
         centerImageView.widthAnchor.constraint(equalToConstant: 50).isActive = true
         centerImageView.heightAnchor.constraint(equalToConstant: 50).isActive = true
-
-        view.addSubview(searchButton)
-        searchButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -(SCREEN_WIDTH * 0.1)).isActive = true
-        searchButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CONTENTS_RATIO_XXXXXXS).isActive = true
-        searchButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true

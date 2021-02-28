@@ -37,11 +37,11 @@ class SearchUserViewController: UIViewController {
                 navigationItem.searchController = searchController
                 navigationItem.hidesSearchBarWhenScrolling = false // 스크롤 해도 검색창 안사라지게
                 
-                // MARK: For DEV_DEBUG
-                currentKeyword = "서원"
-                paramDict["keyword"] = "서원"
-                navigationItem.searchController?.searchBar.text = "서원"
-                getUsers()
+//                // MARK: For DEV_DEBUG
+//                currentKeyword = "서원"
+//                paramDict["keyword"] = "서원"
+//                navigationItem.searchController?.searchBar.text = "서원"
+//                getUsers()
                 
             } else if mode == "FOLLOWER" {
                 navigationItem.title = "팔로워"
@@ -49,6 +49,9 @@ class SearchUserViewController: UIViewController {
                 
             } else if mode == "FOLLOWING" {
                 navigationItem.title = "팔로잉"
+                getUsers()
+            } else if mode == "BLOCK" {
+                navigationItem.title = "차단한 사용자 목록"
                 getUsers()
             }
         }
@@ -175,8 +178,15 @@ extension SearchUserViewController: GetUsersRequestProtocol {
         
         if status == "OK" {
             guard let userList = userList else { return }
+            guard let mode = self.mode else { return }
             
-            self.userList = userList
+            var newUserList: [User] = []
+            for user in userList {
+                if mode != "BLOCK" && user.isBlocked == "Y" { continue }
+                newUserList.append(user)
+            }
+            
+            self.userList = newUserList
             tableView.reloadData()
         }
     }

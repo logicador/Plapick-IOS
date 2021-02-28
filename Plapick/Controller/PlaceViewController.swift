@@ -28,7 +28,7 @@ class PlaceViewController: UIViewController {
     let getPlaceRequest = GetPlaceRequest()
     let getPlaceCommentsRequest = GetPlaceCommentsRequest()
     let getPicksRequest = GetPicksRequest()
-    let removeCommentRequest = RemoveCommentRequest()
+//    let removeCommentRequest = RemoveCommentRequest()
     var place: Place? {
         didSet {
             guard let place = self.place else { return }
@@ -572,11 +572,19 @@ class PlaceViewController: UIViewController {
     @objc func postingTapped() {
         guard let place = self.place else { return }
         
-        let postingVC = PostingViewController()
-        postingVC.selectedPlace = place
-        postingVC.searchPlaceButton.isHidden = true
-        postingVC.delegate = self
-        navigationController?.pushViewController(postingVC, animated: true)
+        let isAgreePosting = app.isAgreePosting()
+        if isAgreePosting {
+            let postingVC = PostingViewController()
+            postingVC.selectedPlace = place
+            postingVC.searchPlaceButton.isHidden = true
+            postingVC.delegate = self
+            navigationController?.pushViewController(postingVC, animated: true)
+
+        } else {
+            let postingTermsVC = PostingTermsViewController()
+            postingTermsVC.delegate = self
+            present(UINavigationController(rootViewController: postingTermsVC), animated: true, completion: nil)
+        }
     }
 }
 
@@ -712,9 +720,6 @@ extension PlaceViewController: PhotoGroupViewProtocol {
         
         let pickVC = PickViewController()
         pickVC.navigationItem.title = place.name
-//        pickVC.placeContainerView.isHidden = true
-//        pickVC.placeView.isHidden = true
-//        pickVC.placeTopLine.isHidden = true
         pickVC.order = "POPULAR"
         pickVC.pId = place.id
         pickVC.id = pick.id
@@ -737,5 +742,18 @@ extension PlaceViewController: PlaceCommentViewControllerProtocol {
 extension PlaceViewController: PostingViewControllerProtocol {
     func addPick() {
         delegate?.addPick()
+    }
+}
+
+// MARK: PostingTermsVC
+extension PlaceViewController: PostingTermsViewControllerProtocol {
+    func agreePosting() {
+        guard let place = self.place else { return }
+        
+        let postingVC = PostingViewController()
+        postingVC.selectedPlace = place
+        postingVC.searchPlaceButton.isHidden = true
+        postingVC.delegate = self
+        navigationController?.pushViewController(postingVC, animated: true)
     }
 }

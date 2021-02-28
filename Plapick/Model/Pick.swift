@@ -19,6 +19,7 @@ struct Pick: Codable {
     var isLike: String
     var likeCnt: Int
     var commentCnt: Int
+    var isBlocked: String
     
     var user: User
     var place: Place

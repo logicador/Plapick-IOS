@@ -55,6 +55,7 @@ class PostingViewController: UIViewController {
             else { navigationItem.rightBarButtonItem = UIBarButtonItem(title: "게시", style: .plain, target: self, action: #selector(postingTapped)) }
         }
     }
+    var isUploading = false
     
     
     // MARK: View
@@ -353,9 +354,12 @@ class PostingViewController: UIViewController {
     }
     
     @objc func postingTapped() {
+        if isUploading { return }
+        
         guard let place = selectedPlace else { return }
         guard let image = selectedImage else { return }
         
+        isUploading = true
         showIndicator(idv: indicatorView, bov: blurOverlayView)
         
         if place.id == 0 {
@@ -460,7 +464,10 @@ extension PostingViewController: AddPlaceRequestProtocol {
             guard let image = selectedImage else { return }
             uploadImageRequest.fetch(vc: self, image: image)
             
-        } else { hideIndicator(idv: indicatorView, bov: blurOverlayView) }
+        } else {
+            isUploading = false
+            hideIndicator(idv: indicatorView, bov: blurOverlayView)
+        }
     }
 }
 
@@ -476,7 +483,10 @@ extension PostingViewController: UploadImageRequestProtocol {
             let message = (messageTextView.textColor == .systemGray) ? "" : messageTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
             addPickRequest.fetch(vc: self, paramDict: ["message": message, "piId": String(imageName), "pId": String(place.id)])
             
-        } else { hideIndicator(idv: indicatorView, bov: blurOverlayView) }
+        } else {
+            isUploading = false
+            hideIndicator(idv: indicatorView, bov: blurOverlayView)
+        }
     }
 }
 
@@ -485,6 +495,7 @@ extension PostingViewController: AddPickRequestProtocol {
     func response(addPick status: String) {
         print("[HTTP RES]", addPickRequest.apiUrl, status)
         
+        isUploading = false
         hideIndicator(idv: indicatorView, bov: blurOverlayView)
         
         if status == "OK" {

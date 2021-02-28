@@ -49,11 +49,11 @@ class SearchPlaceViewController: UIViewController {
                 navigationItem.searchController = searchController
                 navigationItem.hidesSearchBarWhenScrolling = false // 스크롤 해도 검색창 안사라지게
                 
-                // MARK: For DEV_DEBUG
-                currentKeyword = "가평"
-                paramDict["keyword"] = "가평"
-                navigationItem.searchController?.searchBar.text = "가평"
-                getPlaces()
+//                // MARK: For DEV_DEBUG
+//                currentKeyword = "가평"
+//                paramDict["keyword"] = "가평"
+//                navigationItem.searchController?.searchBar.text = "가평"
+//                getPlaces()
                 
             } else if mode == "LIKE_PLACE" {
                 navigationItem.title = "좋아요한 플레이스"

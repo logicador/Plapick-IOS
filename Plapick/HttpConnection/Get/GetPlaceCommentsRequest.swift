@@ -98,7 +98,9 @@ class GetPlaceCommentsRequest: HttpRequest {
                 var placeCommentList: [PlaceComment] = []
                 
                 for resPlaceComment in resPlaceCommentList {
-                    let user = User(id: resPlaceComment.mcp_u_id, nickName: resPlaceComment.u_nick_name, profileImage: resPlaceComment.u_profile_image, connectedDate: resPlaceComment.u_connected_date, isFollow: resPlaceComment.isFollow, followerCnt: resPlaceComment.followerCnt, followingCnt: resPlaceComment.followingCnt, pickCnt: resPlaceComment.pickCnt, likePickCnt: resPlaceComment.likePickCnt, likePlaceCnt: resPlaceComment.likePlaceCnt)
+                    if resPlaceComment.isBlocked == "Y" { continue }
+                    
+                    let user = User(id: resPlaceComment.mcp_u_id, nickName: resPlaceComment.u_nick_name, profileImage: resPlaceComment.u_profile_image, connectedDate: resPlaceComment.u_connected_date, isFollow: resPlaceComment.isFollow, followerCnt: resPlaceComment.followerCnt, followingCnt: resPlaceComment.followingCnt, pickCnt: resPlaceComment.pickCnt, likePickCnt: resPlaceComment.likePickCnt, likePlaceCnt: resPlaceComment.likePlaceCnt, isBlocked: resPlaceComment.isBlocked)
                     let placeComment = PlaceComment(id: resPlaceComment.mcp_id, pId: resPlaceComment.mcp_p_id, comment: resPlaceComment.mcp_comment, createdDate: resPlaceComment.mcp_created_date, updatedDate: resPlaceComment.mcp_updated_date, user: user)
                     
                     placeCommentList.append(placeComment)

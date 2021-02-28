@@ -55,7 +55,7 @@ class UserTVCell: UITableViewCell {
     
     lazy var nickNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16)
+        label.font = .boldSystemFont(ofSize: 14)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

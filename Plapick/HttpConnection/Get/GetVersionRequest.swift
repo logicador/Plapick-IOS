@@ -1,5 +1,5 @@
 //
-//  GetPushNotificationDeviceRequest.swift
+//  GetVersionRequest.swift
 //  Plapick
 //
 //  Created by 서원영 on 2021/01/11.

@@ -52,7 +52,7 @@ class App {
         let likePickCnt = userDefaults.integer(forKey: "uLikePickCnt")
         let likePlaceCnt = userDefaults.integer(forKey: "uLikePlaceCnt")
         
-        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, device: device, isAllowedFollow: isAllowedFollow, isAllowedMyPickComment: isAllowedMyPickComment, isAllowedRecommendedPlace: isAllowedRecommendedPlace, isAllowedAd: isAllowedAd, isAllowedEventNotice: isAllowedEventNotice, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate, isFollow: "N", followerCnt: followerCnt, followingCnt: followingCnt, pickCnt: pickCnt, likePickCnt: likePickCnt, likePlaceCnt: likePlaceCnt)
+        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, device: device, isAllowedFollow: isAllowedFollow, isAllowedMyPickComment: isAllowedMyPickComment, isAllowedRecommendedPlace: isAllowedRecommendedPlace, isAllowedAd: isAllowedAd, isAllowedEventNotice: isAllowedEventNotice, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate, isFollow: "N", followerCnt: followerCnt, followingCnt: followingCnt, pickCnt: pickCnt, likePickCnt: likePickCnt, likePlaceCnt: likePlaceCnt, isBlocked: "N")
     }
     
     func login(user: User) {
@@ -120,6 +120,15 @@ class App {
         
         userDefaults.removeObject(forKey: "recentPlaceList")
         userDefaults.removeObject(forKey: "recentUserList")
+        
+        userDefaults.removeObject(forKey: "isAgreePosting")
+    }
+    
+    func isAgreePosting() -> Bool {
+        return self.userDefaults.bool(forKey: "isAgreePosting")
+    }
+    func setAgreePosting() {
+        userDefaults.set(true, forKey: "isAgreePosting")
     }
     
     func getNickName() -> String {
