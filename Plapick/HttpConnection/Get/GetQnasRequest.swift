@@ -13,16 +13,11 @@ protocol GetQnasRequestProtocol {
 }
 
 
-// GET
-// 픽 리스트 가져오기
 class GetQnasRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: GetQnasRequestProtocol?
     let apiUrl = API_URL + "/get/qnas"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -93,16 +88,9 @@ class GetQnasRequest: HttpRequest {
             
             // MARK: Response
             do {
-                let response = try JSONDecoder().decode(QnasRequestResult.self, from: data)
+                let response = try JSONDecoder().decode(GetQnasRequestResponse.self, from: data)
                 
-                let resQnaList = response.result
-                
-                var qnaList: [Qna] = []
-                
-                for resQna in resQnaList {
-                    let qna = Qna(id: resQna.q_id, uId: resQna.q_u_id, title: resQna.q_title, content: resQna.q_content, answer: resQna.q_answer, status: resQna.q_status, createdDate: resQna.q_created_date, updatedDate: resQna.q_updated_date, answeredDate: resQna.q_answered_date)
-                    qnaList.append(qna)
-                }
+                let qnaList = response.result
                 
                 self.delegate?.response(qnaList: qnaList, getQnas: "OK")
                 
@@ -113,11 +101,9 @@ class GetQnasRequest: HttpRequest {
         }})
         task.resume()
     }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
-    }
 }
 
+
+struct GetQnasRequestResponse: Codable {
+    var result: [Qna]
+}

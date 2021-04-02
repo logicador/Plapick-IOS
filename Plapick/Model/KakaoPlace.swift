@@ -9,14 +9,18 @@ import Foundation
 
 
 struct KakaoPlace: Codable {
+    var address_name: String
+    var category_group_code: String
+    var category_group_name: String
+    var category_name: String
     var id: String
-    var placeName: String
-    var categoryName: String
-    var categoryGroupCode: String
-    var categoryGroupName: String
-    var addressName: String
-    var roadAddressName: String
     var phone: String
-    var latitude: String
-    var longitude: String
+    var place_name: String
+    var road_address_name: String
+    var x: String
+    var y: String
+    
+    var p_like_cnt: Int? = 0
+    var p_comment_cnt: Int? = 0
+    var p_posts_cnt: Int? = 0
 }

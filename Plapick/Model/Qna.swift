@@ -9,13 +9,12 @@ import Foundation
 
 
 struct Qna: Codable {
-    var id: Int
-    var uId: Int
-    var title: String
-    var content: String
-    var answer: String? = ""
-    var status: String
-    var createdDate: String
-    var updatedDate: String
-    var answeredDate: String
+    var q_id: Int
+    var q_u_id: Int
+    var q_question: String
+    var q_answer: String? = ""
+    var q_status: String
+    var q_created_date: String
+    var q_updated_date: String
+    var q_answered_date: String
 }

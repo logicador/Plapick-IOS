@@ -5,7 +5,7 @@
 //  Created by 서원영 on 2021/01/22.
 //
 
-import Foundation
+import UIKit
 import Alamofire
 
 
@@ -14,26 +14,18 @@ protocol UploadImageRequestProtocol {
 }
 
 
-// POST
-// 이미지 업로드
+// 이미지 업로드 Request
+// 이미지 이름(id) 반환
 class UploadImageRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: UploadImageRequestProtocol?
     let apiUrl = API_URL + "/upload/image"
     
-    
-    func fetch(vc: UIViewController, isShowAlert: Bool = true, image: UIImage?) {
+    func fetch(vc: UIViewController, isShowAlert: Bool = true, image: UIImage) {
         print("[HTTP REQ]", apiUrl)
         
         if !vc.isNetworkAvailable() {
             if isShowAlert { vc.showNetworkAlert() }
-            return
-        }
-        
-        guard let image = image else {
-            if isShowAlert { vc.requestErrorAlert(title: "ERR_IMAGE") }
-            delegate?.response(imageName: nil, uploadImage: "ERR_IMAGE")
             return
         }
         
@@ -70,7 +62,7 @@ class UploadImageRequest: HttpRequest {
                     }
                     
                     do {
-                        let response = try JSONDecoder().decode(IntRequestResult.self, from: data)
+                        let response = try JSONDecoder().decode(UploadImageRequestResponse.self, from: data)
                         self.delegate?.response(imageName: response.result, uploadImage: status)
                         
                     } catch {
@@ -85,4 +77,9 @@ class UploadImageRequest: HttpRequest {
             }
         }
     }
+}
+
+
+struct UploadImageRequestResponse: Codable {
+    var result: Int
 }

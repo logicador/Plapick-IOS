@@ -13,16 +13,11 @@ protocol LogoutRequestProtocol {
 }
 
 
-// POST
-// 로그아웃
 class LogoutRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: LogoutRequestProtocol?
     let apiUrl = API_URL + "/logout"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -90,15 +85,8 @@ class LogoutRequest: HttpRequest {
                 return
             }
             
-            // MARK: Response
             self.delegate?.response(logout: "OK")
         }})
         task.resume()
-    }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
     }
 }

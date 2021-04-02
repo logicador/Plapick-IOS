@@ -12,17 +12,11 @@ protocol AddQnaRequestProtocol {
     func response(qna: Qna?, addQna status: String)
 }
 
-
-// POST
-// 푸시 알림 기기 추가
 class AddQnaRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: AddQnaRequestProtocol?
     let apiUrl = API_URL + "/add/qna"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -91,11 +85,9 @@ class AddQnaRequest: HttpRequest {
             }
             
             do {
-                let response = try JSONDecoder().decode(QnaRequestResult.self, from: data)
+                let response = try JSONDecoder().decode(AddQnaRequestResponse.self, from: data)
                 
-                let resQna = response.result
-                
-                let qna = Qna(id: resQna.q_id, uId: resQna.q_u_id, title: resQna.q_title, content: resQna.q_content, answer: resQna.q_answer, status: resQna.q_status, createdDate: resQna.q_created_date, updatedDate: resQna.q_updated_date, answeredDate: resQna.q_answered_date)
+                let qna = response.result
                 
                 self.delegate?.response(qna: qna, addQna: "OK")
                 
@@ -106,11 +98,9 @@ class AddQnaRequest: HttpRequest {
         }})
         task.resume()
     }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
-    }
 }
 
+
+struct AddQnaRequestResponse: Codable {
+    var result: Qna
+}

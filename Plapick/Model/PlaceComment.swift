@@ -9,11 +9,13 @@ import Foundation
 
 
 struct PlaceComment: Codable {
-    var id: Int
-    var pId: Int
-    var comment: String
-    var createdDate: String
-    var updatedDate: String
+    var pc_id: Int
+    var pc_p_id: Int
+    var pc_u_id: Int
+    var pc_comment: String
+    var pc_created_date: String
+    var pc_updated_date: String
     
-    var user: User
+    var u_nickname: String
+    var u_profile_image: String? = ""
 }

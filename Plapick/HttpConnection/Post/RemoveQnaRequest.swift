@@ -13,16 +13,11 @@ protocol RemoveQnaRequestProtocol {
 }
 
 
-// POST
-// 푸시 알림 기기 추가
 class RemoveQnaRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: RemoveQnaRequestProtocol?
     let apiUrl = API_URL + "/remove/qna"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -33,7 +28,6 @@ class RemoveQnaRequest: HttpRequest {
         
         let paramString = makeParamString(paramDict: paramDict)
         
-        // For POST method
         guard let paramData = paramString.data(using: .utf8) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_PARAM_DATA")}
             delegate?.response(removeQna: "ERR_PARAM_DATA")
@@ -93,11 +87,5 @@ class RemoveQnaRequest: HttpRequest {
             self.delegate?.response(removeQna: "OK")
         }})
         task.resume()
-    }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
     }
 }

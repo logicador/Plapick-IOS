@@ -13,16 +13,11 @@ protocol EditUserPushRequestProtocol {
 }
 
 
-// POST
-// 푸시 알림 기기 추가
 class EditUserPushRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: EditUserPushRequestProtocol?
     let apiUrl = API_URL + "/edit/user/push"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -33,7 +28,6 @@ class EditUserPushRequest: HttpRequest {
         
         let paramString = makeParamString(paramDict: paramDict)
         
-        // For POST method
         guard let paramData = paramString.data(using: .utf8) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_PARAM_DATA")}
             delegate?.response(editUserPush: "ERR_PARAM_DATA")
@@ -93,11 +87,5 @@ class EditUserPushRequest: HttpRequest {
             self.delegate?.response(editUserPush: "OK")
         }})
         task.resume()
-    }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
     }
 }

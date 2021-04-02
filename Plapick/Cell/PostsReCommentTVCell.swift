@@ -1,0 +1,253 @@
+//
+//  PostsReCommentTVCell.swift
+//  Plapick
+//
+//  Created by 서원영 on 2021/03/31.
+//
+
+import UIKit
+import SDWebImage
+
+
+protocol PostsReCommentTVCellProtocol {
+    func selectUser(uId: Int)
+    func more(postsReComment: PostsReComment)
+    func reComment(postsReComment: PostsReComment)
+    func selectTargetUser(uId: Int)
+}
+
+
+class PostsReCommentTVCell: UITableViewCell {
+    
+    // MARK: Property
+    var delegate: PostsReCommentTVCellProtocol?
+    var postsReComment: PostsReComment? {
+        didSet {
+            guard let postsReComment = self.postsReComment else { return }
+            
+            guard let profileImage = postsReComment.u_profile_image else { return }
+            guard let url = URL(string: PLAPICK_URL + profileImage) else { return }
+            profileImageView.sd_setImage(with: url, completed: nil)
+            
+            nicknameLabel.text = postsReComment.u_nickname
+            
+            let df = DateFormatter()
+            df.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            let nowDate = Date()
+            let nowString = df.string(from: nowDate)
+            guard let startTime = df.date(from: postsReComment.porc_created_date) else { return }
+            guard let endTime = df.date(from: nowString) else { return }
+            let useDay = Int(endTime.timeIntervalSince(startTime)) / 86400
+            
+            if useDay == 0 { dateLabel.text = "오늘" }
+            else if (useDay > 0 && useDay < 7) || (useDay > 7 && useDay < 14) || (useDay > 14 && useDay < 21) { dateLabel.text = "\(useDay)일 전" }
+            else if useDay == 7 || useDay == 14 || useDay == 21 { dateLabel.text = "\(useDay / 7)주 전" }
+            else { dateLabel.text = postsReComment.porc_created_date.split(separator: " ")[0].replacingOccurrences(of: "-", with: ". ") }
+            
+            if let _ = postsReComment.porc_target_u_id {
+                guard let targetUNickname = postsReComment.porc_target_u_nickname else { return }
+                
+                let attributedLinkString = NSMutableAttributedString(string: "@\(targetUNickname) ", attributes:[NSAttributedString.Key.foregroundColor: UIColor.systemBlue, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 12)])
+                let plainAttributedString = NSMutableAttributedString(string: postsReComment.porc_comment, attributes: nil)
+                
+                let fullAttributedString = NSMutableAttributedString()
+                fullAttributedString.append(attributedLinkString)
+                fullAttributedString.append(plainAttributedString)
+                
+                commentLabel.attributedText = fullAttributedString
+                
+            } else {
+                commentLabel.text = postsReComment.porc_comment
+            }
+        }
+    }
+    
+    
+    // MARK: View
+    lazy var containerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_XXS
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
+    lazy var profileImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
+        iv.backgroundColor = .systemGray6
+        iv.layer.borderWidth = LINE_WIDTH
+        iv.layer.cornerRadius = 20
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(userTapped)))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    lazy var headerContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var nicknameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 14)
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(userTapped)))
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var dateLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 12)
+        label.textColor = .systemGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var moreContainerView: UIView = {
+        let view = UIView()
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(moreTapped)))
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var moreImageView: UIImageView = {
+        let image = UIImage(systemName: "ellipsis")
+        let iv = UIImageView(image: image)
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    lazy var commentLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 15)
+        label.numberOfLines = 0
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(commentTapped)))
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var footerContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    lazy var reCommentButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("답글달기", for: .normal)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 14)
+        button.addTarget(self, action: #selector(reCommentTapped), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    
+    // MARK: Init
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        contentView.isUserInteractionEnabled = false
+        
+        configureView()
+        
+        setThemeColor()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    // MARK: Function
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
+    func setThemeColor() {
+        backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white
+        
+        profileImageView.layer.borderColor = UIColor.separator.cgColor
+    }
+    
+    func configureView() {
+        addSubview(containerView)
+        containerView.topAnchor.constraint(equalTo: topAnchor, constant: SPACE).isActive = true
+        containerView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        containerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -SPACE).isActive = true
+        
+        containerView.addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: containerView.topAnchor).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 40 + 40 + SPACE_XS).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        
+        stackView.addArrangedSubview(headerContainerView)
+        headerContainerView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        headerContainerView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        headerContainerView.addSubview(nicknameLabel)
+        nicknameLabel.topAnchor.constraint(equalTo: headerContainerView.topAnchor).isActive = true
+        nicknameLabel.leadingAnchor.constraint(equalTo: headerContainerView.leadingAnchor).isActive = true
+        nicknameLabel.bottomAnchor.constraint(equalTo: headerContainerView.bottomAnchor).isActive = true
+        
+        headerContainerView.addSubview(dateLabel)
+        dateLabel.centerYAnchor.constraint(equalTo: nicknameLabel.centerYAnchor).isActive = true
+        dateLabel.leadingAnchor.constraint(equalTo: nicknameLabel.trailingAnchor, constant: SPACE_XXS).isActive = true
+        
+        headerContainerView.addSubview(moreContainerView)
+        moreContainerView.topAnchor.constraint(equalTo: nicknameLabel.topAnchor).isActive = true
+        moreContainerView.trailingAnchor.constraint(equalTo: headerContainerView.trailingAnchor).isActive = true
+        moreContainerView.bottomAnchor.constraint(equalTo: nicknameLabel.bottomAnchor).isActive = true
+        
+        moreContainerView.addSubview(moreImageView)
+        moreImageView.centerYAnchor.constraint(equalTo: moreContainerView.centerYAnchor).isActive = true
+        moreImageView.leadingAnchor.constraint(equalTo: moreContainerView.leadingAnchor, constant: SPACE_XXS).isActive = true
+        moreImageView.trailingAnchor.constraint(equalTo: moreContainerView.trailingAnchor).isActive = true
+        moreImageView.widthAnchor.constraint(equalToConstant: 20).isActive = true
+        moreImageView.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        
+        stackView.addArrangedSubview(commentLabel)
+        commentLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        commentLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        containerView.addSubview(profileImageView)
+        profileImageView.topAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
+        profileImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 40).isActive = true
+        profileImageView.widthAnchor.constraint(equalToConstant: 40).isActive = true
+        profileImageView.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        stackView.addArrangedSubview(footerContainerView)
+        footerContainerView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        footerContainerView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        footerContainerView.addSubview(reCommentButton)
+        reCommentButton.topAnchor.constraint(equalTo: footerContainerView.topAnchor).isActive = true
+        reCommentButton.leadingAnchor.constraint(equalTo: footerContainerView.leadingAnchor).isActive = true
+        reCommentButton.bottomAnchor.constraint(equalTo: footerContainerView.bottomAnchor).isActive = true
+    }
+    
+    
+    // MARK: Function - @OBJC
+    @objc func userTapped() {
+        guard let postsReComment = self.postsReComment else { return }
+        delegate?.selectUser(uId: postsReComment.porc_u_id)
+    }
+    
+    @objc func moreTapped() {
+        guard let postsReComment = self.postsReComment else { return }
+        delegate?.more(postsReComment: postsReComment)
+    }
+    
+    @objc func reCommentTapped() {
+        guard let postsReComment = self.postsReComment else { return }
+        delegate?.reComment(postsReComment: postsReComment)
+    }
+    
+    @objc func commentTapped() {
+        guard let postsReComment = self.postsReComment else { return }
+        guard let targetUId = postsReComment.porc_target_u_id else { return }
+        delegate?.selectTargetUser(uId: targetUId)
+    }
+}

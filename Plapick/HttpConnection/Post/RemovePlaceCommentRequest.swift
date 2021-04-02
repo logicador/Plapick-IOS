@@ -9,20 +9,15 @@ import UIKit
 
 
 protocol RemovePlaceCommentRequestProtocol {
-    func response(removePlaceComment status: String)
+    func response(pcId: Int?, removePlaceComment status: String)
 }
 
 
-// POST
-// 푸시 알림 기기 추가
 class RemovePlaceCommentRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: RemovePlaceCommentRequestProtocol?
     let apiUrl = API_URL + "/remove/place/comment"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -33,17 +28,16 @@ class RemovePlaceCommentRequest: HttpRequest {
         
         let paramString = makeParamString(paramDict: paramDict)
         
-        // For POST method
         guard let paramData = paramString.data(using: .utf8) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_PARAM_DATA")}
-            delegate?.response(removePlaceComment: "ERR_PARAM_DATA")
+            delegate?.response(pcId: nil, removePlaceComment: "ERR_PARAM_DATA")
             return
         }
         
         let httpUrl = apiUrl
         guard let url = URL(string: httpUrl) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL") }
-            delegate?.response(removePlaceComment: "ERR_URL")
+            delegate?.response(pcId: nil, removePlaceComment: "ERR_URL")
             return
         }
         
@@ -56,48 +50,57 @@ class RemovePlaceCommentRequest: HttpRequest {
                 
             if let _ = error {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_SERVER") }
-                self.delegate?.response(removePlaceComment: "ERR_SERVER")
+                self.delegate?.response(pcId: nil, removePlaceComment: "ERR_SERVER")
                 return
             }
             
             guard let response = res as? HTTPURLResponse else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_RESPONSE") }
-                self.delegate?.response(removePlaceComment: "ERR_RESPONSE")
+                self.delegate?.response(pcId: nil, removePlaceComment: "ERR_RESPONSE")
                 return
             }
             
             if response.statusCode != 200 {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_CODE") }
-                self.delegate?.response(removePlaceComment: "ERR_STATUS_CODE")
+                self.delegate?.response(pcId: nil, removePlaceComment: "ERR_STATUS_CODE")
                 return
             }
             
             guard let data = data else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA") }
-                self.delegate?.response(removePlaceComment: "ERR_DATA")
+                self.delegate?.response(pcId: nil, removePlaceComment: "ERR_DATA")
                 return
             }
             
             guard let status = self.getStatusCode(data: data) else {
                 if isShowAlert { vc.requestErrorAlert(title: "ERR_STATUS_DECODE") }
-                self.delegate?.response(removePlaceComment: "ERR_STATUS_DECODE")
+                self.delegate?.response(pcId: nil, removePlaceComment: "ERR_STATUS_DECODE")
                 return
             }
             
             if status != "OK" {
                 if isShowAlert { vc.requestErrorAlert(title: status) }
-                self.delegate?.response(removePlaceComment: status)
+                self.delegate?.response(pcId: nil, removePlaceComment: status)
                 return
             }
             
-            self.delegate?.response(removePlaceComment: "OK")
+            do {
+                let response = try JSONDecoder().decode(RemovePlaceCommentRequestResponse.self, from: data)
+                
+                let pcId = response.result
+                
+                self.delegate?.response(pcId: pcId, removePlaceComment: "OK")
+                
+            } catch {
+                if isShowAlert { vc.requestErrorAlert(title: "ERR_DATA_DECODE", message: "데이터 응답 오류가 발생했습니다.") }
+                self.delegate?.response(pcId: nil, removePlaceComment: "ERR_DATA_DECODE")
+            }
         }})
         task.resume()
     }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
-    }
+}
+
+
+struct RemovePlaceCommentRequestResponse: Codable {
+    var result: Int
 }

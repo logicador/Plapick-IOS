@@ -13,16 +13,11 @@ protocol GetVersionRequestProtocol {
 }
 
 
-// GET
-// 버전 가져오기
 class GetVersionRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: GetVersionRequestProtocol?
     let apiUrl = API_URL + "/get/version"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -33,7 +28,6 @@ class GetVersionRequest: HttpRequest {
         
         let paramString = makeParamString(paramDict: paramDict)
         
-        // For GET method
         let urlString = "\(apiUrl)?\(paramString)"
         guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL_ENCODE") }
@@ -91,7 +85,6 @@ class GetVersionRequest: HttpRequest {
                 return
             }
             
-            // MARK: Response
             do {
                 let response = try JSONDecoder().decode(VersionRequestResult.self, from: data)
                 let resVersion = response.result
@@ -104,11 +97,5 @@ class GetVersionRequest: HttpRequest {
             }
         }})
         task.resume()
-    }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
     }
 }

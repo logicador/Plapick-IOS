@@ -13,16 +13,11 @@ protocol GetUsersRequestProtocol {
 }
 
 
-// GET
-// 유저 정보 가져오기
 class GetUsersRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: GetUsersRequestProtocol?
     let apiUrl = API_URL + "/get/users"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -33,7 +28,6 @@ class GetUsersRequest: HttpRequest {
         
         let paramString = makeParamString(paramDict: paramDict)
         
-        // For GET method
         let urlString = "\(apiUrl)?\(paramString)"
         guard let encodedUrlString = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             if isShowAlert { vc.requestErrorAlert(title: "ERR_URL_ENCODE") }
@@ -91,16 +85,10 @@ class GetUsersRequest: HttpRequest {
                 return
             }
             
-            // MARK: Response
             do {
-                let response = try JSONDecoder().decode(UsersRequestResult.self, from: data)
-                let resUserList = response.result
+                let response = try JSONDecoder().decode(GetUsersRequestResponse.self, from: data)
                 
-                var userList: [User] = []
-                for resUser in resUserList {
-                    let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image, status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, isFollow: resUser.isFollow, followerCnt: resUser.followerCnt, followingCnt: resUser.followingCnt, pickCnt: resUser.pickCnt, likePickCnt: resUser.likePickCnt, likePlaceCnt: resUser.likePlaceCnt, isBlocked: resUser.isBlocked)
-                    userList.append(user)
-                }
+                let userList = response.result
                 
                 self.delegate?.response(userList: userList, getUsers: "OK")
                 
@@ -111,10 +99,9 @@ class GetUsersRequest: HttpRequest {
         }})
         task.resume()
     }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
-    }
+}
+
+
+struct GetUsersRequestResponse: Codable {
+    var result: [User]
 }

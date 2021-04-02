@@ -18,165 +18,97 @@ class App {
     // MARK: Property
     var userDefaults = UserDefaults.standard
     
+    // 로그인 여부
     func isLogined() -> Bool {
         return self.userDefaults.bool(forKey: "isLogined")
     }
     
-    func getUser() -> User {
-        let id = userDefaults.integer(forKey: "uId")
-        let type = userDefaults.string(forKey: "uType") ?? ""
-        let socialId = userDefaults.string(forKey: "uSocialId") ?? ""
-        let name = userDefaults.string(forKey: "uName") ?? ""
-        let nickName = userDefaults.string(forKey: "uNickName") ?? ""
-        let email = userDefaults.string(forKey: "uEmail") ?? ""
-        let password = userDefaults.string(forKey: "uPassword") ?? ""
-        let profileImage = userDefaults.string(forKey: "uProfileImage") ?? ""
-        let status = userDefaults.string(forKey: "uStatus") ?? ""
-        let lastLoginPlatform = userDefaults.string(forKey: "uLastLoginPlatform") ?? ""
-        let isLogined = userDefaults.string(forKey: "uIsLogined") ?? ""
-        
-        let device = userDefaults.string(forKey: "uDevice") ?? ""
-        let isAllowedFollow = userDefaults.string(forKey: "uIsAllowedFollow") ?? "Y"
-        let isAllowedMyPickComment = userDefaults.string(forKey: "uIsAllowedMyPickComment") ?? "Y"
-        let isAllowedRecommendedPlace = userDefaults.string(forKey: "uIsAllowedRecommendedPlace") ?? "Y"
-        let isAllowedAd = userDefaults.string(forKey: "uIsAllowedAd") ?? "Y"
-        let isAllowedEventNotice = userDefaults.string(forKey: "uIsAllowedEventNotice") ?? "Y"
-        
-        let createdDate = userDefaults.string(forKey: "uCreatedDate") ?? ""
-        let updatedDate = userDefaults.string(forKey: "uUpdatedDate") ?? ""
-        let connectedDate = userDefaults.string(forKey: "uConnectedDate") ?? ""
-        
-        let followerCnt = userDefaults.integer(forKey: "uFollowerCnt")
-        let followingCnt = userDefaults.integer(forKey: "uFollowingCnt")
-        let pickCnt = userDefaults.integer(forKey: "uPickCnt")
-        let likePickCnt = userDefaults.integer(forKey: "uLikePickCnt")
-        let likePlaceCnt = userDefaults.integer(forKey: "uLikePlaceCnt")
-        
-        return User(id: id, type: type, socialId: socialId, name: name, nickName: nickName, email: email, password: password, profileImage: profileImage, status: status, lastLoginPlatform: lastLoginPlatform, isLogined: isLogined, device: device, isAllowedFollow: isAllowedFollow, isAllowedMyPickComment: isAllowedMyPickComment, isAllowedRecommendedPlace: isAllowedRecommendedPlace, isAllowedAd: isAllowedAd, isAllowedEventNotice: isAllowedEventNotice, createdDate: createdDate, updatedDate: updatedDate, connectedDate: connectedDate, isFollow: "N", followerCnt: followerCnt, followingCnt: followingCnt, pickCnt: pickCnt, likePickCnt: likePickCnt, likePlaceCnt: likePlaceCnt, isBlocked: "N")
+    // 로그인 정보 저장 여부
+    func isSaveLoginInfo() -> Bool {
+        return self.userDefaults.bool(forKey: "isSaveLoginInfo")
+    }
+    func setIsSaveLoginInfo(isSave: Bool) {
+        userDefaults.set(isSave, forKey: "isSaveLoginInfo")
     }
     
-    func login(user: User) {
-        userDefaults.set(true, forKey: "isLogined")
-        userDefaults.set(user.id, forKey: "uId")
-        userDefaults.set(user.type, forKey: "uType")
-        userDefaults.set(user.socialId, forKey: "uSocialId")
-        userDefaults.set(user.name, forKey: "uName")
-        userDefaults.set(user.nickName, forKey: "uNickName")
-        userDefaults.set(user.email, forKey: "uEmail")
-        userDefaults.set(user.password, forKey: "uPassword")
-        userDefaults.set(user.profileImage, forKey: "uProfileImage")
-        userDefaults.set(user.status, forKey: "uStatus")
-        userDefaults.set(user.lastLoginPlatform, forKey: "uLastLoginPlatform")
-        userDefaults.set(user.isLogined, forKey: "uIsLogined")
-        
-        userDefaults.set(user.device, forKey: "uDevice")
-        userDefaults.set(user.isAllowedFollow, forKey: "uIsAllowedFollow")
-        userDefaults.set(user.isAllowedMyPickComment, forKey: "uIsAllowedMyPickComment")
-        userDefaults.set(user.isAllowedRecommendedPlace, forKey: "uIsAllowedRecommendedPlace")
-        userDefaults.set(user.isAllowedAd, forKey: "uIsAllowedAd")
-        userDefaults.set(user.isAllowedEventNotice, forKey: "uIsAllowedEventNotice")
-        
-        userDefaults.set(user.createdDate, forKey: "uCreatedDate")
-        userDefaults.set(user.updatedDate, forKey: "uUpdatedDate")
-        userDefaults.set(user.connectedDate, forKey: "uConnectedDate")
-        
-        userDefaults.set(user.followerCnt, forKey: "uFollowerCnt")
-        userDefaults.set(user.followingCnt, forKey: "uFollowingCnt")
-        userDefaults.set(user.pickCnt, forKey: "uPickCnt")
-        userDefaults.set(user.likePickCnt, forKey: "uLikePickCnt")
-        userDefaults.set(user.likePlaceCnt, forKey: "uLikePlaceCnt")
+    // 저장된 로그인 이메일
+    func getLoginEmail() -> String {
+        return self.userDefaults.string(forKey: "loginEmail") ?? ""
+    }
+    func setLoginEmail(email: String) {
+        userDefaults.set(email, forKey: "loginEmail")
     }
     
-    func logout() {
-        userDefaults.set(false, forKey: "isLogined")
-        userDefaults.removeObject(forKey: "uId")
-        userDefaults.removeObject(forKey: "uType")
-        userDefaults.removeObject(forKey: "uSocialId")
-        userDefaults.removeObject(forKey: "uName")
-        userDefaults.removeObject(forKey: "uNickName")
-        userDefaults.removeObject(forKey: "uEmail")
-        userDefaults.removeObject(forKey: "uPassword")
-        userDefaults.removeObject(forKey: "uProfileImage")
-        userDefaults.removeObject(forKey: "uStatus")
-        userDefaults.removeObject(forKey: "uLastLoginPlatform")
-        userDefaults.removeObject(forKey: "uIsLogined")
-        
-        userDefaults.removeObject(forKey: "uDevice")
-        userDefaults.removeObject(forKey: "uIsAllowedFollow")
-        userDefaults.removeObject(forKey: "uIsAllowedMyPickComment")
-        userDefaults.removeObject(forKey: "uIsAllowedRecommendedPlace")
-        userDefaults.removeObject(forKey: "uIsAllowedAd")
-        userDefaults.removeObject(forKey: "uIsAllowedEventNotice")
-        
-        userDefaults.removeObject(forKey: "uCreatedDate")
-        userDefaults.removeObject(forKey: "uUpdatedDate")
-        userDefaults.removeObject(forKey: "uConnectedDate")
-        
-        userDefaults.removeObject(forKey: "uFollowerCnt")
-        userDefaults.removeObject(forKey: "uFollowingCnt")
-        userDefaults.removeObject(forKey: "uPickCnt")
-        userDefaults.removeObject(forKey: "uLikePickCnt")
-        userDefaults.removeObject(forKey: "uLikePlaceCnt")
-        
-        userDefaults.removeObject(forKey: "recentPlaceList")
-        userDefaults.removeObject(forKey: "recentUserList")
-        
-        userDefaults.removeObject(forKey: "isAgreePosting")
+    // 저장된 로그인 비밀번호
+    func getLoginPassword() -> String {
+        return self.userDefaults.string(forKey: "loginPassword") ?? ""
+    }
+    func setLoginPassword(password: String) {
+        userDefaults.set(password, forKey: "loginPassword")
     }
     
-    func isAgreePosting() -> Bool {
-        return self.userDefaults.bool(forKey: "isAgreePosting")
+    // 알림 허용 다시 보지 않기 여부
+    func getIsDontLookAgainAccessAlarm() -> Bool {
+        return userDefaults.bool(forKey: "isDontLookAgainAccessAlarm")
     }
-    func setAgreePosting() {
-        userDefaults.set(true, forKey: "isAgreePosting")
-    }
-    
-    func getNickName() -> String {
-        return userDefaults.string(forKey: "uNickName") ?? ""
-    }
-    func setNickName(nickName: String) {
-        userDefaults.set(nickName, forKey: "uNickName")
+    func setIsDontLookAgainAccessAlarm(isDontLookAgain: Bool) {
+        userDefaults.set(isDontLookAgain, forKey: "isDontLookAgainAccessAlarm")
     }
     
-    func getProfileImage() -> String {
-        return userDefaults.string(forKey: "uProfileImage") ?? ""
+    // 로그인된 사용자 아이디 가져오기
+    func getUserId() -> Int {
+        return userDefaults.integer(forKey: "u_id")
     }
-    func setProfileImage(profileImage: String) {
-        userDefaults.set(profileImage, forKey: "uProfileImage")
+    // 로그인된 사용자 닉네임 가져오기
+    func getUserNickName() -> String {
+        return userDefaults.string(forKey: "u_nickname") ?? ""
+    }
+    func setUserNickname(nickname: String) {
+        userDefaults.set(nickname, forKey: "u_nickname")
+    }
+    // 로그인된 사용자 프로필 이미지 가져오기
+    func getUserProfileImage() -> String {
+        return userDefaults.string(forKey: "u_profile_image") ?? ""
+    }
+    func setUserProfileImage(profileImage: String) {
+        userDefaults.set(profileImage, forKey: "u_profile_image")
+    }
+    // 로그인된 사용자 게시물 개수 가져오기
+    func getUserPostsCnt() -> Int {
+        return userDefaults.integer(forKey: "u_posts_cnt")
+    }
+    // 로그인된 사용자 플레이스 개수 가져오기
+    func getUserPlaceCnt() -> Int {
+        return userDefaults.integer(forKey: "u_place_cnt")
+    }
+    // 로그인된 사용자 팔로워 개수 가져오기
+    func getUserFollowerCnt() -> Int {
+        return userDefaults.integer(forKey: "u_follower_cnt")
+    }
+    // 로그인된 사용자 팔로잉 개수 가져오기
+    func getUserFollowingCnt() -> Int {
+        return userDefaults.integer(forKey: "u_following_cnt")
     }
     
-    func getPndId() -> String {
-        return userDefaults.string(forKey: "pndId") ?? ""
-    }
-    func setPndId(pndId: String) {
-        userDefaults.set(pndId, forKey: "pndId")
-    }
-    
-    func getUId() -> Int {
-        return userDefaults.integer(forKey: "uId")
-    }
-    
+    // 앱 버전 정보
     func getCurVersionCode() -> Int {
         return userDefaults.integer(forKey: "curVersionCode")
     }
     func setCurVersionCode(curVersionCode: Int) {
         userDefaults.set(curVersionCode, forKey: "curVersionCode")
     }
-    
     func getCurVersionName() -> String {
         return userDefaults.string(forKey: "curVersionName") ?? ""
     }
     func setCurVersionName(curVersionName: String) {
         userDefaults.set(curVersionName, forKey: "curVersionName")
     }
-    
     func getNewVersionCode() -> Int {
         return userDefaults.integer(forKey: "newVersionCode")
     }
     func setNewVersionCode(newVersionCode: Int) {
         userDefaults.set(newVersionCode, forKey: "newVersionCode")
     }
-    
     func getNewVersionName() -> String {
         return userDefaults.string(forKey: "newVersionName") ?? ""
     }
@@ -184,92 +116,117 @@ class App {
         userDefaults.set(newVersionName, forKey: "newVersionName")
     }
     
-    func getPushNotification(key: String) -> String {
-        return userDefaults.string(forKey: key) ?? "Y"
-    }
-    func setPushNotification(key: String, value: String) {
-        userDefaults.set(value, forKey: key)
+    // 로그인된 사용자 가져오기
+    func getUser() -> User {
+        let u_id = userDefaults.integer(forKey: "u_id")
+        let u_type = userDefaults.string(forKey: "u_type") ?? ""
+        let u_phone_number = userDefaults.string(forKey: "u_phone_number") ?? ""
+        let u_social_id = userDefaults.string(forKey: "u_social_id") ?? ""
+        let u_nickname = userDefaults.string(forKey: "u_nickname") ?? ""
+        let u_email = userDefaults.string(forKey: "u_email") ?? ""
+        let u_password = userDefaults.string(forKey: "u_password") ?? ""
+        let u_profile_image = userDefaults.string(forKey: "u_profile_image") ?? ""
+        let u_status = userDefaults.string(forKey: "u_status") ?? ""
+        let u_last_login_platform = userDefaults.string(forKey: "u_last_login_platform") ?? ""
+        let u_is_logined = userDefaults.string(forKey: "u_is_logined") ?? "Y"
+        let u_device = userDefaults.string(forKey: "u_device") ?? ""
+        
+        let u_is_allowed_push_ad = userDefaults.string(forKey: "u_is_allowed_push_ad") ?? "Y"
+        let u_is_allowed_push_posts_comment = userDefaults.string(forKey: "u_is_allowed_push_posts_comment") ?? "Y"
+        let u_is_allowed_push_followed = userDefaults.string(forKey: "u_is_allowed_push_followed") ?? "Y"
+        let u_is_allowed_push_re_comment = userDefaults.string(forKey: "u_is_allowed_push_re_comment") ?? "Y"
+        
+        let u_created_date: String = userDefaults.string(forKey: "u_created_date") ?? ""
+        let u_updated_date: String = userDefaults.string(forKey: "u_updated_date") ?? ""
+        let u_connected_date: String = userDefaults.string(forKey: "u_connected_date") ?? ""
+        
+        let u_follower_cnt = userDefaults.integer(forKey: "u_follower_cnt")
+        let u_following_cnt = userDefaults.integer(forKey: "u_following_cnt")
+        let u_posts_cnt = userDefaults.integer(forKey: "u_posts_cnt")
+        let u_place_cnt = userDefaults.integer(forKey: "u_place_cnt")
+        let u_like_pick_cnt = userDefaults.integer(forKey: "u_like_pick_cnt")
+        let u_like_place_cnt = userDefaults.integer(forKey: "u_like_place_cnt")
+        let u_is_follow: String = userDefaults.string(forKey: "u_is_follow") ?? "N"
+        let u_is_blocked: String = userDefaults.string(forKey: "u_is_blocked") ?? "N"
+        
+        let user = User(u_id: u_id, u_type: u_type, u_phone_number: u_phone_number, u_social_id: u_social_id, u_nickname: u_nickname, u_email: u_email, u_password: u_password, u_profile_image: u_profile_image, u_status: u_status, u_last_login_platform: u_last_login_platform, u_is_logined: u_is_logined, u_device: u_device, u_is_allowed_push_ad: u_is_allowed_push_ad, u_is_allowed_push_posts_comment: u_is_allowed_push_posts_comment, u_is_allowed_push_followed: u_is_allowed_push_followed, u_is_allowed_push_re_comment: u_is_allowed_push_re_comment, u_created_date: u_created_date, u_updated_date: u_updated_date, u_connected_date: u_connected_date, u_is_follow: u_is_follow, u_is_blocked: u_is_blocked, u_follower_cnt: u_follower_cnt, u_following_cnt: u_following_cnt, u_posts_cnt: u_posts_cnt, u_place_cnt: u_place_cnt, u_like_pick_cnt: u_like_pick_cnt, u_like_place_cnt: u_like_place_cnt)
+        return user
     }
     
-    func getLatitude() -> String {
-        return userDefaults.string(forKey: "latitude") ?? DEFAULT_LATITUDE
-    }
-    func setLatitude(latitude: String) {
-        userDefaults.set(latitude, forKey: "latitude")
+    // 로그인
+    func login(user: User) {
+        userDefaults.set(true, forKey: "isLogined")
+        
+        userDefaults.set(user.u_id, forKey: "u_id")
+        userDefaults.set(user.u_type, forKey: "u_type")
+        userDefaults.set(user.u_phone_number, forKey: "u_phone_number")
+        userDefaults.set(user.u_social_id, forKey: "u_social_id")
+        userDefaults.set(user.u_nickname, forKey: "u_nickname")
+        userDefaults.set(user.u_email, forKey: "u_email")
+        userDefaults.set(user.u_password, forKey: "u_password")
+        userDefaults.set(user.u_profile_image, forKey: "u_profile_image")
+        userDefaults.set(user.u_status, forKey: "u_status")
+        userDefaults.set(user.u_last_login_platform, forKey: "u_last_login_platform")
+        userDefaults.set(user.u_is_logined, forKey: "u_is_logined")
+        userDefaults.set(user.u_device, forKey: "u_device")
+        
+        userDefaults.set(user.u_is_allowed_push_ad, forKey: "u_is_allowed_push_ad")
+        userDefaults.set(user.u_is_allowed_push_posts_comment, forKey: "u_is_allowed_push_posts_comment")
+        userDefaults.set(user.u_is_allowed_push_followed, forKey: "u_is_allowed_push_followed")
+        userDefaults.set(user.u_is_allowed_push_re_comment, forKey: "u_is_allowed_push_re_comment")
+        
+        userDefaults.set(user.u_created_date, forKey: "u_created_date")
+        userDefaults.set(user.u_updated_date, forKey: "u_updated_date")
+        userDefaults.set(user.u_connected_date, forKey: "u_connected_date")
+        
+        userDefaults.set(user.u_follower_cnt, forKey: "u_follower_cnt")
+        userDefaults.set(user.u_following_cnt, forKey: "u_following_cnt")
+        userDefaults.set(user.u_posts_cnt, forKey: "u_posts_cnt")
+        userDefaults.set(user.u_place_cnt, forKey: "u_place_cnt")
+        userDefaults.set(user.u_like_pick_cnt, forKey: "u_like_pick_cnt")
+        userDefaults.set(user.u_like_place_cnt, forKey: "u_like_place_cnt")
+        userDefaults.set(user.u_is_follow, forKey: "u_is_follow")
+        userDefaults.set(user.u_is_blocked, forKey: "u_is_blocked")
     }
     
-    func getLongitude() -> String {
-        return userDefaults.string(forKey: "longitude") ?? DEFAULT_LONGITUDE
-    }
-    func setLongitude(longitude: String) {
-        userDefaults.set(longitude, forKey: "longitude")
-    }
-    
-    func getRecentPlaceList() -> [Place] {
-        guard let obj = userDefaults.object(forKey: "recentPlaceList") as? Data else { return [] }
-        let decoder = JSONDecoder()
-        guard let recentPlaceList = try? decoder.decode(Array<Place>.self, from: obj) else { return [] }
-        return recentPlaceList
-    }
-    func addRecentPlace(place: Place) {
-        var recentPlaceList: [Place] = getRecentPlaceList()
+    // 로그아웃
+    func logout() {
+        userDefaults.set(false, forKey: "isLogined")
         
-        // 이미 마지막 인덱스에 있으면
-        if recentPlaceList.count > 0 && recentPlaceList[recentPlaceList.count - 1].id == place.id { return }
+        userDefaults.removeObject(forKey: "u_id")
+        userDefaults.removeObject(forKey: "u_type")
+        userDefaults.removeObject(forKey: "u_phone_number")
+        userDefaults.removeObject(forKey: "u_social_id")
+        userDefaults.removeObject(forKey: "u_nickname")
+        userDefaults.removeObject(forKey: "u_email")
+        userDefaults.removeObject(forKey: "u_password")
+        userDefaults.removeObject(forKey: "u_profile_image")
+        userDefaults.removeObject(forKey: "u_status")
+        userDefaults.removeObject(forKey: "u_last_login_platform")
+        userDefaults.removeObject(forKey: "u_is_logined")
+        userDefaults.removeObject(forKey: "u_device")
         
-        // 중복되었을 경우 기존 플레이스 제거
-        for (i, recentPlace) in recentPlaceList.enumerated() {
-            if recentPlace.id == place.id {
-                recentPlaceList.remove(at: i)
-                break
-            }
-        }
+        userDefaults.removeObject(forKey: "u_is_allowed_push_ad")
+        userDefaults.removeObject(forKey: "u_is_allowed_push_posts_comment")
+        userDefaults.removeObject(forKey: "u_is_allowed_push_followed")
+        userDefaults.removeObject(forKey: "u_is_allowed_push_re_comment")
         
-        recentPlaceList.append(place)
+        userDefaults.removeObject(forKey: "u_created_date")
+        userDefaults.removeObject(forKey: "u_updated_date")
+        userDefaults.removeObject(forKey: "u_connected_date")
         
-        // 최대 10개까지 저장 첫번째(오래된) 플레이스 제거
-        if recentPlaceList.count > 10 { recentPlaceList.remove(at: 0) }
+        userDefaults.removeObject(forKey: "u_follower_cnt")
+        userDefaults.removeObject(forKey: "u_following_cnt")
+        userDefaults.removeObject(forKey: "u_posts_cnt")
+        userDefaults.removeObject(forKey: "u_place_cnt")
+        userDefaults.removeObject(forKey: "u_like_pick_cnt")
+        userDefaults.removeObject(forKey: "u_like_place_cnt")
+        userDefaults.removeObject(forKey: "u_is_follow")
+        userDefaults.removeObject(forKey: "u_is_blocked")
         
-        let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(recentPlaceList) {
-            userDefaults.set(encoded, forKey: "recentPlaceList")
-        }
-    }
-    func removeAllRecentPlaceList() {
         userDefaults.removeObject(forKey: "recentPlaceList")
-    }
-    
-    func getRecentUserList() -> [User] {
-        guard let obj = userDefaults.object(forKey: "recentUserList") as? Data else { return [] }
-        let decoder = JSONDecoder()
-        guard let recentUserList = try? decoder.decode(Array<User>.self, from: obj) else { return [] }
-        return recentUserList
-    }
-    func addRecentUser(user: User) {
-        var recentUserList: [User] = getRecentUserList()
-        
-        // 이미 마지막 인덱스에 있으면
-        if recentUserList.count > 0 && recentUserList[recentUserList.count - 1].id == user.id { return }
-        
-        // 중복되었을 경우 기존 유저 제거
-        for (i, recentUser) in recentUserList.enumerated() {
-            if recentUser.id == user.id {
-                recentUserList.remove(at: i)
-                break
-            }
-        }
-        
-        recentUserList.append(user)
-        
-        // 최대 10개까지 저장 첫번째(오래된) 유저 제거
-        if recentUserList.count > 10 { recentUserList.remove(at: 0) }
-        
-        let encoder = JSONEncoder()
-        if let encoded = try? encoder.encode(recentUserList) {
-            userDefaults.set(encoded, forKey: "recentUserList")
-        }
-    }
-    func removeAllRecentUserList() {
         userDefaults.removeObject(forKey: "recentUserList")
+        
+        userDefaults.removeObject(forKey: "isAgreePosting")
     }
 }

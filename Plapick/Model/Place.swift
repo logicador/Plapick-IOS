@@ -9,24 +9,25 @@ import Foundation
 
 
 struct Place: Codable {
-    var id: Int
-    var kId: Int
+    var p_id: Int
+    var p_k_id: Int
+    var p_name: String
+    var p_category_name: String
+    var p_category_group_code: String
+    var p_category_group_name: String
+    var p_address: String
+    var p_road_address: String
+    var p_latitude: String
+    var p_longitude: String
+    var p_phone: String
+    var p_ploc_code: String
+    var p_cloc_code: String
     
-    var name: String
-    var categoryName: String
-    var categoryGroupName: String
-    var categoryGroupCode: String
-    var address: String
-    var roadAddress: String
-    var latitude: String
-    var longitude: String
-    var phone: String
-    var plocCode: String
-    var clocCode: String
+    var p_is_like: String
     
-    var pickImageList: [String] = []
-    var isLike: String
-    var likeCnt: Int
-    var commentCnt: Int
-    var pickCnt: Int
+    var p_like_cnt: Int
+    var p_comment_cnt: Int
+    var p_posts_cnt: Int
+    
+    var postsList: [Posts]? = []
 }

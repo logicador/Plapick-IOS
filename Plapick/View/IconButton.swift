@@ -40,9 +40,10 @@ class IconButton: UIButton {
         super.init(frame: frame)
         
         backgroundColor = .systemGray6
-        layer.cornerRadius = SPACE_XS
-        contentEdgeInsets = UIEdgeInsets(top: SPACE_S, left: SPACE_S + 22 + SPACE_S, bottom: SPACE_S, right: 0)
-        contentHorizontalAlignment = .left
+        layer.cornerRadius = 8
+        layer.borderWidth = LINE_WIDTH
+        contentEdgeInsets = UIEdgeInsets(top: SPACE_S, left: 0, bottom: SPACE_S, right: 0)
+//        contentHorizontalAlignment = .left
         
         addSubview(iconImageView)
         iconImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: SPACE_S).isActive = true
@@ -50,10 +51,19 @@ class IconButton: UIButton {
         iconImageView.widthAnchor.constraint(equalToConstant: 22).isActive = true
         iconImageView.heightAnchor.constraint(equalToConstant: 22).isActive = true
         
+        setThemeColor()
+        
         translatesAutoresizingMaskIntoConstraints = false
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    
+    // MARK: Function
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
+    func setThemeColor() {
+        layer.borderColor = UIColor.separator.cgColor
     }
 }

@@ -14,24 +14,57 @@ class KakaoPlaceTVCell: UITableViewCell {
     var kakaoPlace: KakaoPlace? {
         didSet {
             guard let kakaoPlace = self.kakaoPlace else { return }
-            nameLabel.text = kakaoPlace.placeName
-            addressLabel.text = (kakaoPlace.roadAddressName.isEmpty) ? kakaoPlace.addressName : kakaoPlace.roadAddressName
+            
+            categoryLabel.text = kakaoPlace.category_name.replacingOccurrences(of: ">", with: "-")
+            nameLabel.text = kakaoPlace.place_name
+            addressLabel.text = (kakaoPlace.road_address_name.isEmpty) ? kakaoPlace.address_name : kakaoPlace.road_address_name
+            
+            let cntMabs = NSMutableAttributedString()
+                .normal("게시물 ", size: 12, color: .systemGray3)
+                .bold(String(kakaoPlace.p_posts_cnt ?? 0), size: 12, color: .systemGray)
+                .normal("  좋아요 ", size: 12, color: .systemGray3)
+                .bold(String(kakaoPlace.p_like_cnt ?? 0), size: 12, color: .systemGray)
+                .normal("  댓글 ", size: 12, color: .systemGray3)
+                .bold(String(kakaoPlace.p_comment_cnt ?? 0), size: 12, color: .systemGray)
+            cntLabel.attributedText = cntMabs
         }
     }
     
     
     // MARK: View
-    lazy var nameLabel: UILabel = {
+    lazy var stackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.distribution = .fill
+        sv.alignment = .center
+        sv.spacing = SPACE_XXS
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        return sv
+    }()
+    lazy var categoryLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.font = .boldSystemFont(ofSize: 12)
+        label.textColor = .systemBlue
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+    lazy var cntLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    lazy var nameLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 24)
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     lazy var addressLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: 14)
         label.textColor = .systemGray
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -48,19 +81,27 @@ class KakaoPlaceTVCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
-    // MARK: Function
     func configureView() {
-        addSubview(nameLabel)
-        nameLabel.topAnchor.constraint(equalTo: topAnchor, constant: SPACE_S).isActive = true
-        nameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: SPACE).isActive = true
-        nameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -SPACE).isActive = true
-        nameLabel.heightAnchor.constraint(equalToConstant: 18).isActive = true
+        addSubview(stackView)
+        stackView.topAnchor.constraint(equalTo: topAnchor, constant: SPACE).isActive = true
+        stackView.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        stackView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -SPACE).isActive = true
         
-        addSubview(addressLabel)
-        addressLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: SPACE).isActive = true
-        addressLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -SPACE).isActive = true
-        addressLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -SPACE_S).isActive = true
-        addressLabel.heightAnchor.constraint(equalToConstant: 14).isActive = true
+        stackView.addArrangedSubview(categoryLabel)
+        categoryLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        categoryLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        categoryLabel.addSubview(cntLabel)
+        cntLabel.centerYAnchor.constraint(equalTo: categoryLabel.centerYAnchor).isActive = true
+        cntLabel.trailingAnchor.constraint(equalTo: categoryLabel.trailingAnchor).isActive = true
+        
+        stackView.addArrangedSubview(nameLabel)
+        nameLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        nameLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        
+        stackView.addArrangedSubview(addressLabel)
+        addressLabel.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
+        addressLabel.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
     }
 }

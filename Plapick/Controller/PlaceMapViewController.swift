@@ -18,9 +18,10 @@ class PlaceMapViewController: UIViewController {
         didSet {
             guard let place = self.place else { return }
             
-            navigationItem.title = place.name
+            navigationItem.title = place.p_name
         }
     }
+    var marker: NMFMarker?
     let locationManager = CLLocationManager()
     
     
@@ -37,8 +38,7 @@ class PlaceMapViewController: UIViewController {
     
     lazy var buttonContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
-        view.layer.cornerRadius = SPACE_XS
+        view.layer.cornerRadius = 8
         view.layer.borderWidth = LINE_WIDTH
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -50,7 +50,7 @@ class PlaceMapViewController: UIViewController {
         return view
     }()
     lazy var markerImageView: UIImageView = {
-        let image = UIImage(systemName: "flag")
+        let image = UIImage(systemName: "mappin.and.ellipse")
         let iv = UIImageView(image: image)
         iv.contentMode = .scaleAspectFit
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -79,8 +79,6 @@ class PlaceMapViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
-        
         configureView()
         
         setThemeColor()
@@ -92,18 +90,22 @@ class PlaceMapViewController: UIViewController {
         super.viewDidAppear(animated)
         
         guard let place = self.place else { return }
-        
-        guard let latitude = Double(place.latitude) else { return }
-        guard let longitude = Double(place.longitude) else { return }
 
-        let marker = NMFMarker()
-        marker.position = NMGLatLng(lat: latitude, lng: longitude)
-        marker.mapView = mapView
-    
+        guard let latitude = Double(place.p_latitude) else { return }
+        guard let longitude = Double(place.p_longitude) else { return }
+
         let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: latitude, lng: longitude), zoomTo: 15)
         mapView.moveCamera(cameraUpdate, completion: { (_) in
             UIView.animate(withDuration: 0.2, animations: {
                 self.mapView.alpha = 1
+                
+            }, completion: { (_) in
+                self.marker?.mapView = nil
+                self.marker = nil
+                
+                self.marker = NMFMarker()
+                self.marker?.position = NMGLatLng(lat: latitude, lng: longitude)
+                self.marker?.mapView = self.mapView
             })
         })
     }
@@ -111,7 +113,13 @@ class PlaceMapViewController: UIViewController {
     
     // MARK: Function
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
-    func setThemeColor() { buttonContainerView.layer.borderColor = UIColor.separator.cgColor }
+    func setThemeColor() {
+        view.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white
+        
+        buttonContainerView.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white
+        
+        buttonContainerView.layer.borderColor = UIColor.separator.cgColor
+    }
     
     func configureView() {
         view.addSubview(mapView)
@@ -160,45 +168,49 @@ class PlaceMapViewController: UIViewController {
     @objc func markerTapped() {
         guard let place = self.place else { return }
         
-        guard let latitude = Double(place.latitude) else { return }
-        guard let longitude = Double(place.longitude) else { return }
+        guard let latitude = Double(place.p_latitude) else { return }
+        guard let longitude = Double(place.p_longitude) else { return }
         
-        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: latitude, lng: longitude))
+        let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: latitude, lng: longitude), zoomTo: 15)
         cameraUpdate.animation = .fly
         cameraUpdate.animationDuration = 1
         mapView.moveCamera(cameraUpdate)
     }
     
     @objc func gpsTapped() {
-        let status = CLLocationManager.authorizationStatus()
-        
-        if status == .notDetermined {
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
             locationManager.requestWhenInUseAuthorization()
             
-        } else if status == .restricted || status == .denied {
-            requestSettingAlert(title: "위치 액세스 허용하기", message: "'플레픽'에서 사용자의 위치에 접근하고자 합니다.")
+        case .restricted, .denied:
+            let alert = UIAlertController(title: "위치 액세스 허용하기", message: "사용자의 위치를 제공받습니다.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+            alert.addAction(UIAlertAction(title: "설정", style: .default, handler: { (_) in
+                if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                }
+            }))
+            present(alert, animated: true, completion: nil)
             
-        } else {
+        default:
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.startUpdatingLocation()
             
             guard let location = locationManager.location else {
-                let alert = UIAlertController(title: "위치정보", message: "사용자의 위치 정보를 가져올 수 없습니다. 다시 시도해주세요.", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "닫기", style: UIAlertAction.Style.cancel))
+                let alert = UIAlertController(title: nil, message: "위치 정보를 가져올 수 없습니다.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "확인", style: .cancel))
                 present(alert, animated: true, completion: nil)
                 return
             }
+            
             let coord = location.coordinate
             let lat = coord.latitude
             let lng = coord.longitude
-            app.setLatitude(latitude: String(lat))
-            app.setLongitude(longitude: String(lng))
             
             let locationOverlay = mapView.locationOverlay
             locationOverlay.hidden = false
             locationOverlay.location = NMGLatLng(lat: lat, lng: lng)
-            
-            let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng))
+            let cameraUpdate = NMFCameraUpdate(scrollTo: NMGLatLng(lat: lat, lng: lng), zoomTo: 15)
             cameraUpdate.animation = .fly
             cameraUpdate.animationDuration = 1
             mapView.moveCamera(cameraUpdate)

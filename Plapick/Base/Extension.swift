@@ -151,17 +151,17 @@ extension UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    func requestErrorAlert(title: String?, message: String? = "오류가 발생했습니다. 고객센터에 문의해주세요.\n\n평일 10:00-17:00\n15xx-xxxx", buttonText: String = "확인", handler: ((UIAlertAction) -> Void)? = nil) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert)
-        alert.addAction(UIAlertAction(title: buttonText, style: UIAlertAction.Style.cancel, handler: handler))
+    func requestErrorAlert(title: String?, message: String? = "오류가 발생했습니다. 오류코드와 함께 고객센터에 문의해주세요.\n\n문의메일\ninfo.plapick@gmail.com", buttonText: String = "확인", handler: ((UIAlertAction) -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: buttonText, style: .cancel, handler: handler))
         self.present(alert, animated: true, completion: nil)
     }
     
     func showNetworkAlert() {
         DispatchQueue.main.async {
-            let alert = UIAlertController(title: "네트워크 오류", message: "네트워크가 연결중인지 확인해주세요.", preferredStyle: UIAlertController.Style.alert)
-            alert.addAction(UIAlertAction(title: "닫기", style: UIAlertAction.Style.cancel))
-            alert.addAction(UIAlertAction(title: "다시시도", style: UIAlertAction.Style.default, handler: { (_) in
+            let alert = UIAlertController(title: "네트워크 오류", message: "네트워크가 연결중인지 확인해주세요.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+            alert.addAction(UIAlertAction(title: "다시시도", style: .default, handler: { (_) in
                 self.changeRootViewController(rootViewController: LaunchViewController())
             }))
             self.present(alert, animated: true)
@@ -200,8 +200,44 @@ extension UIViewController {
     }
     func hideIndicator(idv: UIActivityIndicatorView, bov: UIVisualEffectView) {
         idv.stopAnimating()
-        idv.removeView()
-        bov.removeView()
+        idv.removeFromSuperview()
+        bov.removeFromSuperview()
+    }
+    
+    func showToast(tv: UIView, tcl: UILabel, text: String) {
+        if !tv.isHidden { return }
+        
+        tcl.text = text
+        
+        view.addSubview(tv)
+        tv.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        tv.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(SCREEN_WIDTH / 4)).isActive = true
+        
+        tv.addSubview(tcl)
+        tcl.topAnchor.constraint(equalTo: tv.topAnchor, constant: SPACE_S).isActive = true
+        tcl.leadingAnchor.constraint(equalTo: tv.leadingAnchor, constant: SPACE_S).isActive = true
+        tcl.trailingAnchor.constraint(equalTo: tv.trailingAnchor, constant: -SPACE_S).isActive = true
+        tcl.bottomAnchor.constraint(equalTo: tv.bottomAnchor, constant: -SPACE_S).isActive = true
+        
+        tv.isHidden = false
+        UIView.animate(withDuration: 0.5, animations: {
+            tv.alpha = 1
+        }, completion: { (_) in
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
+                self.hideToast(tv: tv, tcl: tcl)
+            }
+        })
+    }
+    func hideToast(tv: UIView, tcl: UILabel) {
+        if tv.isHidden { return }
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            tv.alpha = 0
+        }, completion: { (_) in
+            tv.isHidden = true
+            tcl.removeFromSuperview()
+            tv.removeFromSuperview()
+        })
     }
 }
 
@@ -228,6 +264,20 @@ extension UILabel {
         }
         attributedString.addAttribute(NSAttributedString.Key.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, attributedString.length))
         self.attributedText = attributedString
+    }
+    
+    func getHeight() -> CGFloat {
+        return ("1" as NSString).size(withAttributes: [.font : font!]).height
+    }
+    
+    func getLineCnt() -> Int {
+        // Call self.layoutIfNeeded() if your view uses auto layout
+        let myText = text! as NSString
+
+        let rect = CGSize(width: bounds.width, height: .greatestFiniteMagnitude)
+        let labelSize = myText.boundingRect(with: rect, options: .usesLineFragmentOrigin, attributes: [.font: font!], context: nil)
+
+        return Int(ceil(CGFloat(labelSize.height) / font.lineHeight))
     }
 }
 

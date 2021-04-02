@@ -13,16 +13,13 @@ protocol LoginRequestProtocol {
 }
 
 
-// POST
-// 로그인
+// 로그인 Request
+// 유저 정보 반환
 class LoginRequest: HttpRequest {
     
-    // MARK: Properties
     var delegate: LoginRequestProtocol?
     let apiUrl = API_URL + "/login"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -85,21 +82,17 @@ class LoginRequest: HttpRequest {
             }
             
             if status != "OK" {
-                if status == "LOGIN_FAILED" {
-                    if isShowAlert { vc.requestErrorAlert(title: "로그인 실패", message: "사용자를 찾을 수 없습니다. 로그인 정보를 다시 확인해주세요.") }
-                } else {
+                if status != "LOGIN_FAILED" && status != "JOIN_CONTINUE" && status != "LEAVE_USER" && status != "BLOCK_USER" {
                     if isShowAlert { vc.requestErrorAlert(title: status) }
                 }
                 self.delegate?.response(user: nil, login: status)
                 return
             }
             
-            // MARK: Response
             do {
-                let response = try JSONDecoder().decode(UserRequestResult.self, from: data)
-                let resUser = response.result
+                let response = try JSONDecoder().decode(LoginRequestResponse.self, from: data)
                 
-                let user = User(id: resUser.u_id, type: resUser.u_type, socialId: resUser.u_social_id, name: resUser.u_name, nickName: resUser.u_nick_name, email: resUser.u_email, password: resUser.u_password, profileImage: resUser.u_profile_image, status: resUser.u_status, lastLoginPlatform: resUser.u_last_login_platform, isLogined: resUser.u_is_logined, device: resUser.u_device, isAllowedFollow: resUser.u_is_allowed_follow, isAllowedMyPickComment: resUser.u_is_allowed_my_pick_comment, isAllowedRecommendedPlace: resUser.u_is_allowed_recommended_place, isAllowedAd: resUser.u_is_allowed_ad, isAllowedEventNotice: resUser.u_is_allowed_event_notice, createdDate: resUser.u_created_date, updatedDate: resUser.u_updated_date, connectedDate: resUser.u_connected_date, isFollow: resUser.isFollow, followerCnt: resUser.followerCnt, followingCnt: resUser.followingCnt, pickCnt: resUser.pickCnt, likePickCnt: resUser.likePickCnt, likePlaceCnt: resUser.likePlaceCnt, isBlocked: resUser.isBlocked)
+                let user = response.result
                 
                 self.delegate?.response(user: user, login: "OK")
                 
@@ -110,10 +103,9 @@ class LoginRequest: HttpRequest {
         }})
         task.resume()
     }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
-    }
+}
+
+
+struct LoginRequestResponse: Codable {
+    var result: User
 }

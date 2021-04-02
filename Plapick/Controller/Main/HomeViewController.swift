@@ -12,39 +12,28 @@ class HomeViewController: UIViewController {
     
     // MARK: Property
     let app = App()
-    let getPicksRequest = GetPicksRequest()
     let getVersionRequest = GetVersionRequest()
-    var isEnded = false
-    var isLoading = false
+    let getPostsRequest = GetPostsRequest()
+    var postsList: [Posts] = []
     var page = 1
+    var isLoading = false
+    var isEnd = false
     
     
     // MARK: View
-    lazy var scrollView: UIScrollView = {
-        let sv = UIScrollView()
-        sv.delegate = self
-        sv.alwaysBounceVertical = true
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        return sv
-    }()
-    lazy var stackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.distribution = .fill
-        sv.alignment = .center
-        sv.spacing = 0
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        return sv
-    }()
-    
-    lazy var recentPickStackView: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.distribution = .fill
-        sv.alignment = .center
-        sv.spacing = 1
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        return sv
+    lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.alwaysBounceVertical = true
+        cv.register(PostsCVCell.self, forCellWithReuseIdentifier: "PostsCVCell")
+        cv.showsVerticalScrollIndicator = false
+        cv.dataSource = self
+        cv.delegate = self
+        cv.refreshControl = UIRefreshControl()
+        cv.refreshControl?.addTarget(self, action: #selector(refreshed), for: .valueChanged)
+        cv.translatesAutoresizingMaskIntoConstraints = false
+        return cv
     }()
     
     
@@ -52,139 +41,210 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
+        navigationItem.title = "최근 게시물"
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"), style: .plain, target: self, action: #selector(searchTapped))
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
         configureView()
         
-        getPicksRequest.delegate = self
+        setThemeColor()
+        
         getVersionRequest.delegate = self
+        getPostsRequest.delegate = self
         
-        checkPushNotificationAvailable(allow: {
-            UIApplication.shared.registerForRemoteNotifications()
-        })
-        
-        getPicks()
         getVersionRequest.fetch(vc: self, paramDict: [:])
+        getPosts()
     }
     
     
     // MARK: Function
-    func configureView() {
-        view.addSubview(scrollView)
-        scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
+    func setThemeColor() {
+        view.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white
         
-        scrollView.addSubview(stackView)
-        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-        stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor).isActive = true
-        stackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor).isActive = true
-        
-        stackView.addArrangedSubview(recentPickStackView)
-        recentPickStackView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor).isActive = true
-        recentPickStackView.trailingAnchor.constraint(equalTo: stackView.trailingAnchor).isActive = true
+        collectionView.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white
     }
     
-    func getPicks() {
+    func configureView() {
+        view.addSubview(collectionView)
+        collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
+    
+    func getPosts() {
         isLoading = true
-        getPicksRequest.fetch(vc: self, paramDict: ["page": String(page), "limit": "30"])
+        getPostsRequest.fetch(vc: self, paramDict: ["mode": "ALL", "page": String(page)])
+    }
+    
+    func reloadPosts() {
+        postsList.removeAll()
+        page = 1
+        isEnd = false
+        getPosts()
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        
-        if offsetY > contentHeight - scrollView.frame.height {
-            if !isLoading && !isEnded {
+        let offsetY = collectionView.contentOffset.y
+        let contentHeight = collectionView.contentSize.height
+        let frameHeight = collectionView.frame.height
+
+        if offsetY > contentHeight - frameHeight {
+            if !isLoading && !isEnd {
                 page += 1
-                getPicks()
+                getPosts()
             }
         }
     }
-}
-
-// MARK: PhotoGroupView
-extension HomeViewController: PhotoGroupViewProtocol {
-    func detailPick(pick: Pick) {
-        let pickVC = PickViewController()
-        pickVC.navigationItem.title = "최신 픽"
-        pickVC.id = pick.id
-        navigationController?.pushViewController(pickVC, animated: true)
+    
+    // MARK: Function - @OBJC
+    @objc func refreshed() {
+        postsList.removeAll()
+        page = 1
+        isEnd = false
+        getPosts()
+    }
+    
+    @objc func searchTapped() {
+        navigationController?.pushViewController(SearchKakaoPlaceViewController(), animated: true)
     }
 }
 
-// MARK: HTTP - GetPicks
-extension HomeViewController: GetPicksRequestProtocol {
-    func response(pickList: [Pick]?, getPicks status: String) {
-        print("[HTTP RES]", getPicksRequest.apiUrl, status)
-        
-        if status == "OK" {
-            guard let pickList = pickList else { return }
-            
-            if pickList.count > 0 {
-                isEnded = false
-                
-                var _pickList: [Pick] = []
-                for (i, pick) in pickList.enumerated() {
-                    
-                    _pickList.append(pick)
-                    if ((i + 1) % 3 == 0) {
-                        let pgv = PhotoGroupView(direction: .random(in: 0...2))
-                        pgv.vc = self
-                        pgv.pickList = _pickList
-                        pgv.delegate = self
-                        
-                        recentPickStackView.addArrangedSubview(pgv)
-                        pgv.leadingAnchor.constraint(equalTo: recentPickStackView.leadingAnchor).isActive = true
-                        pgv.trailingAnchor.constraint(equalTo: recentPickStackView.trailingAnchor).isActive = true
-                        _pickList.removeAll()
-                        
-                    } else {
-                        if ((i + 1) == pickList.count && _pickList.count > 0) {
-                            // 마지막 direction은 무조건 0
-                            let pgv = PhotoGroupView()
-                            pgv.vc = self
-                            pgv.pickList = _pickList
-                            pgv.delegate = self
-                            
-                            recentPickStackView.addArrangedSubview(pgv)
-                            pgv.leadingAnchor.constraint(equalTo: recentPickStackView.leadingAnchor).isActive = true
-                            pgv.trailingAnchor.constraint(equalTo: recentPickStackView.trailingAnchor).isActive = true
-                        }
-                    }
-                }
-            } else { isEnded = true }
-        }
-        isLoading = false
+
+// MARK: CollectionView
+extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return postsList.count
     }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PostsCVCell", for: indexPath) as! PostsCVCell
+        cell.posts = postsList[indexPath.row]
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 2
+    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: (view.frame.width / 3) - (4 / 3), height: (view.frame.width / 3) - (4 / 3))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let postsVC = PostsViewController()
+        postsVC.mode = "ALL"
+        postsVC.poId = postsList[indexPath.row].po_id
+        postsVC.postsList = postsList
+        postsVC.page = page
+        postsVC.isEnd = isEnd
+        postsVC.delegate = self
+        navigationController?.pushViewController(postsVC, animated: true)
+    }
+}
+
+// MARK: PostsVC
+extension HomeViewController: PostsViewControllerProtocol {
+    func removePosts(poId: Int) { reloadPosts() }
+    func likePosts(poId: Int, isLike: String) { reloadPosts() }
+    func editPosts(posts: Posts) { reloadPosts() }
 }
 
 // MARK: HTTP - GetVersion
 extension HomeViewController: GetVersionRequestProtocol {
     func response(versionCode: Int?, versionName: String?, getVersion status: String) {
         print("[HTTP RES]", getVersionRequest.apiUrl, status)
-        
+
         if status == "OK" {
             guard let newVersionCode = versionCode else { return }
             guard let newVersionName = versionName else { return }
             app.setNewVersionCode(newVersionCode: newVersionCode)
             app.setNewVersionName(newVersionName: newVersionName)
-            
+
             guard let infoDictionary = Bundle.main.infoDictionary else { return }
             guard let code = infoDictionary["CFBundleVersion"] as? String else { return }
             guard let curVersionName = infoDictionary["CFBundleShortVersionString"] as? String else { return }
             guard let curVersionCode = Int(code) else { return }
             app.setCurVersionCode(curVersionCode: curVersionCode)
             app.setCurVersionName(curVersionName: curVersionName)
-            
+
             if newVersionCode > curVersionCode {
-                
+                let alert = UIAlertController(title: "업데이트됨", message: "새로운 버전 ver. \(newVersionName) 이 출시되었습니다. 업데이트를 진행해주세요.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "취소", style: .default, handler: { (_) in
+                    self.changeRootViewController(rootViewController: LaunchViewController())
+                }))
+                alert.addAction(UIAlertAction(title: "업데이트", style: .default, handler: { (_) in
+                    guard let url = URL(string: "itms-apps://itunes.apple.com/app/1548230910") else { return }
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                    self.changeRootViewController(rootViewController: LaunchViewController())
+                }))
+                present(alert, animated: true, completion: nil)
+                return
             }
+            
+            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge], completionHandler: { (isAllowed, error) in DispatchQueue.main.async {
+                let isDontLookAgainAccessAlarm = self.app.getIsDontLookAgainAccessAlarm()
+                
+                if let _ = error {
+                    if !isDontLookAgainAccessAlarm {
+                        let alert = UIAlertController(title: "알림 액세스 허용하기", message: "앱 사용시 중요한 정보를 알려드립니다.", preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+                        alert.addAction(UIAlertAction(title: "다시 보지 않기", style: .default, handler: { (_) in
+                            self.app.setIsDontLookAgainAccessAlarm(isDontLookAgain: true)
+                        }))
+                        alert.addAction(UIAlertAction(title: "설정", style: .default, handler: { (_) in
+                            if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                            }
+                        }))
+                        self.present(alert, animated: true, completion: nil)
+                        return
+                    }
+                }
+                
+                if !isAllowed && !isDontLookAgainAccessAlarm {
+                    let alert = UIAlertController(title: "알림 액세스 허용하기", message: "앱 사용시 중요한 정보를 알려드립니다.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
+                    alert.addAction(UIAlertAction(title: "다시 보지 않기", style: .default, handler: { (_) in
+                        self.app.setIsDontLookAgainAccessAlarm(isDontLookAgain: true)
+                    }))
+                    alert.addAction(UIAlertAction(title: "설정", style: .default, handler: { (_) in
+                        if let appSettings = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(appSettings, options: [:], completionHandler: nil)
+                        }
+                    }))
+                    self.present(alert, animated: true, completion: nil)
+                    return
+                }
+                
+                self.app.setIsDontLookAgainAccessAlarm(isDontLookAgain: false)
+                UIApplication.shared.registerForRemoteNotifications()
+            }})
         }
+    }
+}
+
+// MARK: HTTP - GetPosts
+extension HomeViewController: GetPostsRequestProtocol {
+    func response(postsList: [Posts]?, mode: String?, getPosts status: String) {
+        print("[HTTP RES]", getPostsRequest.apiUrl, status)
+        
+        if status == "OK" {
+            guard let postsList = postsList else { return }
+            
+            self.postsList.append(contentsOf: postsList)
+            collectionView.reloadData()
+            
+            if postsList.count < GET_POSTS_LIMIT { isEnd = true }
+        }
+        
+        isLoading = false
+        collectionView.refreshControl?.endRefreshing()
     }
 }

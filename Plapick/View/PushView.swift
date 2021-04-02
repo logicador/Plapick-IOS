@@ -23,7 +23,7 @@ class PushView: UIView {
     // MARK: View
     lazy var label: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 18)
+        label.font = .systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()

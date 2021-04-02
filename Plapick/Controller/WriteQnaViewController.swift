@@ -18,66 +18,50 @@ class WriteQnaViewController: UIViewController {
     // MARK: Property
     var delegate: WriteQnaViewControllerProtocol?
     let addQnaRequest = AddQnaRequest()
+    var bottomButtonBottomCons: NSLayoutConstraint?
     
     
     // MARK: View
-    lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "제목"
-        label.font = .boldSystemFont(ofSize: 22)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    lazy var bottomButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("작성완료", for: .normal)
+        button.backgroundColor = .systemGray6
+        button.titleLabel?.font = .boldSystemFont(ofSize: 18)
+        button.contentEdgeInsets = UIEdgeInsets(top: 18, left: 0, bottom: 18, right: 0)
+        button.addTarget(self, action: #selector(writeTapped), for: .touchUpInside)
+        button.isEnabled = false
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
-    lazy var titleTextContainerView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = SPACE_XS
-        view.backgroundColor = .systemGray6
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    lazy var titleTextField: UITextField = {
-        let tf = UITextField()
-        tf.font = .systemFont(ofSize: 15)
-        tf.addTarget(self, action: #selector(titleTextChanged), for: .editingChanged)
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        return tf
-    }()
-    lazy var titleCntLabel: UILabel = {
-        let label = UILabel()
-        label.text = "0 / 20"
-        label.textColor = .systemRed
-        label.font = .systemFont(ofSize: 12)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    lazy var bottomButtonTopLine: LineView = {
+        let lv = LineView()
+        return lv
     }()
     
-    lazy var contentTitleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "내용"
-        label.font = .boldSystemFont(ofSize: 22)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    lazy var contentTextContainerView: UIView = {
+    lazy var containerView: UIView = {
         let view = UIView()
-        view.layer.cornerRadius = SPACE_XS
-        view.backgroundColor = .systemGray6
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-    lazy var contentTextView: UITextView = {
+    lazy var questionTextView: UITextView = {
         let tv = UITextView()
-        tv.backgroundColor = .systemGray6
         tv.font = .systemFont(ofSize: 15)
+        tv.text = "이곳에 문의내용을 입력합니다. (10자 이상)"
+        tv.textColor = .systemGray3
         tv.delegate = self
         tv.translatesAutoresizingMaskIntoConstraints = false
         return tv
     }()
-    lazy var contentCntLabel: UILabel = {
+    lazy var questionBottomLine: LineView = {
+        let lv = LineView()
+        return lv
+    }()
+    lazy var questionCntLabel: UILabel = {
         let label = UILabel()
-        label.text = "0 / 100"
+        label.text = "0 / 500"
         label.textColor = .systemRed
-        label.font = .systemFont(ofSize: 12)
+        label.font = .boldSystemFont(ofSize: 12)
+        label.textAlignment = .right
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -87,11 +71,17 @@ class WriteQnaViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGray6
         
-        navigationItem.title = "문의"
+        navigationItem.title = "문의하기"
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         
         configureView()
+        
+        setThemeColor()
         
         hideKeyboardWhenTappedAround()
         
@@ -100,64 +90,77 @@ class WriteQnaViewController: UIViewController {
     
     
     // MARK: Function
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) { setThemeColor() }
+    func setThemeColor() {
+        containerView.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white
+        
+        questionTextView.backgroundColor = (traitCollection.userInterfaceStyle == .dark) ? .black : .white
+        questionTextView.textColor = (questionTextView.textColor == .systemGray3) ? .systemGray3 : (traitCollection.userInterfaceStyle == .dark) ? .white : .black
+    }
+    
     func configureView() {
-        view.addSubview(titleLabel)
-        titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: SPACE_XL).isActive = true
-        titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        titleLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
+        view.addSubview(bottomButton)
+        bottomButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        bottomButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        bottomButtonBottomCons = bottomButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        bottomButtonBottomCons?.isActive = true
         
-        view.addSubview(titleTextContainerView)
-        titleTextContainerView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: SPACE_S).isActive = true
-        titleTextContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        titleTextContainerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
+        view.addSubview(bottomButtonTopLine)
+        bottomButtonTopLine.topAnchor.constraint(equalTo: bottomButton.topAnchor).isActive = true
+        bottomButtonTopLine.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        bottomButtonTopLine.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        titleTextContainerView.addSubview(titleTextField)
-        titleTextField.topAnchor.constraint(equalTo: titleTextContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        titleTextField.leadingAnchor.constraint(equalTo: titleTextContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        titleTextField.trailingAnchor.constraint(equalTo: titleTextContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
-        titleTextField.bottomAnchor.constraint(equalTo: titleTextContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
+        view.addSubview(containerView)
+        containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        containerView.bottomAnchor.constraint(equalTo: bottomButton.topAnchor).isActive = true
         
-        view.addSubview(titleCntLabel)
-        titleCntLabel.topAnchor.constraint(equalTo: titleTextContainerView.bottomAnchor, constant: SPACE_XS).isActive = true
-        titleCntLabel.trailingAnchor.constraint(equalTo: titleTextContainerView.trailingAnchor).isActive = true
+        containerView.addSubview(questionTextView)
+        questionTextView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: SPACE_XS).isActive = true
+        questionTextView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+        questionTextView.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
+        questionTextView.heightAnchor.constraint(equalTo: containerView.heightAnchor, multiplier: 0.5).isActive = true
         
-        view.addSubview(contentTitleLabel)
-        contentTitleLabel.topAnchor.constraint(equalTo: titleTextContainerView.bottomAnchor, constant: SPACE_XL).isActive = true
-        contentTitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        contentTitleLabel.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
+        containerView.addSubview(questionCntLabel)
+        questionCntLabel.topAnchor.constraint(equalTo: questionTextView.bottomAnchor, constant: SPACE_XS).isActive = true
+        questionCntLabel.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).isActive = true
+        questionCntLabel.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: CONTENTS_RATIO_XS).isActive = true
         
-        view.addSubview(contentTextContainerView)
-        contentTextContainerView.topAnchor.constraint(equalTo: contentTitleLabel.bottomAnchor, constant: SPACE_S).isActive = true
-        contentTextContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        contentTextContainerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: CONTENTS_RATIO).isActive = true
-        contentTextContainerView.heightAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5).isActive = true
-        
-        contentTextContainerView.addSubview(contentTextView)
-        contentTextView.topAnchor.constraint(equalTo: contentTextContainerView.topAnchor, constant: SPACE_XS).isActive = true
-        contentTextView.leadingAnchor.constraint(equalTo: contentTextContainerView.leadingAnchor, constant: SPACE_S).isActive = true
-        contentTextView.trailingAnchor.constraint(equalTo: contentTextContainerView.trailingAnchor, constant: -SPACE_S).isActive = true
-        contentTextView.bottomAnchor.constraint(equalTo: contentTextContainerView.bottomAnchor, constant: -SPACE_XS).isActive = true
-        
-        view.addSubview(contentCntLabel)
-        contentCntLabel.topAnchor.constraint(equalTo: contentTextContainerView.bottomAnchor, constant: SPACE_XS).isActive = true
-        contentCntLabel.trailingAnchor.constraint(equalTo: contentTextContainerView.trailingAnchor).isActive = true
+        containerView.addSubview(questionBottomLine)
+        questionBottomLine.topAnchor.constraint(equalTo: questionCntLabel.bottomAnchor, constant: SPACE_XS).isActive = true
+        questionBottomLine.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        questionBottomLine.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
     }
     
     // MARK: Function - @OBJC
-    @objc func titleTextChanged() {
-        guard let title = titleTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
-        titleCntLabel.text = "\(title.count) / 20"
-        titleCntLabel.textColor = (title.count < 4 || title.count > 20) ? .systemRed : .systemBlue
-        navigationItem.rightBarButtonItem = (titleCntLabel.textColor == .systemBlue && contentCntLabel.textColor == .systemBlue) ? UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(completeTapped)) : nil
+    @objc func keyboardWillShow(notification: NSNotification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            bottomButtonBottomCons?.isActive = false
+            bottomButtonBottomCons = bottomButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -keyboardSize.height)
+            bottomButtonBottomCons?.isActive = true
+            
+            UIView.animate(withDuration: 0.2, animations: {
+                self.view.layoutIfNeeded()
+            })
+        }
+    }
+    @objc func keyboardWillHide(notification: NSNotification) {
+        bottomButtonBottomCons?.isActive = false
+        bottomButtonBottomCons = bottomButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        bottomButtonBottomCons?.isActive = true
+        
+        UIView.animate(withDuration: 0.2, animations: {
+            self.view.layoutIfNeeded()
+        })
     }
     
-    @objc func completeTapped() {
+    @objc func writeTapped() {
         dismissKeyboard()
         
-        guard let title = titleTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
-        let content = contentTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-    
-        addQnaRequest.fetch(vc: self, paramDict: ["title": title, "content": content])
+        let question = questionTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        addQnaRequest.fetch(vc: self, paramDict: ["question": question])
     }
 }
 
@@ -165,10 +168,33 @@ class WriteQnaViewController: UIViewController {
 // MARK: TextView
 extension WriteQnaViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
-        let content = contentTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        contentCntLabel.text = "\(content.count) / 100"
-        contentCntLabel.textColor = (content.count < 20 || content.count > 100) ? .systemRed : .systemBlue
-        navigationItem.rightBarButtonItem = (titleCntLabel.textColor == .systemBlue && contentCntLabel.textColor == .systemBlue) ? UIBarButtonItem(title: "완료", style: .plain, target: self, action: #selector(completeTapped)) : nil
+        let question = questionTextView.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        questionCntLabel.text = "\(question.count) / 500"
+        
+        if question.count < 10 {
+            questionCntLabel.textColor = .systemRed
+            bottomButton.isEnabled = false
+        } else if question.count > 500 {
+            questionCntLabel.textColor = .systemRed
+            bottomButton.isEnabled = false
+        } else {
+            questionCntLabel.textColor = .systemGreen
+            bottomButton.isEnabled = true
+        }
+    }
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.textColor == UIColor.systemGray3 {
+            textView.text = ""
+            textView.textColor = (traitCollection.userInterfaceStyle == .dark) ? .white : .black
+        }
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            textView.text = "이곳에 문의내용을 입력합니다. (10자 이상)"
+            textView.textColor = .systemGray3
+        }
     }
 }
 
@@ -176,12 +202,12 @@ extension WriteQnaViewController: UITextViewDelegate {
 extension WriteQnaViewController: AddQnaRequestProtocol {
     func response(qna: Qna?, addQna status: String) {
         print("[HTTP RES]", addQnaRequest.apiUrl, status)
-        
+
         if status == "OK" {
             guard let qna = qna else { return }
-            
+
             delegate?.addQna(qna: qna)
-            let alert = UIAlertController(title: "문의하기", message: "문의하기가 완료되었습니다. 빠른 시일 내에 답변을 드리겠습니다. 감사합니다.", preferredStyle: .alert)
+            let alert = UIAlertController(title: nil, message: "문의하기가 완료되었습니다. 문의내용을 확인한 후 답변을 드리겠습니다. 감사합니다.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: { (_) in
                 self.navigationController?.popViewController(animated: true)
             }))

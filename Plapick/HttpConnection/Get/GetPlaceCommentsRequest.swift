@@ -13,16 +13,11 @@ protocol GetPlaceCommentsRequestProtocol {
 }
 
 
-// GET
-// 픽 리스트 가져오기
 class GetPlaceCommentsRequest: HttpRequest {
     
-    // MARK: Property
     var delegate: GetPlaceCommentsRequestProtocol?
     let apiUrl = API_URL + "/get/place/comments"
     
-    
-    // MARK: Fetch
     func fetch(vc: UIViewController, isShowAlert: Bool = true, paramDict: [String: String]) {
         print("[HTTP REQ]", apiUrl, paramDict)
         
@@ -92,19 +87,9 @@ class GetPlaceCommentsRequest: HttpRequest {
             }
             
             do {
-                let response = try JSONDecoder().decode(PlaceCommentsRequestResult.self, from: data)
-                let resPlaceCommentList = response.result
+                let response = try JSONDecoder().decode(GetPlaceCommentsRequestResponse.self, from: data)
                 
-                var placeCommentList: [PlaceComment] = []
-                
-                for resPlaceComment in resPlaceCommentList {
-                    if resPlaceComment.isBlocked == "Y" { continue }
-                    
-                    let user = User(id: resPlaceComment.mcp_u_id, nickName: resPlaceComment.u_nick_name, profileImage: resPlaceComment.u_profile_image, connectedDate: resPlaceComment.u_connected_date, isFollow: resPlaceComment.isFollow, followerCnt: resPlaceComment.followerCnt, followingCnt: resPlaceComment.followingCnt, pickCnt: resPlaceComment.pickCnt, likePickCnt: resPlaceComment.likePickCnt, likePlaceCnt: resPlaceComment.likePlaceCnt, isBlocked: resPlaceComment.isBlocked)
-                    let placeComment = PlaceComment(id: resPlaceComment.mcp_id, pId: resPlaceComment.mcp_p_id, comment: resPlaceComment.mcp_comment, createdDate: resPlaceComment.mcp_created_date, updatedDate: resPlaceComment.mcp_updated_date, user: user)
-                    
-                    placeCommentList.append(placeComment)
-                }
+                let placeCommentList = response.result
                 
                 self.delegate?.response(placeCommentList: placeCommentList, getPlaceComments: "OK")
                 
@@ -115,10 +100,9 @@ class GetPlaceCommentsRequest: HttpRequest {
         }})
         task.resume()
     }
-    
-    
-    // MARK: Init
-    override init() {
-        super.init()
-    }
+}
+
+
+struct GetPlaceCommentsRequestResponse: Codable {
+    var result: [PlaceComment]
 }
