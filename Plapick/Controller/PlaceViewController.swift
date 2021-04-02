@@ -39,15 +39,12 @@ class PlaceViewController: UIViewController {
             
             navigationItem.title = place.p_name
             
-//            isLike = place.p_is_like
-            
             getPosts()
         }
     }
     let getPlaceRequest = GetPlaceRequest()
     let getPostsRequest = GetPostsRequest()
     let likePlaceRequest = LikePlaceRequest()
-//    var isLike = "N"
     var postsList: [Posts] = []
     
     
@@ -116,23 +113,16 @@ class PlaceViewController: UIViewController {
         getPlaceRequest.fetch(vc: self, paramDict: ["pId": String(place.p_id)])
     }
     
-//    @objc func likeTapped() {
-//        guard let place = self.place else { return }
-//        likePlaceRequest.fetch(vc: self, paramDict: ["pId": String(place.p_id)])
-//    }
-    
     @objc func moreTapped() {
         
         let alert = UIAlertController(title: nil, message: "다음 중 항목을 선택해주세요.", preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
         
-//        alert.addAction(UIAlertAction(title: (isLike == "Y") ? "좋아요 취소" : "좋아요", style: .default, handler: { (_) in
-//            guard let place = self.place else { return }
-//            self.likePlaceRequest.fetch(vc: self, paramDict: ["pId": String(place.p_id)])
+        // MARK: For DEV_DEBUG
+        // MARK: TODO: 공유하기
+//        alert.addAction(UIAlertAction(title: "공유하기", style: .default, handler: { (_) in
+//
 //        }))
-        alert.addAction(UIAlertAction(title: "공유하기", style: .default, handler: { (_) in
-            
-        }))
         alert.addAction(UIAlertAction(title: "신고하기", style: .destructive, handler: { (_) in
             guard let pId = self.pId else { return }
             let reportVC = ReportViewController()
@@ -255,10 +245,7 @@ extension PlaceViewController: LikePlaceRequestProtocol {
         print("[HTTP RES]", likePlaceRequest.apiUrl, status)
         
         if status == "OK" {
-//            guard let isLike = isLike else { return }
             guard let place = self.place else { return }
-            
-//            self.isLike = isLike
             
             getPlaceRequest.fetch(vc: self, paramDict: ["pId": String(place.p_id)])
             

@@ -181,17 +181,19 @@ extension PostsViewController: PostsTVCellProtocol {
         let alert = UIAlertController(title: nil, message: "다음 중 항목을 선택해주세요.", preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "닫기", style: .cancel))
         
-        alert.addAction(UIAlertAction(title: "공유하기", style: .default, handler: { (_) in
-            var objectsToShare = [String]()
-            objectsToShare.append("공유하기테스트")
-            
-            let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
-            activityVC.popoverPresentationController?.sourceView = self.view
-            
-            // 공유하기 기능 중 제외할 기능이 있을 때 사용
-    //        activityVC.excludedActivityTypes = [UIActivityType.airDrop, UIActivityType.addToReadingList]
-            self.present(activityVC, animated: true, completion: nil)
-        }))
+        // MARK: For DEV_DEBUG
+        // MARK: TODO: 공유하기
+//        alert.addAction(UIAlertAction(title: "공유하기", style: .default, handler: { (_) in
+//            var objectsToShare = [String]()
+//            objectsToShare.append("공유하기테스트")
+//            
+//            let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
+//            activityVC.popoverPresentationController?.sourceView = self.view
+//            
+//            // 공유하기 기능 중 제외할 기능이 있을 때 사용
+//    //        activityVC.excludedActivityTypes = [UIActivityType.airDrop, UIActivityType.addToReadingList]
+//            self.present(activityVC, animated: true, completion: nil)
+//        }))
         if posts.po_u_id == app.getUserId() {
             alert.addAction(UIAlertAction(title: "수정하기", style: .default, handler: { (_) in
                 let editPostsVC = EditPostsViewController()
