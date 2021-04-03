@@ -184,6 +184,21 @@ class PostsReCommentViewController: UIViewController {
         return tv
     }()
     
+    // MARK: View - Indicator
+    lazy var indicatorView: UIActivityIndicatorView = {
+        let aiv = UIActivityIndicatorView()
+        aiv.style = .large
+        aiv.translatesAutoresizingMaskIntoConstraints = false
+        return aiv
+    }()
+    lazy var blurOverlayView: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .light)
+        let vev = UIVisualEffectView(effect: blurEffect)
+        vev.alpha = 0.2
+        vev.translatesAutoresizingMaskIntoConstraints = false
+        return vev
+    }()
+    
     
     // MARK: ViewDidLoad
     override func viewDidLoad() {
@@ -192,6 +207,8 @@ class PostsReCommentViewController: UIViewController {
         view.backgroundColor = .systemGray6
         
         navigationItem.title = "답글"
+        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -375,6 +392,7 @@ class PostsReCommentViewController: UIViewController {
                 paramDict["targetUId"] = String(targetUId)
             }
             
+            showIndicator(idv: indicatorView, bov: blurOverlayView)
             addPostsReCommentRequest.fetch(vc: self, paramDict: paramDict)
         }
     }
@@ -568,6 +586,8 @@ extension PostsReCommentViewController: AddPostsReCommentRequestProtocol {
             
             tableView.selectRow(at: IndexPath(row: postsReCommentList.count - 1, section: 0), animated: true, scrollPosition: .top)
         }
+        
+        hideIndicator(idv: indicatorView, bov: blurOverlayView)
     }
 }
 

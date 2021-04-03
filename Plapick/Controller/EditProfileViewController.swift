@@ -122,6 +122,8 @@ class EditProfileViewController: UIViewController {
         
         navigationItem.title = "프로필 편집"
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        
         configureView()
         
         setThemeColor()

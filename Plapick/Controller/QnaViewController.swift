@@ -148,6 +148,8 @@ class QnaViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "삭제", style: .plain, target: self, action: #selector(removeTapped))
         navigationItem.rightBarButtonItem?.tintColor = .systemRed
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        
         configureView()
         
         setThemeColor()

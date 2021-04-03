@@ -76,6 +76,21 @@ class PostsCommentViewController: UIViewController {
         return tv
     }()
     
+    // MARK: View - Indicator
+    lazy var indicatorView: UIActivityIndicatorView = {
+        let aiv = UIActivityIndicatorView()
+        aiv.style = .large
+        aiv.translatesAutoresizingMaskIntoConstraints = false
+        return aiv
+    }()
+    lazy var blurOverlayView: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .light)
+        let vev = UIVisualEffectView(effect: blurEffect)
+        vev.alpha = 0.2
+        vev.translatesAutoresizingMaskIntoConstraints = false
+        return vev
+    }()
+    
     
     // MARK: ViewDidLoad
     override func viewDidLoad() {
@@ -199,6 +214,7 @@ class PostsCommentViewController: UIViewController {
             
         } else {
             guard let posts = self.posts else { return }
+            showIndicator(idv: indicatorView, bov: blurOverlayView)
             addPostsCommentRequest.fetch(vc: self, paramDict: ["poId": String(posts.po_id), "comment": comment])
         }
     }
@@ -320,6 +336,8 @@ extension PostsCommentViewController: AddPostsCommentRequestProtocol {
             
             tableView.selectRow(at: IndexPath(row: postsCommentList.count - 1, section: 0), animated: true, scrollPosition: .top)
         }
+        
+        hideIndicator(idv: indicatorView, bov: blurOverlayView)
     }
 }
 

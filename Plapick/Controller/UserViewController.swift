@@ -34,6 +34,8 @@ class UserViewController: UIViewController {
     let getPlacesRequest = GetPlacesRequest()
     var placeList: [Place] = []
     
+    var isFollowing = false
+    
     
     // MARK: View
     lazy var profileContainerView: UIView = {
@@ -470,7 +472,10 @@ class UserViewController: UIViewController {
     
     // MARK: Function - @OBJC
     @objc func followTapped() {
+        if isFollowing { return }
+        
         guard let uId = self.uId else { return }
+        isFollowing = true
         followRequest.fetch(vc: self, paramDict: ["uId": String(uId)])
     }
     
@@ -714,5 +719,7 @@ extension UserViewController: FollowRequestProtocol {
             
             getUser()
         }
+        
+        isFollowing = false
     }
 }

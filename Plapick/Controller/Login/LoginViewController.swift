@@ -207,7 +207,7 @@ class LoginViewController: UIViewController {
     }()
     lazy var appleButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("애플 로그인", for: .normal)
+        button.setTitle("Apple로 로그인", for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 18)
         button.layer.cornerRadius = 6
         button.contentEdgeInsets = UIEdgeInsets(top: 18, left: 0, bottom: 18, right: 0)
